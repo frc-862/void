@@ -14,7 +14,7 @@ To build the application locally, run
 
 Keep in mind you will have to periodically connect to internet so gradle can sync dependencies.
 
-To depoly the application, connect to the robot and run
+To deploy the application, connect to the robot and run
 
 ```bash
 ./gradlew deploy
