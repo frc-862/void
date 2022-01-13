@@ -1,4 +1,4 @@
-package frc.robot;
+package com.lightningrobotics.voidrobot;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
