@@ -1,4 +1,4 @@
-package frc.robot;
+package com.lightningrobotics.voidrobot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
