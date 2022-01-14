@@ -21,13 +21,13 @@ public class RobotContainer {
 
 	private static final Drivetrain drivetrain = new Drivetrain();
 
-	private static final Joystick driver = new Joystick(1);
+	private static final Joystick driver = new Joystick(0);
 
 	public RobotContainer() {
 		// Configure the button bindings
 		configureButtonBindings();
 
-		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(2))); //TODO check the axis's's'ssssss
+		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
 	}
 
 	/**

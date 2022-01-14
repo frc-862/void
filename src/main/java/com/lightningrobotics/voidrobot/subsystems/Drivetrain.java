@@ -11,20 +11,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
     public class Drivetrain extends SubsystemBase {
     /** Creates a new Drivetrain. */
-    final TalonFX left1 = new TalonFX(0);//TODO check the iddddddsdssdss
-    final TalonFX left2 = new TalonFX(0);
-    final TalonFX left3 = new TalonFX(0);
+    final TalonFX left1 = new TalonFX(1);
+    final TalonFX left2 = new TalonFX(2);
+    final TalonFX left3 = new TalonFX(3);
 
-    final TalonFX right1 = new TalonFX(0);
-    final TalonFX right2 = new TalonFX(0);
-    final TalonFX right3 = new TalonFX(0);
+    final TalonFX right1 = new TalonFX(4);
+    final TalonFX right2 = new TalonFX(5);
+    final TalonFX right3 = new TalonFX(6);
 
     public Drivetrain() {
         left2.follow(left1);
         left3.follow(left1);
 
         right2.follow(right1);
-        right2.follow(right1);
+        right3.follow(right1);
+
+        left1.setInverted(true);
+        right1.setInverted(false);
+
+        left2.setInverted(false);
+        left3.setInverted(false);
+
+        right2.setInverted(true);
+        right3.setInverted(true);
+
     }
 
     public void setPower(double left, double right){
