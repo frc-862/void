@@ -1,6 +1,10 @@
 package com.lightningrobotics.voidrobot;
 
+import com.lightningrobotics.voidrobot.commands.Drive;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -14,14 +18,16 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-	// The robot's subsystems and commands are defined here...
 
-	/**
-	 * The container for the robot. Contains subsystems, OI devices, and commands.
-	 */
+	private static final Drivetrain drivetrain = new Drivetrain();
+
+	private static final Joystick driver = new Joystick(0);
+
 	public RobotContainer() {
 		// Configure the button bindings
 		configureButtonBindings();
+
+		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
 	}
 
 	/**
