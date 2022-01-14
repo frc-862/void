@@ -6,34 +6,41 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
+import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
+import com.lightningrobotics.voidrobot.Constants;
 
-    public class Drivetrain extends SubsystemBase {
+    public class Drivetrain extends DifferentialDrivetrain {
     /** Creates a new Drivetrain. */
-    final TalonFX left1 = new TalonFX(0);//TODO check the iddddddsdssdss
-    final TalonFX left2 = new TalonFX(0);
-    final TalonFX left3 = new TalonFX(0);
 
-    final TalonFX right1 = new TalonFX(0);
-    final TalonFX right2 = new TalonFX(0);
-    final TalonFX right3 = new TalonFX(0);
+    private static final DifferentialGains DIFFERENTIAL_GAINS = new DifferentialGains( // TODO take a look at these gains for quasar later
+        5d,
+        5d,
+        0.5583711759,
+        new boolean[]{true, false, false},
+        new boolean[]{false, true, true} 
+    );
 
+    
     public Drivetrain() {
-        left2.follow(left1);
-        left3.follow(left1);
-
-        right2.follow(right1);
-        right2.follow(right1);
-    }
-
-    public void setPower(double left, double right){
-        left1.set(ControlMode.PercentOutput, left);
-        right1.set(ControlMode.PercentOutput, right);
-    }
-
-    public void stop(){
-        setPower(0, 0);
+        super(
+            DIFFERENTIAL_GAINS, 
+            new MotorController[]{
+                new WPI_TalonFX(Constants.left_1_CAN_ID),
+                new WPI_TalonFX(Constants.left_2_CAN_ID),
+                new WPI_TalonFX(Constants.left_3_CAN_ID)
+            }, 
+            new MotorController[]{
+                new WPI_TalonFX(Constants.right_1_CAN_ID),
+                new WPI_TalonFX(Constants.right_2_CAN_ID),
+                new WPI_TalonFX(Constants.right_3_CAN_ID),
+            }
+        );
     }
 
     @Override

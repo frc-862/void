@@ -5,6 +5,17 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = "https://maven.pkg.github.com/frc-862/lightning"
+        credentials {
+            username = project.findProperty("gpr.user")
+            password = project.findProperty("gpr.key")
+        }
+    }
+}
+
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
@@ -52,6 +63,8 @@ def includeDesktopSupport = false
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
+    implementation 'com.lightningrobotics:common:0.0.1'
+
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)

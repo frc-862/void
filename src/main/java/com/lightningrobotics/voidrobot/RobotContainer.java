@@ -1,6 +1,6 @@
 package com.lightningrobotics.voidrobot;
 
-import com.lightningrobotics.voidrobot.commands.Drive;
+import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.GenericHID;
@@ -18,16 +18,15 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
 	private static final Drivetrain drivetrain = new Drivetrain();
 
-	private static final Joystick driver = new Joystick(1);
+	private static final XboxController driver = new XboxController(Constants.driver_port); // changed from joystick to xboxcontroller
 
 	public RobotContainer() {
 		// Configure the button bindings
 		configureButtonBindings();
 
-		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(2))); //TODO check the axis's's'ssssss
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, ()-> driver.getLeftY(), ()-> driver.getRightY())); // uses default lightning joystick filter, could add one later
 	}
 
 	/**
