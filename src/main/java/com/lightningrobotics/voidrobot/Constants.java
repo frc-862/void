@@ -24,6 +24,6 @@ public final class Constants {
     public static final int right_3_CAN_ID = 6;
 
     // joystick constants
-    public static final int driver_port = 1;
+    public static final int driver_port = 0;
 
 }
