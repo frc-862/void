@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+	// TODO use lightning base when ready
 	private Command m_autonomousCommand;
 
 	private RobotContainer m_robotContainer;

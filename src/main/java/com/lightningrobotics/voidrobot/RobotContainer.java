@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+	// TODO use lightning base when ready
 
 	private static final Drivetrain drivetrain = new Drivetrain();
 

@@ -7,6 +7,8 @@ import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class Drive extends CommandBase {
+	// TODO use lightning base code when ready
+
     /** Creates a new Drive. */
     Drivetrain drivetrain;
     private final DoubleSupplier left;
