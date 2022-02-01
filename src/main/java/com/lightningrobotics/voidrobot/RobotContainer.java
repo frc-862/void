@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,15 +21,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
 	// TODO use lightning base when ready
 
-	private static final Drivetrain drivetrain = new Drivetrain();
+	// private static final Drivetrain drivetrain = new Drivetrain();
 
-	private static final Joystick driver = new Joystick(0);
+	private static final Intake intake = new Intake();
+
+	// private static final Joystick driver = new Joystick(0);
 
 	public RobotContainer() {
 		// Configure the button bindings
-		configureButtonBindings();
 
-		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
+
+		// configureButtonBindings();
+
+		// drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
+
+
 	}
 
 	/**
