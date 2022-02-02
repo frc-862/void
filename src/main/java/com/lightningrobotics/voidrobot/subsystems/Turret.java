@@ -4,22 +4,19 @@
 
 package com.lightningrobotics.voidrobot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.lightningrobotics.voidrobot.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.lightningrobotics.voidrobot.Constants;
-
-
 public class Turret extends SubsystemBase {
-  private CANSparkMax twistMotor; // TODO: change VictorSPX to correct motor controller
+
+  private CANSparkMax twistMotor; 
 
   private RelativeEncoder twistMotorEncoder;
 
@@ -28,7 +25,7 @@ public class Turret extends SubsystemBase {
   private boolean isDone = false;
 
   public Turret() {
-    twistMotor = new CANSparkMax(Constants.TURRET_MOTOR_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
+    twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
 
     twistMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
@@ -41,22 +38,36 @@ public class Turret extends SubsystemBase {
     target = turretRevToDeg() + degrees;
   }
 
-  public void twistTurret(double degrees) { // -135 -> 135     // TODO: find gear ratio and then multiple getPosition() by 360 * gear ratio
-    double error = target-turretRevToDeg();
+  public void twistTurret(double turretTarget, double kP) { // -135 -> 135     
+    double error = turretTarget-turretRevToDeg();
 
     // if (Math.abs(error) < 1) {
-    //   isDone = true;
+    //   isDone = true;  //TODO: fix later
     // }
 
-    twistMotor.set(Constants.TURRET_kP*degrees);    
+    double motorPower = kP*error; 
+
+    if(motorPower > 1) {
+      motorPower = 1;
+    } else if (motorPower <-1) {
+      motorPower = -1;
+    } //TODO: implement lightning's version of this
+
+
+    twistMotor.set(motorPower);    
   }
+
   
   public void stopTurret() {
     twistMotor.set(0);
   }
 
   public double turretRevToDeg() {
-    return twistMotorEncoder.getPosition() * 360 * Constants.TURRET_GEAR_RATIO;
+    return twistMotorEncoder.getPosition() * 360 / Constants.TURN_TURRET_GEAR_RATIO;
+  }
+  
+  public double getEncoderValue() {
+    return twistMotorEncoder.getPosition();
   }
 
   public boolean isDone() {

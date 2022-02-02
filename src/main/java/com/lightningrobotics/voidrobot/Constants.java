@@ -17,4 +17,11 @@ public final class Constants {
 
     public static final int INTAKE_SENSOR_ID = 14;
 
+
+    public static final int TURN_TURRET_ID = 2;
+
+    // public static final double TURN_TURRET_KP = 0.008;
+
+    public static final double TURN_TURRET_GEAR_RATIO = 77;
+
 }

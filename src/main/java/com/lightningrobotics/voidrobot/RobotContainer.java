@@ -1,8 +1,10 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.voidrobot.commands.Drive;
+import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
+import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -23,13 +25,18 @@ public class RobotContainer {
 
 	// private static final Drivetrain drivetrain = new Drivetrain();
 
-	private static final Intake intake = new Intake();
+	// private static final Intake intake = new Intake();
+
+
+	private static final Turret turret = new Turret();
 
 	// private static final Joystick driver = new Joystick(0);
 
 	public RobotContainer() {
 		// Configure the button bindings
-
+		configureButtonBindings();
+		
+		turret.setDefaultCommand(new TurnTurret(turret));
 
 		// configureButtonBindings();
 
