@@ -44,7 +44,7 @@ public class Turret extends SubsystemBase {
       turretTarget -= 360;
     }
     if(turretTarget < -180) {
-      turretTarget -= 360;
+      turretTarget += 360;
     } 
     if(turretTarget >= 135) {
       turretTarget = 135;
