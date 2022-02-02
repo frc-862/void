@@ -38,7 +38,7 @@ public class TurnTurret extends CommandBase {
         targetEntry = turretTab
                 .add("target", 180)
                 .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", -180, "max", 180)) // specify widget properties here
+                .withProperties(Map.of("min", -360, "max", 360)) // specify widget properties here
                 .getEntry();
 
         kPEntry = turretTab

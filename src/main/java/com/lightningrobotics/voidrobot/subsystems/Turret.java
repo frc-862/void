@@ -38,7 +38,21 @@ public class Turret extends SubsystemBase {
     target = turretRevToDeg() + degrees;
   }
 
-  public void twistTurret(double turretTarget, double kP) { // -135 -> 135     
+  public void twistTurret(double turretTarget, double kP) { // -135 -> 135
+
+    if(turretTarget > 180) {
+      turretTarget -= 360;
+    }
+    if(turretTarget < -180) {
+      turretTarget -= 360;
+    } 
+    if(turretTarget >= 135) {
+      turretTarget = 135;
+    }
+    if(turretTarget <= -135) {
+      turretTarget = -135;
+    }
+
     double error = turretTarget-turretRevToDeg();
 
     // if (Math.abs(error) < 1) {
