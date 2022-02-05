@@ -41,11 +41,13 @@ public class Turret extends SubsystemBase {
   private NetworkTableEntry targetEntry;
 
   private NetworkTableEntry targetDegrees;
-
+  private NetworkTableEntry targetAngel;
+  private NetworkTableEntry Error;
   private NetworkTableEntry currentDegrees;
 
   private final double DEFAULT_TARGET = 0;
 
+  private static double turretTarget = 0; //IDK where i should be creating this variable but I htink this is right
 
   public Turret(DoubleSupplier joystickXInput) {
     twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
@@ -66,35 +68,52 @@ public class Turret extends SubsystemBase {
     .add("current turret target", 0)
     .getEntry();
 
+    Error = turretTab
+    .add("current Error", 0)
+    .getEntry();
+
+    targetAngel = turretTab
+    .add("current turret Angel", 0)
+    .getEntry();
+
   }
 
   public void setTarget(double degrees) {
     target = turretRevToDeg() + degrees;
   }
 
-  public void twistTurret(double turretTarget) { // -135 -> 135
+  public void twistTurret(double targetAngle) { // -135 -> 135
+    if (Math.abs(targetAngle) < 0.5) {
+      targetAngle = 0;
+    }
+    turretTarget += targetAngle;
+    double error = 0;
 
-    if(turretTarget + turretRevToDeg() > 180) {
-      turretTarget -= 360 - turretRevToDeg();
+    if(turretTarget > 180) {
+      turretTarget -= 360;
     }
-    if(turretTarget + turretRevToDeg() < -180) {
-      turretTarget += 360 - turretRevToDeg();
+    if(turretTarget < -180) {
+      turretTarget += 360;
     } 
-    if(turretTarget + turretRevToDeg() >= 135) {
-      turretTarget = 135 - turretRevToDeg();
+
+    error = turretTarget - turretRevToDeg();
+
+    if(turretTarget >= 135) {
+      error = 135 - turretRevToDeg();
     }
-    if(turretTarget + turretRevToDeg() <= -135) {
-      turretTarget = -135 - turretRevToDeg();
+    if(turretTarget <= -135) {
+      error = -135 - turretRevToDeg();
     }
 
     targetDegrees.setDouble(turretTarget);
-
-    double error = turretTarget;
+    targetAngel.setDouble(targetAngle);
+    Error.setDouble(error);
 
     // if (Math.abs(error) < 1) {
     //   isDone = true;  //TODO: fix later
     // }
 
+  
     double motorPower = turretkP*error; 
 
     if(motorPower > 1) {
