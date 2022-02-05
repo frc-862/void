@@ -15,17 +15,17 @@ package com.lightningrobotics.voidrobot;
 public final class Constants {
 
     // robot map
-    public static final int left_1_CAN_ID = 1;
-    public static final int left_2_CAN_ID = 2;
-    public static final int left_3_CAN_ID = 3;
+    public static final int LEFT_1_CAN_ID = 1;
+    public static final int LEFT_2_CAN_ID = 2;
+    public static final int LEFT_3_CAN_ID = 3;
     
-    public static final int right_1_CAN_ID = 4;
-    public static final int right_2_CAN_ID = 5;
-    public static final int right_3_CAN_ID = 6;
+    public static final int RIGHT_1_CAN_ID = 4;
+    public static final int RIGHT_2_CAN_ID = 5;
+    public static final int RIGHT_3_CAN_ID = 6;
 
     // joystick constants
-    public static final int driver_port = 0;
-    public static final int driverLeft_port = 0;
-    public static final int driverRight_port = 1;
+    public static final int DRIVER_PORT = 0;
+    public static final int DRIVER_LEFT_PORT = 0;
+    public static final int DRIVER_RIGHT_PORT = 1;
 
 }

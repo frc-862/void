@@ -30,9 +30,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 public class RobotContainer extends LightningContainer {
 	private static final Drivetrain drivetrain = new Drivetrain();
 	
-	private static final Joystick driverLeft = new Joystick(Constants.driverLeft_port);
-	private static final Joystick driverRight = new Joystick(Constants.driverRight_port);
-	private static final XboxController driver = new XboxController(Constants.driver_port); // changed from joystick to xboxcontroller
+	private static final Joystick driverLeft = new Joystick(Constants.DRIVER_LEFT_PORT);
+	private static final Joystick driverRight = new Joystick(Constants.DRIVER_RIGHT_PORT);
+	private static final XboxController driver = new XboxController(Constants.DRIVER_PORT); // changed from joystick to xboxcontroller
 
 	public RobotContainer() {
 		// Configure the button bindings
