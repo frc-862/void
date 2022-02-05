@@ -63,7 +63,7 @@ def includeDesktopSupport = false
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-    implementation project(':lightning')
+    implementation 'com.lightningrobotics:common:0.0.2'
 
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)

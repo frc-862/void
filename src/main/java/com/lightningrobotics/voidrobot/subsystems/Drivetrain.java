@@ -31,8 +31,8 @@ public class Drivetrain extends DifferentialDrivetrain {
         0.5583711759,
         new boolean[]{false, false, false},
         new boolean[]{true, true ,true},
-        new PIDFController(0.0038793, 0, 0),
-        new FeedForwardController(0.53397, 3.2953, 0.17849)
+        new PIDFController(0.0038793, 0, 0), // TODO: to be tuned 
+        new FeedForwardController(0.53397, 3.2953, 0.17849) // TODO: to be tuned 
     );
 
     

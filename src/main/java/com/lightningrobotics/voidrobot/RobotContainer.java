@@ -46,9 +46,51 @@ public class RobotContainer extends LightningContainer {
 	@Override
 	protected void configureAutonomousCommands() {
 		try {
-			Autonomous.register("Test Differential Auton", 
+			Autonomous.register("Test Differential Auton 0.5", 
 			(new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0d)), 
-				new Pose2d(5d, 0d, Rotation2d.fromDegrees(0d))))).getCommand(drivetrain));
+				new Pose2d(0.5d, 0d, Rotation2d.fromDegrees(0d))))).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("1/2 ball path", 
+			(new Path("1-2Ball.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("3 ball hanger", 
+			(new Path("3BallHanger.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("3 ball terminal", 
+			(new Path("3BallTerminal.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("4/5 ball terminal", 
+			(new Path("4-5BallTerminal.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("5/6 ball terminal", 
+			(new Path("5-6BallTerminal.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("1 meter", 
+			(new Path("1Meter.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("1 meter forward 1 meter right", 
+			(new Path("1Forward1right.path", false)).getCommand(drivetrain));
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
