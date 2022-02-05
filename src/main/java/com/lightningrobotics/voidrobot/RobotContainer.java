@@ -10,6 +10,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -28,7 +29,9 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public class RobotContainer extends LightningContainer {
 	private static final Drivetrain drivetrain = new Drivetrain();
-
+	
+	private static final Joystick driverLeft = new Joystick(Constants.driverLeft_port);
+	private static final Joystick driverRight = new Joystick(Constants.driverRight_port);
 	private static final XboxController driver = new XboxController(Constants.driver_port); // changed from joystick to xboxcontroller
 
 	public RobotContainer() {
@@ -36,7 +39,8 @@ public class RobotContainer extends LightningContainer {
 		configureButtonBindings();
 		
 
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, ()-> driver.getLeftY(), ()-> driver.getRightY())); // uses default lightning joystick filter, could add one later
+		// drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, ()-> -driver.getLeftY(), ()-> -driver.getRightY())); // uses default lightning joystick filter, could add one later
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, ()-> -driverLeft.getY(), ()-> -driverRight.getY())); // uses driverstation joystick
 	}
 
 	@Override
@@ -44,7 +48,7 @@ public class RobotContainer extends LightningContainer {
 		try {
 			Autonomous.register("Test Differential Auton", 
 			(new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0d)), 
-				new Pose2d(1d, 0d, Rotation2d.fromDegrees(0d))))).getCommand(drivetrain));
+				new Pose2d(5d, 0d, Rotation2d.fromDegrees(0d))))).getCommand(drivetrain));
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}

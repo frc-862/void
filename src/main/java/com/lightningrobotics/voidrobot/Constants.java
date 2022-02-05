@@ -25,5 +25,7 @@ public final class Constants {
 
     // joystick constants
     public static final int driver_port = 0;
+    public static final int driverLeft_port = 0;
+    public static final int driverRight_port = 1;
 
 }
