@@ -18,16 +18,16 @@ public class Intake extends SubsystemBase {
 	// VictorSPX to run
 	// TalonSRX to deploy
 
-	// private VictorSPX intakeMotor;//TODO: correctly set sign for motors
-	// private TalonSRX deployIntakeMotor;
+	private VictorSPX intakeMotor;//TODO: correctly set sign for motors
+	private TalonSRX deployIntakeMotor;
 
 	private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
 	private final ColorSensorV3 intakeSensor;
 
 	public Intake() {
-		// intakeMotor = new VictorSPX(Constants.INTAKE_MOTOR_ID); 
-		// deployIntakeMotor = new TalonSRX(Constants.DEPLOY_INTAKE_MOTOR_ID); 
+		intakeMotor = new VictorSPX(Constants.INTAKE_MOTOR_ID); 
+		deployIntakeMotor = new TalonSRX(Constants.DEPLOY_INTAKE_MOTOR_ID); 
 		intakeSensor = new ColorSensorV3(i2cPort);
 	}
 
@@ -36,26 +36,28 @@ public class Intake extends SubsystemBase {
 		getColorSensorOutputs();
 	}
 
-	// public void runIntake(double intakePower) {
-	// 	intakeMotor.set(VictorSPXControlMode.PercentOutput, intakePower);
-	// }
+	public void runIntake(double intakePower) {
+		intakeMotor.set(VictorSPXControlMode.PercentOutput, intakePower);
+	}
 
-	// public void stopIntake() {
-	// 	intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
-	// }
+	public void stopIntake() {
+		intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
+	}
 
-	// public void deployIntake() {
-	// 	deployIntakeMotor.set(TalonSRXControlMode.PercentOutput, 0.7); //TODO: implement sensor input
-	// }
+	public void deployIntake() {
+		deployIntakeMotor.set(TalonSRXControlMode.PercentOutput, 0.7); //TODO: implement sensor input
+	}
 
-	// public void retractIntake() {
-	// 	deployIntakeMotor.set(TalonSRXControlMode.PercentOutput, -0.7); //TODO: implement sensor input
+	public void retractIntake() {
+		deployIntakeMotor.set(TalonSRXControlMode.PercentOutput, -0.7); //TODO: implement sensor input
+	}
+
+	// public void stopDeployIntakeMotor() {
+	// 	deployIntakeMotor.set(TalonSRXControlMode.PercentOutput, 0);
 	// }
 
 
 	public void getColorSensorOutputs() {
-
-
 		if(intakeSensor.getColor().red >= 0.4) {
 			SmartDashboard.putString("Color", "red");
 		} else if(intakeSensor.getColor().blue >= 0.4) {

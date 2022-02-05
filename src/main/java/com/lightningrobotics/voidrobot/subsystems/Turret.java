@@ -4,17 +4,24 @@
 
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.util.Map;
+import java.util.function.DoubleSupplier;
+
 import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
+
+  private double turretkP = 0.035;
 
   private CANSparkMax twistMotor; 
 
@@ -24,7 +31,23 @@ public class Turret extends SubsystemBase {
 
   private boolean isDone = false;
 
-  public Turret() {
+  DoubleSupplier joystickXInput;
+
+  private double joystickGain = 100;
+
+
+  private ShuffleboardTab turretTab = Shuffleboard.getTab("turret");
+
+  private NetworkTableEntry targetEntry;
+
+  private NetworkTableEntry targetDegrees;
+
+  private NetworkTableEntry currentDegrees;
+
+  private final double DEFAULT_TARGET = 0;
+
+
+  public Turret(DoubleSupplier joystickXInput) {
     twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
 
     twistMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -32,34 +55,47 @@ public class Turret extends SubsystemBase {
     twistMotor.setClosedLoopRampRate(.02);
 
     twistMotorEncoder = twistMotor.getEncoder();
+
+    this.joystickXInput = joystickXInput;
+
+  currentDegrees = turretTab
+    .add("current turret degrees", turretRevToDeg())
+    .getEntry();
+     
+    targetDegrees = turretTab
+    .add("current turret target", 0)
+    .getEntry();
+
   }
 
   public void setTarget(double degrees) {
     target = turretRevToDeg() + degrees;
   }
 
-  public void twistTurret(double turretTarget, double kP) { // -135 -> 135
+  public void twistTurret(double turretTarget) { // -135 -> 135
 
-    if(turretTarget > 180) {
-      turretTarget -= 360;
+    if(turretTarget + turretRevToDeg() > 180) {
+      turretTarget -= 360 - turretRevToDeg();
     }
-    if(turretTarget < -180) {
-      turretTarget += 360;
+    if(turretTarget + turretRevToDeg() < -180) {
+      turretTarget += 360 - turretRevToDeg();
     } 
-    if(turretTarget >= 135) {
-      turretTarget = 135;
+    if(turretTarget + turretRevToDeg() >= 135) {
+      turretTarget = 135 - turretRevToDeg();
     }
-    if(turretTarget <= -135) {
-      turretTarget = -135;
+    if(turretTarget + turretRevToDeg() <= -135) {
+      turretTarget = -135 - turretRevToDeg();
     }
 
-    double error = turretTarget-turretRevToDeg();
+    targetDegrees.setDouble(turretTarget);
+
+    double error = turretTarget;
 
     // if (Math.abs(error) < 1) {
     //   isDone = true;  //TODO: fix later
     // }
 
-    double motorPower = kP*error; 
+    double motorPower = turretkP*error; 
 
     if(motorPower > 1) {
       motorPower = 1;
@@ -90,6 +126,7 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    twistTurret(joystickXInput.getAsDouble()*3);
+    currentDegrees.setDouble(turretRevToDeg());
   }
 }

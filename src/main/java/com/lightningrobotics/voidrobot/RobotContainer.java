@@ -3,13 +3,17 @@ package com.lightningrobotics.voidrobot;
 import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
+import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -27,22 +31,25 @@ public class RobotContainer {
 
 	// private static final Intake intake = new Intake();
 
+	private static Turret turret;
 
-	private static final Turret turret = new Turret();
+	private static LEDs leds;
 
-	// private static final Joystick driver = new Joystick(0);
+	private static final XboxController driver = new XboxController(0);
+
+	
 
 	public RobotContainer() {
 		// Configure the button bindings
 		configureButtonBindings();
 		
-		turret.setDefaultCommand(new TurnTurret(turret));
+		// turret.setDefaultCommand(new TurnTurret(turret));
 
-		// configureButtonBindings();
+		configureButtonBindings();
 
 		// drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
 
-
+		turret = new Turret(() -> driver.getRightX());
 	}
 
 	/**
@@ -54,6 +61,11 @@ public class RobotContainer {
 	 * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
 	 */
 	private void configureButtonBindings() {
+		JoystickButton button = new JoystickButton(driver, 1); //TODO: map the correct button
+
+		// button.whenPressed(new InstantCommand(() -> intake.runIntake(0.5)));
+
+		// button.whenReleased(new InstantCommand(() -> intake.stopIntake()));
 	}
 
 	/**

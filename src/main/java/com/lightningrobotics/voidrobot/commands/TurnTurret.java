@@ -27,7 +27,7 @@ public class TurnTurret extends CommandBase {
 
     private NetworkTableEntry currentDegrees;
 
-    private final double DEFAULT_TARGET = 180d;
+    private final double DEFAULT_TARGET = 0;
 
     private double turretkP = 0.035;
 
@@ -36,10 +36,10 @@ public class TurnTurret extends CommandBase {
         addRequirements(turret);
 
         targetEntry = turretTab
-                .add("target", 180)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", -360, "max", 360)) // specify widget properties here
-                .getEntry();
+            .add("target", DEFAULT_TARGET)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", -360, "max", 360)) // specify widget properties here
+            .getEntry();
 
         kPEntry = turretTab
             .add("kP", turretkP)
@@ -53,13 +53,13 @@ public class TurnTurret extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        turret.setTarget(180);
+        turret.setTarget(DEFAULT_TARGET);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        turret.twistTurret(targetEntry.getDouble(DEFAULT_TARGET), kPEntry.getDouble(turretkP));
+        turret.twistTurret(targetEntry.getDouble(DEFAULT_TARGET)/*, kPEntry.getDouble(turretkP)*/);
         currentDegrees.setDouble(turret.turretRevToDeg());
     }
 
