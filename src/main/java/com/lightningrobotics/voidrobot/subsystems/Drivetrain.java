@@ -9,13 +9,13 @@ public class Drivetrain extends SubsystemBase {
 	// TODO use lightning base code when ready
 
     /** Creates a new Drivetrain. */
-    final TalonFX left1 = new TalonFX(1); // TODO these should be static or initialized in constructor
-    final TalonFX left2 = new TalonFX(2);
-    final TalonFX left3 = new TalonFX(3);
+    final TalonFX left1 = new TalonFX(5); // TODO these should be static or initialized in constructor
+    final TalonFX left2 = new TalonFX(4);
+    final TalonFX left3 = new TalonFX(6);
 
-    final TalonFX right1 = new TalonFX(4);
-    final TalonFX right2 = new TalonFX(5);
-    final TalonFX right3 = new TalonFX(6);
+    final TalonFX right1 = new TalonFX(3);
+    final TalonFX right2 = new TalonFX(1);
+    final TalonFX right3 = new TalonFX(2);
 
     public Drivetrain() {
         left2.follow(left1);

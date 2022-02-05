@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
 
+  LEDs leds;
+
   private double turretkP = 0.035;
 
   private CANSparkMax twistMotor; 
@@ -47,7 +49,7 @@ public class Turret extends SubsystemBase {
 
   private final double DEFAULT_TARGET = 0;
 
-  private static double turretTarget = 0; //IDK where i should be creating this variable but I htink this is right
+  private static double turretTarget = 0; 
 
   public Turret(DoubleSupplier joystickXInput) {
     twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
@@ -76,6 +78,8 @@ public class Turret extends SubsystemBase {
     .add("current turret Angel", 0)
     .getEntry();
 
+    leds = new LEDs();
+
   }
 
   public void setTarget(double degrees) {
@@ -85,24 +89,34 @@ public class Turret extends SubsystemBase {
   public void twistTurret(double targetAngle) { // -135 -> 135
     if (Math.abs(targetAngle) < 0.5) {
       targetAngle = 0;
+      //deadban for controller; tune later
     }
     turretTarget += targetAngle;
     double error = 0;
 
     if(turretTarget > 180) {
       turretTarget -= 360;
-    }
+    } 
     if(turretTarget < -180) {
       turretTarget += 360;
-    } 
+    }
 
     error = turretTarget - turretRevToDeg();
 
     if(turretTarget >= 135) {
       error = 135 - turretRevToDeg();
-    }
-    if(turretTarget <= -135) {
-      error = -135 - turretRevToDeg();
+
+      leds.setAllRGB(255, 0, 0);
+
+    } else if(turretTarget <= -135) {
+      error = -135 - turretRevToDeg(); // basically sets turretTarget to 135 without changing turretTarget so the turret can wrap around
+      
+      leds.setAllRGB(255, 0, 0);
+
+    } else if(Math.abs(error) > 5) { //TODO: tune the compliance angle, add vision
+      leds.setAllRGB(255, 255, 0);
+    } else {
+      leds.setAllRGB(0, 255, 0);
     }
 
     targetDegrees.setDouble(turretTarget);

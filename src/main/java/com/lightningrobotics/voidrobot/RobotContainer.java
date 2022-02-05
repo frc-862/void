@@ -8,9 +8,12 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -45,11 +48,11 @@ public class RobotContainer {
 		
 		// turret.setDefaultCommand(new TurnTurret(turret));
 
-		configureButtonBindings();
-
 		// drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
 
 		turret = new Turret(() -> driver.getRightX());
+
+		// leds = new LEDs();
 	}
 
 	/**
@@ -61,11 +64,11 @@ public class RobotContainer {
 	 * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		JoystickButton button = new JoystickButton(driver, 1); //TODO: map the correct button
+		JoystickButton button = new JoystickButton(driver, 1);
 
-		// button.whenPressed(new InstantCommand(() -> intake.runIntake(0.5)));
+		button.whenPressed(new InstantCommand(() -> leds.setAllRGB(0, 0, 255)));
 
-		// button.whenReleased(new InstantCommand(() -> intake.stopIntake()));
+		button.whenReleased(new InstantCommand(() -> leds.stopLEDs()));
 	}
 
 	/**
