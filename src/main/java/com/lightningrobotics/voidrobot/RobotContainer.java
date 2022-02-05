@@ -2,10 +2,13 @@ package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.commands.TurnTurret;
+import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.commands.moveShooter;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
+import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -38,6 +41,12 @@ public class RobotContainer {
 
 	private static LEDs leds;
 
+	private static Shooter shooter;
+
+	private static VoltageTestContinuous VContinous;
+
+	private static moveShooter shooterMove;
+
 	private static final XboxController driver = new XboxController(0);
 
 	
@@ -50,7 +59,15 @@ public class RobotContainer {
 
 		// drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
 
-		turret = new Turret(() -> driver.getRightX());
+		// turret = new Turret(() -> driver.getRightX());
+
+		shooter = new Shooter();
+
+		// VContinous = new VoltageTestContinuous(shooter);
+
+		shooterMove = new moveShooter(shooter);
+
+		shooter.setDefaultCommand(shooterMove);
 
 		// leds = new LEDs();
 	}
