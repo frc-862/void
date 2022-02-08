@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
+import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 public class VoltageTestContinuous extends CommandBase {
@@ -30,7 +32,7 @@ public class VoltageTestContinuous extends CommandBase {
   private NetworkTableEntry power;
   private NetworkTableEntry energy;
 
-  PowerDistribution powerDistributor = new PowerDistribution(1, ModuleType.kRev);
+  PowerDistribution powerDistributor = new PowerDistribution(10, ModuleType.kCTRE);
 
   public VoltageTestContinuous(Shooter shooter) {
     this.shooter = shooter;
@@ -49,6 +51,9 @@ public class VoltageTestContinuous extends CommandBase {
     energy = voltageTab
       .add("energy", energyDrawn)
       .getEntry();
+
+    DataLogger.addDataElement("voltage drawn", () -> voltageDrawn);
+    DataLogger.addDataElement("current drawn", () -> currentDrawn);
   }
 
   // Called when the command is initially scheduled.
@@ -64,7 +69,7 @@ public class VoltageTestContinuous extends CommandBase {
     shooter.runShooter(0.5);
 
     voltageDrawn = powerDistributor.getVoltage(); 
-    currentDrawn = powerDistributor.getTotalCurrent();
+    currentDrawn = powerDistributor.getCurrent(Constants.FLYWHEEL_MOTOR_ID);
     powerDrawn = powerDistributor.getTotalPower();
     energyDrawn = powerDistributor.getTotalEnergy();
     
@@ -79,7 +84,8 @@ public class VoltageTestContinuous extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

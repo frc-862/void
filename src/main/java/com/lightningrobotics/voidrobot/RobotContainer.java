@@ -47,7 +47,7 @@ public class RobotContainer {
 
 	private static moveShooter shooterMove;
 
-	private static final XboxController driver = new XboxController(0);
+	// private static final XboxController driver = new XboxController(0);
 
 	
 
@@ -62,6 +62,8 @@ public class RobotContainer {
 		// turret = new Turret(() -> driver.getRightX());
 
 		shooter = new Shooter();
+
+		VContinous = new VoltageTestContinuous(shooter);
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
@@ -81,11 +83,11 @@ public class RobotContainer {
 	 * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		JoystickButton button = new JoystickButton(driver, 1);
+		// JoystickButton button = new JoystickButton(driver, 1);
 
-		button.whenPressed(new InstantCommand(() -> leds.setAllRGB(0, 0, 255)));
+		// button.whenPressed(new InstantCommand(() -> leds.setAllRGB(0, 0, 255)));
 
-		button.whenReleased(new InstantCommand(() -> leds.stopLEDs()));
+		// button.whenReleased(new InstantCommand(() -> leds.stopLEDs()));
 	}
 
 	/**
