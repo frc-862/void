@@ -22,7 +22,6 @@ public class IndexBalls extends CommandBase {
 
   public IndexBalls(Indexer indexer) {
     this.indexer = indexer;
-    this.startIndexTime = Timer.getFPGATimestamp();
     this.previousBallCount = indexer.getBallCount();
 
     addRequirements(indexer);
@@ -35,6 +34,7 @@ public class IndexBalls extends CommandBase {
   public void execute() {
     if(indexer.getBallCount() > previousBallCount){
       isRunning = true;
+      startIndexTime = Timer.getFPGATimestamp();
     }
 
     if(Timer.getFPGATimestamp() - startIndexTime <= indexTime && isRunning){
