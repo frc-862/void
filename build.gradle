@@ -107,3 +107,6 @@ tasks.register('paths', Copy) {
     include "*.path"
     into "src/main/deploy/paths"
 }
+
+// Automatically copy paths over on build
+build.dependsOn('paths')
