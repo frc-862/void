@@ -17,7 +17,7 @@ public final class Constants {
 
     public static final int INTAKE_SENSOR_ID = 14;
 
-    public static final int INDEXER_MOTOR_ID = 15; //TODO: what is a number
+    public static final int INDEXER_MOTOR_ID = 8; //TODO: what is a number
 
 
     public static final int TURN_TURRET_ID = 2;
@@ -25,5 +25,11 @@ public final class Constants {
     // public static final double TURN_TURRET_KP = 0.008;
 
     public static final double TURN_TURRET_GEAR_RATIO = 77;
+
+
+    // beam breaks 
+
+    public static final int ENTER_BEAM_BREAK = 9;
+    public static final int EXIT_BEAM_BREAK = 8;
 
 }

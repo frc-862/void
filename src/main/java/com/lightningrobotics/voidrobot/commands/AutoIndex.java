@@ -24,13 +24,12 @@ public class AutoIndex extends CommandBase {
      */
     public AutoIndex(Indexer indexer) {
         this.indexer = indexer;
-
         addRequirements(indexer);
     }    
 
     @Override
     public void execute() {
-        
+
         if((Timer.getFPGATimestamp() - indexTimer) < 0.19d) {
             indexer.setPower(1d);
         } else {

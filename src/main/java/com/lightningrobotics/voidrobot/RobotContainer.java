@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.voidrobot.commands.Drive;
+import com.lightningrobotics.voidrobot.commands.IndexBalls;
 import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.commands.moveShooter;
@@ -43,6 +44,8 @@ public class RobotContainer {
 
 	private static Shooter shooter;
 
+	private static Indexer indexer;
+
 	private static VoltageTestContinuous VContinous;
 
 	private static moveShooter shooterMove;
@@ -61,13 +64,15 @@ public class RobotContainer {
 
 		// turret = new Turret(() -> driver.getRightX());
 
-		shooter = new Shooter();
+		// shooter = new Shooter();
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
-		shooterMove = new moveShooter(shooter);
+		// shooterMove = new moveShooter(shooter);
 
-		shooter.setDefaultCommand(shooterMove);
+		// shooter.setDefaultCommand(shooterMove);
+
+		indexer.setDefaultCommand(new IndexBalls(indexer));
 
 		// leds = new LEDs();
 	}
