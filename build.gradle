@@ -100,3 +100,10 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+// Custom tasks
+tasks.register('paths', Copy) {
+    from "PathWeaver/Paths/"
+    include "*.path"
+    into "src/main/deploy/paths"
+}
