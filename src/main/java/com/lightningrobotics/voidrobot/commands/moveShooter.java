@@ -13,24 +13,33 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class moveShooter extends CommandBase {
   Shooter shooter;
-  private ShuffleboardTab voltageTab = Shuffleboard.getTab("shooter test");
+  private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
   private NetworkTableEntry shooterVelocity;
-  private NetworkTableEntry shooterPosition;
-  private NetworkTableEntry shooterDist;
+  private NetworkTableEntry shooterTarget;
+  private NetworkTableEntry shooterPower;
+  private NetworkTableEntry shooterkP;
+  private NetworkTableEntry shooterkD;
   /** Creates a new moveShooter. */
   public moveShooter(Shooter shooter) {
     this.shooter = shooter;
     addRequirements(shooter);
 
-    shooterVelocity = voltageTab
-    .add("velocity", 0)
+    shooterVelocity = shooterTab
+    .add("RPMs", 0)
     .getEntry();
-    shooterPosition = voltageTab
-    .add("current position", 0)
+    shooterTarget = shooterTab
+    .add("current target", 0)
     .getEntry();
-    shooterDist = voltageTab
-      .add("current distance", 0)
+    shooterPower = shooterTab
+    .add("commanded power", 0)
+    .getEntry();
+    shooterkP = shooterTab
+      .add("kP", 0.0025)
       .getEntry();
+    shooterkD = shooterTab
+      .add("kD", 0)
+      .getEntry();
+
   }
 
   // Called when the command is initially scheduled.
@@ -40,10 +49,12 @@ public class moveShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.runShooter(0.4);
+    // shooter.shooterPID(shooterkP.getDouble(0), 2000);
+
     shooterVelocity.setDouble(shooter.getEncoderRPMs());
-    shooterPosition.setDouble(shooter.currentEncoderTicks());
-    shooterDist.setDouble(shooter.getEncoderDist());
+    
+    //TODO: make this better
+    shooterPower.setDouble(shooter.shooterPID(shooterkP.getDouble(0.00225), shooterkD.getDouble(0), shooterTarget.getDouble(0)));
   }
 
   // Called once the command ends or is interrupted.

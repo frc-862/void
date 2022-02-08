@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.voidrobot.Constants;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -20,6 +21,10 @@ public class Shooter extends SubsystemBase {
 	private TalonSRX hoodMotor;
 
 	private Encoder shooterEncoder;
+
+	private PIDFController pid = new PIDFController(0, 0, 0);
+
+	double setPower;
 
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
@@ -55,6 +60,14 @@ public class Shooter extends SubsystemBase {
 
 	public double currentEncoderTicks() {
 		return shooterEncoder.getRaw(); 
+	}
+
+	public double shooterPID(double kP, double kD, double targetRPMs) {
+		pid.setP(kP);
+		pid.setD(kD);
+		setPower = pid.calculate(getEncoderRPMs(), targetRPMs);
+		runShooter(setPower);
+		return setPower;
 	}
 
 	@Override
