@@ -45,7 +45,8 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         if(xbox.getBButtonPressed()) {
-            
+            //TODO: left trigger down (analogue) 
+            // TODO: 
         }
          
         

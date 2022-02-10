@@ -39,6 +39,7 @@ public class QueueBalls extends CommandBase {
 
   @Override
   public void execute() {
+      indexer.setPower(0.5);
     if(indexer.getBallCount() > previousBallCount){
       isRunning = true;
       startIndexTime = Timer.getFPGATimestamp();
@@ -46,10 +47,10 @@ public class QueueBalls extends CommandBase {
     }
 
     if(Timer.getFPGATimestamp() - startIndexTime <= indexTime && isRunning){
-        indexer.setPower(0.5);
+        //indexer.setPower(0.5);
       }
     else{
-        indexer.setPower(0);
+        //indexer.setPower(0);
         isRunning = false;
         previousBallCount = indexer.getBallCount();
     }

@@ -27,7 +27,7 @@ public class Indexer extends SubsystemBase {
 
 	private VictorSPX Indexer;
 
-	private final I2C.Port i2cPort = I2C.Port.kOnboard;
+	private final I2C.Port i2cPort = I2C.Port.kMXP;
 
 	private final ColorSensorV3 intakeSensor;
 
