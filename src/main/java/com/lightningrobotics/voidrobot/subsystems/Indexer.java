@@ -52,11 +52,11 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public boolean getBeamBreakEnterStatus(){
-		return BEAM_BREAK_ENTER.get();
+		return !BEAM_BREAK_ENTER.get();
 	}
 
 	public boolean getBeamBreakExitStatus(){
-		return BEAM_BREAK_EXIT.get();
+		return !BEAM_BREAK_EXIT.get();
 	}
 
 	public void closeBeamBreaks(){

@@ -21,14 +21,15 @@ public class RobotContainer extends LightningContainer{
 	private static Indexer indexer;
 
     // TODO commands shouldn't be here . . .
+    // Cap
 	private static VoltageTestContinuous VContinous;
 	private static moveShooter shooterMove;
 
     public RobotContainer() {
-        turret = new Turret(null); // TODO subsystems should not be taking input
-        leds = new LEDs();
-        shooter = new Shooter();
-        shooter = new Shooter();
+        // turret = new Turret(null); // TODO subsystems should not be taking input
+        // leds = new LEDs(); //TODO uncomment these if needed
+        // shooter = new Shooter();
+        // shooter = new Shooter();
         indexer = new Indexer();
     }
 

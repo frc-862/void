@@ -29,7 +29,7 @@ public final class Constants {
 
     // beam breaks 
 
-    public static final int ENTER_BEAM_BREAK = 9;
-    public static final int EXIT_BEAM_BREAK = 8;
+    public static final int ENTER_BEAM_BREAK = 0;
+    public static final int EXIT_BEAM_BREAK = 1;
 
 }
