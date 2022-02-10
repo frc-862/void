@@ -3,9 +3,11 @@ package com.lightningrobotics.voidrobot.subsystems;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.voidrobot.Constants;
+import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,8 +27,15 @@ public class Indexer extends SubsystemBase {
 
 	private VictorSPX Indexer;
 
+	private final I2C.Port i2cPort = I2C.Port.kOnboard;
+
+	private final ColorSensorV3 intakeSensor;
+
 	public Indexer() {
 		Indexer = new VictorSPX(Constants.INDEXER_MOTOR_ID);
+		intakeSensor = new ColorSensorV3(i2cPort);
+
+		ballCount = 0;
 	}
 
 	@Override
@@ -72,5 +81,23 @@ public class Indexer extends SubsystemBase {
 		Indexer.set(VictorSPXControlMode.PercentOutput, 0);
 	}
 
+	public int getColorSensorOutputs() {
+		//TODO: make 255
+		// SmartDashboard.putNumber("Red", intakeSensor.getColor().red);
+    	// SmartDashboard.putNumber("Green", intakeSensor.getColor().green);
+    	// SmartDashboard.putNumber("Blue", intakeSensor.getColor().blue);
 
+
+		if(intakeSensor.getColor().red >= 0.4) {
+			SmartDashboard.putString("Color", "red");
+			return 1;
+		} else if(intakeSensor.getColor().blue >= 0.4) {
+			SmartDashboard.putString("Color", "blue");
+			return 2;
+		} else {
+			return 0;
+		}
+
+		
+	}
 }

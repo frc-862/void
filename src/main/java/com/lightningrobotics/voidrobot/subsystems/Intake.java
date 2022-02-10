@@ -33,7 +33,6 @@ public class Intake extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		getColorSensorOutputs();
 	}
 
 	public void runIntake(double intakePower) {
@@ -57,18 +56,7 @@ public class Intake extends SubsystemBase {
 	// }
 
 
-	public void getColorSensorOutputs() {
-		if(intakeSensor.getColor().red >= 0.4) {
-			SmartDashboard.putString("Color", "red");
-		} else if(intakeSensor.getColor().blue >= 0.4) {
-			SmartDashboard.putString("Color", "blue");
-		} else {
-			SmartDashboard.putString("Color", "probably green or smth");
-		}
-
-		SmartDashboard.putNumber("Red", intakeSensor.getColor().red);
-    	SmartDashboard.putNumber("Green", intakeSensor.getColor().green);
-    	SmartDashboard.putNumber("Blue", intakeSensor.getColor().blue);
-	}
+	
+	
 	
 }
