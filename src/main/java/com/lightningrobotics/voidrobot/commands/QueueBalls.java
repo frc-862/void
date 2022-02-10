@@ -9,9 +9,10 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import org.opencv.ml.StatModel;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class IndexBalls extends CommandBase {
+public class QueueBalls extends CommandBase {
   /** Creates a new IndexBalls. */
   
   private Indexer indexer;
@@ -20,31 +21,36 @@ public class IndexBalls extends CommandBase {
   private boolean isRunning;
   private int previousBallCount;
 
-  public IndexBalls(Indexer indexer) {
+  public QueueBalls(Indexer indexer) {
     this.indexer = indexer;
-    this.previousBallCount = indexer.getBallCount();
 
     addRequirements(indexer);
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    previousBallCount = indexer.getBallCount();
+  }
 
   @Override
   public void execute() {
     if(indexer.getBallCount() > previousBallCount){
       isRunning = true;
       startIndexTime = Timer.getFPGATimestamp();
+      previousBallCount = indexer.getBallCount();
     }
 
     if(Timer.getFPGATimestamp() - startIndexTime <= indexTime && isRunning){
-        indexer.setPower(1);
+        indexer.setPower(0.5);
       }
     else{
         indexer.setPower(0);
         isRunning = false;
         previousBallCount = indexer.getBallCount();
     }
+    
+    SmartDashboard.putNumber("previous ball count", previousBallCount);
+
   }
 
   @Override

@@ -2,7 +2,7 @@ package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
-import com.lightningrobotics.voidrobot.commands.IndexBalls;
+import com.lightningrobotics.voidrobot.commands.QueueBalls;
 import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.commands.moveShooter;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
@@ -16,9 +16,9 @@ public class RobotContainer extends LightningContainer{
 
     // Subsystems
     private static Turret turret;
-	private static LEDs leds;
+	private static LEDs leds = new LEDs();
 	private static Shooter shooter;
-	private static Indexer indexer;
+	private static Indexer indexer = new Indexer();
 
     // TODO commands shouldn't be here . . .
     // Cap
@@ -26,11 +26,7 @@ public class RobotContainer extends LightningContainer{
 	private static moveShooter shooterMove;
 
     public RobotContainer() {
-        // turret = new Turret(null); // TODO subsystems should not be taking input
-        // leds = new LEDs(); //TODO uncomment these if needed
-        // shooter = new Shooter();
-        // shooter = new Shooter();
-        indexer = new Indexer();
+        super();
     }
 
     @Override
@@ -55,7 +51,7 @@ public class RobotContainer extends LightningContainer{
 
 		// shooter = new Shooter();
 
-		VContinous = new VoltageTestContinuous(shooter);
+		// VContinous = new VoltageTestContinuous(shooter);
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
@@ -63,7 +59,7 @@ public class RobotContainer extends LightningContainer{
 
 		// shooter.setDefaultCommand(shooterMove);
 
-		indexer.setDefaultCommand(new IndexBalls(indexer));
+		indexer.setDefaultCommand(new QueueBalls(indexer));
 
 		// leds = new LEDs();
         

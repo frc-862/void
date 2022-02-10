@@ -114,7 +114,7 @@ public class LEDs extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
+        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
         led.setData(buffer);
     }
 }
