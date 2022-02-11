@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(0, 1);
+		shooterEncoder = new Encoder(9, 8);
 
 		flywheelMotor.setInverted(true);
 
