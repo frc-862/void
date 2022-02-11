@@ -6,6 +6,7 @@ package com.lightningrobotics.voidrobot.commands;
 
 import java.util.Map;
 
+import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -19,48 +20,66 @@ public class TurnTurret extends CommandBase {
 
     private Turret turret;
 
-    private ShuffleboardTab turretTab = Shuffleboard.getTab("turret");
+    private double turretTarget = 0d;
 
-    private NetworkTableEntry targetEntry;
+    private double targetAngle;
 
-    private NetworkTableEntry kPEntry;
+    LEDs leds = new LEDs();
 
-    private NetworkTableEntry currentDegrees;
-
-    private final double DEFAULT_TARGET = 0;
-
-    private double turretkP = 0.035;
-
-    public TurnTurret(Turret turret) {
+    public TurnTurret(Turret turret, double targetAngle) {
         this.turret = turret;
-        addRequirements(turret);
-
-        targetEntry = turretTab
-            .add("target", DEFAULT_TARGET)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -360, "max", 360)) // specify widget properties here
-            .getEntry();
-
-        kPEntry = turretTab
-            .add("kP", turretkP)
-            .getEntry();
-
-        currentDegrees = turretTab
-            .add("current turret degrees", turret.turretRevToDeg())
-            .getEntry();
+        this.targetAngle = targetAngle;
+        addRequirements(turret);        
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        turret.setTarget(DEFAULT_TARGET);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        turret.twistTurret(targetEntry.getDouble(DEFAULT_TARGET)/*, kPEntry.getDouble(turretkP)*/);
-        currentDegrees.setDouble(turret.turretRevToDeg());
+
+        if (Math.abs(targetAngle) < 0.5) {
+            targetAngle = 0;
+            //deadban for controller; tune later
+          }
+          turretTarget += targetAngle;
+          double error = 0;
+      
+          if(turretTarget > 180) {
+            turretTarget -= 360;
+          } 
+          if(turretTarget < -180) {
+            turretTarget += 360;
+          }
+      
+          error = turretTarget - turret.turretRevToDeg();
+      
+          if(turretTarget >= 135) {
+            error = 135 - turret.turretRevToDeg();
+            leds.setAllRGB(255, 0, 0);
+          } else if(turretTarget <= -135) {
+            error = -135 - turret.turretRevToDeg(); // basically sets turretTarget to 135 without changing turretTarget so the turret can wrap around
+            leds.setAllRGB(255, 0, 0);
+          } else if(Math.abs(error) > 5) { //TODO: tune the compliance angle, add vision
+            leds.setAllRGB(255, 255, 0);
+          } else {
+            leds.setAllRGB(0, 255, 0);
+          }
+      
+          
+          // if (Math.abs(error) < 1) {
+          //   isDone = true;  //TODO: fix later
+          // }
+      
+        
+      
+      
+          turret.twistTurret(error, turretTarget); //input target here
+          
+        
     }
 
     // Called once the command ends or is interrupted.

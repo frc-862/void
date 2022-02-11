@@ -4,6 +4,7 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
+import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class moveShooter extends CommandBase {
+public class MoveShooter extends CommandBase {
   Shooter shooter;
   private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
   private NetworkTableEntry shooterVelocity;
@@ -20,7 +21,7 @@ public class moveShooter extends CommandBase {
   private NetworkTableEntry shooterkP;
   private NetworkTableEntry shooterkD;
   /** Creates a new moveShooter. */
-  public moveShooter(Shooter shooter) {
+  public MoveShooter(Shooter shooter) {
     this.shooter = shooter;
     addRequirements(shooter);
 
@@ -34,10 +35,10 @@ public class moveShooter extends CommandBase {
     .add("commanded power", 0)
     .getEntry();
     shooterkP = shooterTab
-      .add("kP", 0.0025)
+      .add("kP", Constants.SHOOTER_KP)
       .getEntry();
     shooterkD = shooterTab
-      .add("kD", 0)
+      .add("kD", Constants.SHOOTER_KD)
       .getEntry();
 
   }
@@ -52,9 +53,13 @@ public class moveShooter extends CommandBase {
     // shooter.shooterPID(shooterkP.getDouble(0), 2000);
 
     shooterVelocity.setDouble(shooter.getEncoderRPMs());
+
+    shooter.setPIDGains(shooterkP.getDouble(Constants.SHOOTER_KP), shooterkD.getDouble(Constants.SHOOTER_KD));
     
     //TODO: make this better
-    shooterPower.setDouble(shooter.shooterPID(shooterkP.getDouble(0.00225), shooterkD.getDouble(0), shooterTarget.getDouble(0)));
+    shooterPower.setDouble(shooter.setShooterRPMs(shooterTarget.getDouble(0)));
+
+
   }
 
   // Called once the command ends or is interrupted.

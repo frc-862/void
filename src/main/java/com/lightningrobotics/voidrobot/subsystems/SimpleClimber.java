@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SimpleClimber extends SubsystemBase {
 
+	// TODO: implement climber logic
+
 	// Two TalonFX to winch down climb arms
 
 	private TalonFX winch1Motor;

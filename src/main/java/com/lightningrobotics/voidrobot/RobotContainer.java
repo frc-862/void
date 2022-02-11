@@ -4,8 +4,9 @@ import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.commands.QueueBalls;
+import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
-import com.lightningrobotics.voidrobot.commands.moveShooter;
+import com.lightningrobotics.voidrobot.commands.MoveShooter;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
@@ -30,7 +31,7 @@ public class RobotContainer extends LightningContainer{
     // TODO commands shouldn't be here . . .
     // Cap
 	private static VoltageTestContinuous VContinous;
-	private static moveShooter shooterMove;
+	private static MoveShooter shooterMove;
 
     public RobotContainer() {
         super();
@@ -45,10 +46,8 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         if(xbox.getBButtonPressed()) {
-            //TODO: left trigger down (analogue) 
-            // TODO: 
+            //TODO: left trigger down (analogue), left bumper up
         }
-         
         
     }
 
@@ -65,6 +64,8 @@ public class RobotContainer extends LightningContainer{
 		// shooter.setDefaultCommand(shooterMove);
 
 		indexer.setDefaultCommand(new QueueBalls(indexer));
+
+        turret.setDefaultCommand(new TurnTurret(turret, xbox.getLeftX()));
 
 		// leds = new LEDs();
         

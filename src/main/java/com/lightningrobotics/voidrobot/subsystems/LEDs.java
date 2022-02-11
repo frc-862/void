@@ -20,7 +20,6 @@ public class LEDs extends SubsystemBase {
     private final AddressableLEDBuffer buffer;
     private Random rand = new Random();
 
-
     private ShuffleboardTab LEDTab = Shuffleboard.getTab("LED");
 
     private NetworkTableEntry Red;

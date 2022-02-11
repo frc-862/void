@@ -1,9 +1,7 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.controller.PIDFController;
@@ -13,16 +11,12 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
-
-	// TalonFX on flywheel
-	// TalonSRX on hood
-
-	private VictorSPX flywheelMotor;//TODO: correctly set sign for motors
+	private VictorSPX flywheelMotor;//TODO: correctly set invert for motors
 	private TalonSRX hoodMotor;
 
 	private Encoder shooterEncoder;
 
-	private PIDFController pid = new PIDFController(0, 0, 0);
+	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
 
 	double setPower;
 
@@ -33,11 +27,12 @@ public class Shooter extends SubsystemBase {
 
 		flywheelMotor.setInverted(true);
 
-		shooterEncoder.setDistancePerPulse(1d/2048d);
+		shooterEncoder.setDistancePerPulse(1d/2048d); //encoder ticks per rev (or, the other way around)
 	}
 
 
 	public void runShooter(double shooterVelocity) {
+		//TODO: use falcon built-in functions
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, shooterVelocity); 
 	}
 
@@ -51,7 +46,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public double getEncoderRPMs() {
-		return shooterEncoder.getRate() * 60;
+		return shooterEncoder.getRate() * 60; //converts from revs per second to revs per minute
 	}
 
 	public double getEncoderDist() {
@@ -62,12 +57,15 @@ public class Shooter extends SubsystemBase {
 		return shooterEncoder.getRaw(); 
 	}
 
-	public double shooterPID(double kP, double kD, double targetRPMs) {
-		pid.setP(kP);
-		pid.setD(kD);
+	public double setShooterRPMs(double targetRPMs) {
 		setPower = pid.calculate(getEncoderRPMs(), targetRPMs);
 		runShooter(setPower);
 		return setPower;
+	}
+
+	public void setPIDGains(double kP, double kD) {
+		pid.setP(kP);
+		pid.setD(kD);
 	}
 
 	@Override

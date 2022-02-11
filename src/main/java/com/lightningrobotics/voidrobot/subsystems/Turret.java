@@ -20,10 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
-
-  LEDs leds;
-
-  private double turretkP = 0.035;
+  private double turretkP = Constants.TURRET_kP;
 
   private CANSparkMax twistMotor; 
 
@@ -37,19 +34,30 @@ public class Turret extends SubsystemBase {
 
   private double joystickGain = 100;
 
-
   private ShuffleboardTab turretTab = Shuffleboard.getTab("turret");
-
-  private NetworkTableEntry targetEntry;
-
-  private NetworkTableEntry targetDegrees;
-  private NetworkTableEntry targetAngel;
-  private NetworkTableEntry Error;
-  private NetworkTableEntry currentDegrees;
 
   private final double DEFAULT_TARGET = 0;
 
-  private static double turretTarget = 0; 
+  private NetworkTableEntry targetDegrees = turretTab
+  .add("current turret target", 0)
+  .getEntry();;
+  private NetworkTableEntry currentTargetAngel = turretTab
+  .add("current target Angel", 0)
+  .getEntry();;
+  private NetworkTableEntry currentDegrees = turretTab
+  .add("current turret degrees", turretRevToDeg())
+  .getEntry();;
+  private NetworkTableEntry targetEntry = turretTab
+  .add("target", DEFAULT_TARGET)
+  .withWidget(BuiltInWidgets.kNumberSlider)
+  .withProperties(Map.of("min", -360, "max", 360)) // specify widget properties here
+  .getEntry();
+  private NetworkTableEntry kPEntry = turretTab
+  .add("kP", Constants.TURRET_kP)
+  .getEntry();
+
+    private static double turretTarget = 0;
+
 
   public Turret(DoubleSupplier joystickXInput) {
     twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
@@ -61,83 +69,27 @@ public class Turret extends SubsystemBase {
     twistMotorEncoder = twistMotor.getEncoder();
 
     this.joystickXInput = joystickXInput;
-
-  currentDegrees = turretTab
-    .add("current turret degrees", turretRevToDeg())
-    .getEntry();
-     
-    targetDegrees = turretTab
-    .add("current turret target", 0)
-    .getEntry();
-
-    Error = turretTab
-    .add("current Error", 0)
-    .getEntry();
-
-    targetAngel = turretTab
-    .add("current turret Angel", 0)
-    .getEntry();
-
-    leds = new LEDs();
-
   }
 
   public void setTarget(double degrees) {
     target = turretRevToDeg() + degrees;
   }
 
-  public void twistTurret(double targetAngle) { // -135 -> 135
-    if (Math.abs(targetAngle) < 0.5) {
-      targetAngle = 0;
-      //deadban for controller; tune later
-    }
-    turretTarget += targetAngle;
-    double error = 0;
+  public void twistTurret(double error, double target) { // -135 -> 135
 
-    if(turretTarget > 180) {
-      turretTarget -= 360;
-    } 
-    if(turretTarget < -180) {
-      turretTarget += 360;
-    }
-
-    error = turretTarget - turretRevToDeg();
-
-    if(turretTarget >= 135) {
-      error = 135 - turretRevToDeg();
-
-      leds.setAllRGB(255, 0, 0);
-
-    } else if(turretTarget <= -135) {
-      error = -135 - turretRevToDeg(); // basically sets turretTarget to 135 without changing turretTarget so the turret can wrap around
-      
-      leds.setAllRGB(255, 0, 0);
-
-    } else if(Math.abs(error) > 5) { //TODO: tune the compliance angle, add vision
-      leds.setAllRGB(255, 255, 0);
-    } else {
-      leds.setAllRGB(0, 255, 0);
-    }
-
-    targetDegrees.setDouble(turretTarget);
-    targetAngel.setDouble(targetAngle);
-    Error.setDouble(error);
-
-    // if (Math.abs(error) < 1) {
-    //   isDone = true;  //TODO: fix later
-    // }
-
-  
     double motorPower = turretkP*error; 
-
+      
     if(motorPower > 1) {
       motorPower = 1;
     } else if (motorPower <-1) {
       motorPower = -1;
-    } //TODO: implement lightning's version of this
+    } 
 
-
-    twistMotor.set(motorPower);    
+    targetDegrees.setDouble(turretTarget);
+    currentTargetAngel.setDouble(target);
+      
+    
+      twistMotor.set(motorPower);
   }
 
   
@@ -159,7 +111,8 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    twistTurret(joystickXInput.getAsDouble()*3);
+    // twistTurret(targetEntry.getDouble(DEFAULT_TARGET));
+    turretkP = kPEntry.getDouble(turretkP);
     currentDegrees.setDouble(turretRevToDeg());
   }
 }
