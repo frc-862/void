@@ -20,20 +20,22 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    private static Turret turret;
-	private static LEDs leds = new LEDs();
-	private static Shooter shooter;
-	private static Indexer indexer = new Indexer();
+    // private static Turret turret;
+	// private static LEDs leds = new LEDs();
+	private static Shooter shooter = new Shooter();
+	// private static Indexer indexer = new Indexer();
 
     private static final XboxController xbox = new XboxController(1); //TODO: set right ID
 
+    private static moveShooter shooterMove;
+
     // TODO commands shouldn't be here . . .
     // Cap
-	private static VoltageTestContinuous VContinous;
-	private static moveShooter shooterMove;
+	// private static VoltageTestContinuous VContinous;
+	// private static moveShooter shooterMove;
 
     public RobotContainer() {
-        super();
+        shooterMove = new moveShooter(shooter);
     }
 
     @Override
@@ -62,9 +64,9 @@ public class RobotContainer extends LightningContainer{
 
 		// shooterMove = new moveShooter(shooter);
 
-		// shooter.setDefaultCommand(shooterMove);
+		shooter.setDefaultCommand(shooterMove);
 
-		indexer.setDefaultCommand(new QueueBalls(indexer));
+		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
 		// leds = new LEDs();
         

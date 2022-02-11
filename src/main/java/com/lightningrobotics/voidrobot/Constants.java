@@ -4,7 +4,7 @@ public final class Constants {
     public static final int INTAKE_MOTOR_ID = 7;
     public static final int DEPLOY_INTAKE_MOTOR_ID = 69;
 
-    public static final int FLYWHEEL_MOTOR_ID = 8;
+    public static final int FLYWHEEL_MOTOR_ID = 0;
     public static final int HOOD_MOTOR_ID = 10;
 
     public static final int WINCH1_MOTOR_ID = 11;

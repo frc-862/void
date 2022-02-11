@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class moveShooter extends CommandBase {
   Shooter shooter;
   private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
-  private NetworkTableEntry shooterVelocity;
+  private NetworkTableEntry shooterVelocityDashboard;
   private NetworkTableEntry shooterTarget;
   private NetworkTableEntry shooterPower;
   private NetworkTableEntry shooterkP;
@@ -24,8 +24,8 @@ public class moveShooter extends CommandBase {
     this.shooter = shooter;
     addRequirements(shooter);
 
-    shooterVelocity = shooterTab
-    .add("RPMs", 0)
+    shooterVelocityDashboard = shooterTab
+    .add("RPM", 0)
     .getEntry();
     shooterTarget = shooterTab
     .add("current target", 0)
@@ -51,7 +51,7 @@ public class moveShooter extends CommandBase {
   public void execute() {
     // shooter.shooterPID(shooterkP.getDouble(0), 2000);
 
-    shooterVelocity.setDouble(shooter.getEncoderRPMs());
+    shooterVelocityDashboard.setDouble(shooter.getEncoderRPMs());
     
     //TODO: make this better
     shooterPower.setDouble(shooter.shooterPID(shooterkP.getDouble(0.00225), shooterkD.getDouble(0), shooterTarget.getDouble(0)));
