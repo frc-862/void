@@ -25,9 +25,9 @@ public class RobotContainer extends LightningContainer{
 	private static Shooter shooter = new Shooter();
 	// private static Indexer indexer = new Indexer();
 
-    private static final XboxController xbox = new XboxController(1); //TODO: set right ID
+    // private static final XboxController xbox = new XboxController(1); //TODO: set right ID
 
-    private static moveShooter shooterMove;
+    private static moveShooter shooterMove = new moveShooter(shooter);
 
     // TODO commands shouldn't be here . . .
     // Cap
@@ -35,7 +35,7 @@ public class RobotContainer extends LightningContainer{
 	// private static moveShooter shooterMove;
 
     public RobotContainer() {
-        shooterMove = new moveShooter(shooter);
+        super();
     }
 
     @Override
@@ -46,11 +46,10 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
-        if(xbox.getBButtonPressed()) {
+        // if(xbox.getBButtonPressed()) {
             //TODO: left trigger down (analogue) 
             // TODO: 
-        }
-         
+                 
         
     }
 

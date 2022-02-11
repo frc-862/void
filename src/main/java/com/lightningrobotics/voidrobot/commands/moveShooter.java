@@ -24,6 +24,11 @@ public class moveShooter extends CommandBase {
     this.shooter = shooter;
     addRequirements(shooter);
 
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
     shooterVelocityDashboard = shooterTab
     .add("RPM", 0)
     .getEntry();
@@ -41,10 +46,6 @@ public class moveShooter extends CommandBase {
       .getEntry();
 
   }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
