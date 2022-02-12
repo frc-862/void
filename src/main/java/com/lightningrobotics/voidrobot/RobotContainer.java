@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
+<<<<<<< HEAD
     // private static Turret turret = new Turret();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
@@ -32,11 +33,25 @@ public class RobotContainer extends LightningContainer{
     private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
     // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+=======
+    // private static Turret turret;
+	// private static LEDs leds = new LEDs();
+	private static Shooter shooter = new Shooter();
+	// private static Indexer indexer = new Indexer();
+
+    // private static final XboxController xbox = new XboxController(1); //TODO: set right ID
+
+    private static moveShooter shooterMove = new moveShooter(shooter);
+>>>>>>> feature/PROG-159-template-subsystems
 
     // TODO commands shouldn't be here . . .
     // Cap
 	// private static VoltageTestContinuous VContinous;
+<<<<<<< HEAD
 	// private static MoveShooter moveShooter = new MoveShooter(shooter);
+=======
+	// private static moveShooter shooterMove;
+>>>>>>> feature/PROG-159-template-subsystems
 
     public RobotContainer() {
         super();
@@ -50,9 +65,16 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
+<<<<<<< HEAD
         if(driver.getBButtonPressed()) {
             //TODO: left trigger down (analogue), left bumper up
         }
+=======
+        // if(xbox.getBButtonPressed()) {
+            //TODO: left trigger down (analogue) 
+            // TODO: 
+                 
+>>>>>>> feature/PROG-159-template-subsystems
         
     }
 
@@ -66,9 +88,15 @@ public class RobotContainer extends LightningContainer{
 
 		// shooter.setDefaultCommand(new MoveShooter(shooter));
 
+<<<<<<< HEAD
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
         // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
+=======
+		shooter.setDefaultCommand(shooterMove);
+
+		// indexer.setDefaultCommand(new QueueBalls(indexer));
+>>>>>>> feature/PROG-159-template-subsystems
 
 		// leds = new LEDs();
         
