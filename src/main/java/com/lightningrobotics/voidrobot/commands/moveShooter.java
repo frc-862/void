@@ -1,5 +1,6 @@
 package com.lightningrobotics.voidrobot.commands;
 
+import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -14,6 +15,7 @@ public class MoveShooter extends CommandBase {
     private NetworkTableEntry setRPM;
     private NetworkTableEntry setkP;
     private NetworkTableEntry setkD;
+    private NetworkTableEntry shooterPower;
 
     //   private NetworkTableEntry shooterVelocityDashboard;
     //   private NetworkTableEntry shooterTarget;
@@ -41,7 +43,8 @@ public class MoveShooter extends CommandBase {
             .add("set kD", 0.0)
             .getEntry();
         shooterPower = shooterTab
-        .add(shooter.) 
+            .add("shooter power output", shooter.getPowerSetpoint())
+            .getEntry(); 
 
         // shooterVelocityDashboard = shooterTab
         // .add("RPM", 0)
@@ -72,7 +75,8 @@ public class MoveShooter extends CommandBase {
         displayRPM.setDouble(shooter.getEncoderRPMs());
 
         shooter.setRPM(setRPM.getDouble(0));
-        shooter.setPIDGains(setkP.getDouble(0.0025), setkD.getDouble(0));
+        shooter.setPIDGains(setkP.getDouble(Constants.SHOOTER_KP), setkD.getDouble(Constants.SHOOTER_KD));
+        shooterPower.setDouble(shooter.getPowerSetpoint());
 
     }
 

@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.voidrobot.Constants;
@@ -17,21 +18,30 @@ public class Shooter extends SubsystemBase {
 	private Encoder shooterEncoder;
 
 	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
-	private PIDFDashboardTuner pidTuner = new PIDFDashboardTuner("shooter", pid);
+	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
+
+	// private PIDFDashboardTuner pidTuner = new PIDFDashboardTuner("shooter", pid);
 
 	private double powerSetPoint;
 
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(9, 8);
+		shooterEncoder = new Encoder(8, 9);
 
 		flywheelMotor.setInverted(true);
 
 		shooterEncoder.setDistancePerPulse(1d/2048d); //encoder ticks per rev (or, the other way around)
 	}
 
+	public PIDFController getPIDFController(){
+		return pid;
+	}
 	
+	public FeedForwardController getFeedForwardController(){
+		return feedForward;
+	}
+
 	public void setPower(double power) {
 		//TODO: use falcon built-in functions
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, power); 
@@ -64,6 +74,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setRPM(double targetRPMs) {
+		targetRPMs = feedForward.calculate(targetRPMs); // maybe not??
 		powerSetPoint = pid.calculate(getEncoderRPMs(), targetRPMs);
 		setPower(powerSetPoint);
 	}

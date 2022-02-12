@@ -28,8 +28,13 @@ public final class Constants {
     public static final int ENTER_BEAM_BREAK = 0;
     public static final int EXIT_BEAM_BREAK = 1;
 
-    public static final double SHOOTER_KP = 0.0025;
+    public static final double SHOOTER_KP = 0.0011335;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
+
+    public static final double SHOOTER_KS = -.81807;
+    public static final double SHOOTER_KV = 2.1597;
+    public static final double SHOOTER_KA = 2.3746;
+    
 
 }

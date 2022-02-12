@@ -14,6 +14,7 @@ import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,19 +24,19 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    // private static Turret turret;
+    private static Turret turret = new Turret();
 	// private static LEDs leds = new LEDs();
-	private static Shooter shooter = new Shooter();
+	// private static Shooter shooter = new Shooter();
 	// private static Indexer indexer = new Indexer();
 
-    private static final XboxController driver = new XboxController(1); //TODO: set right ID
+    private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
-    // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
     // TODO commands shouldn't be here . . .
     // Cap
 	// private static VoltageTestContinuous VContinous;
-	private static MoveShooter moveShooter = new MoveShooter(shooter);
+	// private static MoveShooter moveShooter = new MoveShooter(shooter);
 
     public RobotContainer() {
         super();
@@ -63,11 +64,11 @@ public class RobotContainer extends LightningContainer{
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
-		shooter.setDefaultCommand(moveShooter);
+		// shooter.setDefaultCommand(moveShooter);
 
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
-        // turret.setDefaultCommand(new AimTurret(turret, ((int)(filter.filter(driver.getLeftX()) * 180)))); // this should return degrees
+        turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
 
 		// leds = new LEDs();
         

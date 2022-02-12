@@ -18,7 +18,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public double getTargetAngle() {
-		return targetAngle;
+		return targetAngle; // TODO: implement math for error to get target angle
 	}
 
 	public double getTargetDistance() {

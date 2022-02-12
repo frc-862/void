@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
@@ -19,7 +20,7 @@ public class Turret extends SubsystemBase {
 
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
-	private Rotation2d target;
+	private double target;
 
 	public Turret() {
 		turretMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
@@ -31,14 +32,16 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
-		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target.getDegrees(), -135, 135));
+		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, -135, 135));
 
 		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+
+		SmartDashboard.putNumber("motor output", output);
 
 		turretMotor.set(output);
 	}
 
-	public void setTargetAngle(Rotation2d target) {
+	public void setTargetAngle(double target) {
 		this.target = target;
 	}
 
@@ -47,16 +50,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Rotation2d getTurretAngle() {
-		return Rotation2d.fromDegrees(getEncoderValue() * 360d / Constants.TURN_TURRET_GEAR_RATIO); // maybe divid by Constants.TURN_TURRET_GEAR_RATIO then multiply 360d also maybe divid by 2
-		// double angle = (getEncoderValue() * 360 / Constants.TURN_TURRET_GEAR_RATIO);
-		// if(angle > 0){
-		//     angle -= 180;
-		// } 
-		// else if(angle < 0){
-		//     angle += 180;
-		// }
-		// return Rotation2d.fromDegrees(angle);
-
+		return Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d); 
 		
 	}
 
