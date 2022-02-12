@@ -24,9 +24,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    private static Turret turret = new Turret();
+    // private static Turret turret = new Turret();
 	// private static LEDs leds = new LEDs();
-	// private static Shooter shooter = new Shooter();
+	private static Shooter shooter = new Shooter();
 	// private static Indexer indexer = new Indexer();
 
     private static final XboxController driver = new XboxController(0); //TODO: set right ID
@@ -64,11 +64,11 @@ public class RobotContainer extends LightningContainer{
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
-		// shooter.setDefaultCommand(moveShooter);
+		shooter.setDefaultCommand(new MoveShooter(shooter));
 
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
-        turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
+        // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
 
 		// leds = new LEDs();
         

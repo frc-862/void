@@ -3,7 +3,7 @@ package com.lightningrobotics.voidrobot;
 public final class Constants {
     public static final int INTAKE_MOTOR_ID = 7;
 
-    public static final int FLYWHEEL_MOTOR_ID = 12;
+    public static final int FLYWHEEL_MOTOR_ID = 3;
     public static final int HOOD_MOTOR_ID = 10;
 
     public static final int WINCH1_MOTOR_ID = 11;
@@ -28,13 +28,13 @@ public final class Constants {
     public static final int ENTER_BEAM_BREAK = 0;
     public static final int EXIT_BEAM_BREAK = 1;
 
-    public static final double SHOOTER_KP = 0.0011335;
+    public static final double SHOOTER_KP = 0.00013484;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
-    public static final double SHOOTER_KS = -.81807;
-    public static final double SHOOTER_KV = 2.1597;
-    public static final double SHOOTER_KA = 2.3746;
+    public static final double SHOOTER_KS = 1.4864;//-.81807;
+    public static final double SHOOTER_KV = 0.62326;//2.1597;
+    public static final double SHOOTER_KA = 0.44521;//2.3746;
     
 
 }
