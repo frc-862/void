@@ -11,7 +11,7 @@ public final class Constants {
 
     public static final int INTAKE_SENSOR_ID = 14;
 
-    public static final int INDEXER_MOTOR_ID = 8; //TODO: what is a number
+    public static final int INDEXER_MOTOR_ID = 3; //TODO: what is a number
 
     // Turret 
     // public static final double TURN_TURRET_KP = 0.008;

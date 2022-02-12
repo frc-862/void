@@ -26,12 +26,12 @@ public class RobotContainer extends LightningContainer{
     // Subsystems
     // private static Turret turret = new Turret();
 	// private static LEDs leds = new LEDs();
-	private static Shooter shooter = new Shooter();
-	// private static Indexer indexer = new Indexer();
+	// private static Shooter shooter = new Shooter();
+	private static Indexer indexer = new Indexer();
 
     private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
-    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+    // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
     // TODO commands shouldn't be here . . .
     // Cap
@@ -64,7 +64,7 @@ public class RobotContainer extends LightningContainer{
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
-		shooter.setDefaultCommand(new MoveShooter(shooter));
+		// shooter.setDefaultCommand(new MoveShooter(shooter));
 
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
