@@ -17,6 +17,8 @@ private static double startIndexTime = 0d;
 private static boolean isRunning;
 private static int previousBallCount;
 
+private boolean bool = true; //TODO: name this
+
 private static int ball1Color;
 private static int ball2Color;
 
@@ -33,21 +35,26 @@ public QueueBalls(Indexer indexer) {
 
     @Override
     public void execute() {
-        indexer.setPower(0.5); // TODO: get rid of this when we want to setup proper que times
+        //indexer.setPower(0.5); // TODO: get rid of this when we want to setup proper que times
         
-        if(indexer.getBallCount() > previousBallCount){
+        if(indexer.getRunIndexer() && bool) { // indexer.getBallCount() > previousBallCount
             isRunning = true;
             startIndexTime = Timer.getFPGATimestamp();
             previousBallCount = indexer.getBallCount();
+            
+            bool = false; 
         }
 
         if(Timer.getFPGATimestamp() - startIndexTime <= indexTime && isRunning){
-            //indexer.setPower(0.5);
+            indexer.setPower(0.5);
         }
         else{
-            //indexer.setPower(0);
+            indexer.setPower(0);
             isRunning = false;
+            indexer.setRunIndexer(false);
             previousBallCount = indexer.getBallCount();
+
+            bool = true;
         }
 
         // if(indexer.getBallCount() == 1 && indexer.getColorSensorOutputs() == 1) {
