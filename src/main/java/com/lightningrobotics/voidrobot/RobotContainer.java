@@ -2,9 +2,11 @@ package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
+import com.lightningrobotics.common.util.filter.JoystickFilter;
+import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
+import com.lightningrobotics.voidrobot.commands.AimTurret;
 import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.commands.QueueBalls;
-import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.commands.MoveShooter;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
@@ -26,12 +28,14 @@ public class RobotContainer extends LightningContainer{
 	private static Shooter shooter = new Shooter();
 	// private static Indexer indexer = new Indexer();
 
-    private static final XboxController xbox = new XboxController(1); //TODO: set right ID
+    private static final XboxController driver = new XboxController(1); //TODO: set right ID
+
+    // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
     // TODO commands shouldn't be here . . .
     // Cap
 	// private static VoltageTestContinuous VContinous;
-	private static MoveShooter shooterMove = new MoveShooter(shooter);
+	private static MoveShooter moveShooter = new MoveShooter(shooter);
 
     public RobotContainer() {
         super();
@@ -45,7 +49,7 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
-        if(xbox.getBButtonPressed()) {
+        if(driver.getBButtonPressed()) {
             //TODO: left trigger down (analogue), left bumper up
         }
         
@@ -59,13 +63,11 @@ public class RobotContainer extends LightningContainer{
 
 		// VContinous = new VoltageTestContinuous(shooter);
 
-		// shooterMove = new moveShooter(shooter);
-
-		shooter.setDefaultCommand(shooterMove);
+		shooter.setDefaultCommand(moveShooter);
 
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
 
-        // turret.setDefaultCommand(new TurnTurret(turret, xbox.getLeftX()));
+        // turret.setDefaultCommand(new AimTurret(turret, ((int)(filter.filter(driver.getLeftX()) * 180)))); // this should return degrees
 
 		// leds = new LEDs();
         

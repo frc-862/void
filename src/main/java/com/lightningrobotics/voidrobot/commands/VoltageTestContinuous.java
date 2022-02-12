@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.lightningrobotics.voidrobot.commands;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -17,79 +13,78 @@ import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 public class VoltageTestContinuous extends CommandBase {
 
-  Shooter shooter;
+    Shooter shooter;
 
-  private ShuffleboardTab voltageTab = Shuffleboard.getTab("voltage test");
+    private ShuffleboardTab voltageTab = Shuffleboard.getTab("voltage test");
 
-  double voltageDrawn = 0;
-  double currentDrawn = 0;
-  double powerDrawn = 0;
-  double energyDrawn = 0;
-  double totalEnergyDrawn = 0;
+    double voltageDrawn = 0;
+    double currentDrawn = 0;
+    double powerDrawn = 0;
+    double energyDrawn = 0;
+    double totalEnergyDrawn = 0;
 
-  private NetworkTableEntry voltage;
-  private NetworkTableEntry current;
-  private NetworkTableEntry power;
-  private NetworkTableEntry energy;
+    private NetworkTableEntry voltage;
+    private NetworkTableEntry current;
+    private NetworkTableEntry power;
+    private NetworkTableEntry energy;
 
-  PowerDistribution powerDistributor = new PowerDistribution(10, ModuleType.kCTRE);
+    PowerDistribution powerDistributor = new PowerDistribution(10, ModuleType.kCTRE);
 
-  public VoltageTestContinuous(Shooter shooter) {
-    this.shooter = shooter;
+    public VoltageTestContinuous(Shooter shooter) {
+        this.shooter = shooter;
 
-    addRequirements(shooter);
+        addRequirements(shooter);
 
-    voltage = voltageTab
-      .add("voltage", voltageDrawn)
-      .getEntry();
-    current = voltageTab
-      .add("current", currentDrawn)
-      .getEntry();
-    power = voltageTab
-      .add("power", powerDrawn)
-      .getEntry();
-    energy = voltageTab
-      .add("energy", energyDrawn)
-      .getEntry();
+        voltage = voltageTab
+            .add("voltage", voltageDrawn)
+            .getEntry();
+        current = voltageTab
+            .add("current", currentDrawn)
+            .getEntry();
+        power = voltageTab
+            .add("power", powerDrawn)
+            .getEntry();
+        energy = voltageTab
+            .add("energy", energyDrawn)
+            .getEntry();
 
-    DataLogger.addDataElement("voltage drawn", () -> voltageDrawn);
-    DataLogger.addDataElement("current drawn", () -> currentDrawn);
-  }
+        DataLogger.addDataElement("voltage drawn", () -> voltageDrawn);
+        DataLogger.addDataElement("current drawn", () -> currentDrawn);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {}
 
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+        shooter.setPower(0.5);
 
-    shooter.runShooter(0.5);
+        voltageDrawn = powerDistributor.getVoltage(); 
+        currentDrawn = powerDistributor.getCurrent(Constants.FLYWHEEL_MOTOR_ID);
+        powerDrawn = powerDistributor.getTotalPower();
+        energyDrawn = powerDistributor.getTotalEnergy();
 
-    voltageDrawn = powerDistributor.getVoltage(); 
-    currentDrawn = powerDistributor.getCurrent(Constants.FLYWHEEL_MOTOR_ID);
-    powerDrawn = powerDistributor.getTotalPower();
-    energyDrawn = powerDistributor.getTotalEnergy();
-    
-    voltage.setDouble(voltageDrawn);
-    current.setDouble(currentDrawn);
-    power.setDouble(powerDrawn);
-    energy.setDouble(energyDrawn);
+        voltage.setDouble(voltageDrawn);
+        current.setDouble(currentDrawn);
+        power.setDouble(powerDrawn);
+        energy.setDouble(energyDrawn);
 
-    totalEnergyDrawn += energyDrawn;
+        totalEnergyDrawn += energyDrawn;
 
-  }
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
     return false;
-  }
+    }
 }

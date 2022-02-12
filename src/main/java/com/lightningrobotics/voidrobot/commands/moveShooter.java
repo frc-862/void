@@ -1,10 +1,5 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.lightningrobotics.voidrobot.commands;
 
-import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -13,64 +8,83 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class MoveShooter extends CommandBase {
-  Shooter shooter;
-  private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
-  private NetworkTableEntry shooterVelocity;
-  private NetworkTableEntry shooterTarget;
-  private NetworkTableEntry shooterPower;
-  private NetworkTableEntry shooterkP;
-  private NetworkTableEntry shooterkD;
-  /** Creates a new moveShooter. */
-  public MoveShooter(Shooter shooter) {
-    this.shooter = shooter;
-    addRequirements(shooter);
+    private Shooter shooter;
+    private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
+    private NetworkTableEntry displayRPM;
+    private NetworkTableEntry setRPM;
+    private NetworkTableEntry setkP;
+    private NetworkTableEntry setkD;
 
-    shooterVelocity = shooterTab
-    .add("RPMs", 0)
-    .getEntry();
-    shooterTarget = shooterTab
-    .add("current target", 0)
-    .getEntry();
-    shooterPower = shooterTab
-    .add("commanded power", 0)
-    .getEntry();
-    shooterkP = shooterTab
-      .add("kP", Constants.SHOOTER_KP)
-      .getEntry();
-    shooterkD = shooterTab
-      .add("kD", Constants.SHOOTER_KD)
-      .getEntry();
-
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    // shooter.shooterPID(shooterkP.getDouble(0), 2000);
-
-    shooterVelocity.setDouble(shooter.getEncoderRPMs());
-
-    shooter.setPIDGains(shooterkP.getDouble(Constants.SHOOTER_KP), shooterkD.getDouble(Constants.SHOOTER_KD));
-    
-    //TODO: make this better
-    shooterPower.setDouble(shooter.setShooterRPMs(shooterTarget.getDouble(0)));
+    //   private NetworkTableEntry shooterVelocityDashboard;
+    //   private NetworkTableEntry shooterTarget;
+    //   private NetworkTableEntry shooterPower;
+    //   private NetworkTableEntry shooterkP;
+    //   private NetworkTableEntry shooterkD;
 
 
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    
-  }
+    /** Creates a new moveShooter. */
+    public MoveShooter(Shooter shooter) {
+        this.shooter = shooter;
+        addRequirements(shooter);
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+        displayRPM = shooterTab
+            .add("RPM-From encoder", 0)
+            .getEntry();
+        setRPM = shooterTab
+            .add("setRPM", 0)
+            .getEntry();
+        setkP = shooterTab
+            .add("set kP", 0.0025)
+            .getEntry();
+        setkD = shooterTab
+            .add("set kD", 0.0)
+            .getEntry();
+        shooterPower = shooterTab
+        .add(shooter.) 
+
+        // shooterVelocityDashboard = shooterTab
+        // .add("RPM", 0)
+        // .getEntry();
+        // shooterTarget = shooterTab
+        // .add("current target", 0)
+        // .getEntry();
+        // shooterPower = shooterTab
+        // .add("commanded power", 0)
+        // .getEntry();
+        // shooterkP = shooterTab
+        //   .add("kP", 0.0025)
+        //   .getEntry();
+        // shooterkD = shooterTab
+        //   .add("kD", 0)
+        //   .getEntry();
+
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {}
+
+    // Called every time the scheduler runs while the command is scheduled.j
+    @Override
+    public void execute() {
+        // shooterVelocityDashboard.setDouble(shooter.getEncoderRPMs()); // Putting our encouder value converted to RPM on the dashboard
+        displayRPM.setDouble(shooter.getEncoderRPMs());
+
+        shooter.setRPM(setRPM.getDouble(0));
+        shooter.setPIDGains(setkP.getDouble(0.0025), setkD.getDouble(0));
+
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

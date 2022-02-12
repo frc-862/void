@@ -14,47 +14,51 @@ public class Indexer extends SubsystemBase {
 	
 	// VictorSPX to run
 
+	// TODO: check to see if the value being return is false or true when the beam break is "broken"
 	private static final DigitalInput BEAM_BREAK_ENTER = new DigitalInput(Constants.ENTER_BEAM_BREAK);
 	private static final DigitalInput BEAM_BREAK_EXIT = new DigitalInput(Constants.EXIT_BEAM_BREAK);
 
-	private boolean beamBreakEnterStatus = false;
-	private boolean previousBeamBreakEnterStatus = false;
-	private boolean beamBreakExitStatus = false;
-	private boolean previousBeamBreakExitStatus = false;
+	private static boolean beamBreakEnterStatus = false;
+	private static boolean previousBeamBreakEnterStatus = false;
+	private static boolean beamBreakExitStatus = false;
+	private static boolean previousBeamBreakExitStatus = false;
 
-	public int ballCount = 0;
+	public static int ballCount = 0;
 
-	private final VictorSPX Indexer;
+	private final VictorSPX indexer;
 
 	private final I2C.Port i2cPort = I2C.Port.kMXP;
-
 	private final ColorSensorV3 intakeSensor;
 
 	public Indexer() {
-		Indexer = new VictorSPX(Constants.INDEXER_MOTOR_ID);
+		indexer = new VictorSPX(Constants.INDEXER_MOTOR_ID);
 		intakeSensor = new ColorSensorV3(i2cPort);
 	}
 
 	@Override
 	public void periodic() {
-		beamBreakEnterStatus = getBeamBreakEnterStatus();
-		beamBreakExitStatus = getBeamBreakExitStatus();
+		beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
+		beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
 		
-		if (beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus){
-			ballCount++;
+		if (beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus){ // checks to see of the beam break has seen a ball
+			ballCount++; 
 		}
-		if (beamBreakExitStatus != previousBeamBreakExitStatus && beamBreakExitStatus){
+		if (beamBreakExitStatus != previousBeamBreakExitStatus && beamBreakExitStatus){ // checks to see of the beam break has seen a ball
 			ballCount--;
 		}
 		
 		previousBeamBreakEnterStatus = beamBreakEnterStatus;
 		previousBeamBreakExitStatus = beamBreakExitStatus;
 	
-		SmartDashboard.putNumber("Ball Count", getBallCount());
+		SmartDashboard.putNumber("Ball Count", getBallCount()); // displays our ballcount to the dashboard
+
+		// for the top todo
+		SmartDashboard.putBoolean("enter beam break", BEAM_BREAK_ENTER.get());
+
 	}
 
 	public void setPower(double power) {
-		Indexer.set(VictorSPXControlMode.PercentOutput, power);
+		indexer.set(VictorSPXControlMode.PercentOutput, power);
 	}
 
 	public boolean getBeamBreakEnterStatus(){
@@ -77,7 +81,7 @@ public class Indexer extends SubsystemBase {
 	}
 	
 	public void stop() {
-		Indexer.set(VictorSPXControlMode.PercentOutput, 0);
+		indexer.set(VictorSPXControlMode.PercentOutput, 0);
 	}
 
 	public int getColorSensorOutputs() {

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.controller.PIDFController;
+import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.voidrobot.Constants;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -13,12 +14,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
 	private VictorSPX flywheelMotor;//TODO: correctly set invert for motors
 	private TalonSRX hoodMotor;
-
 	private Encoder shooterEncoder;
 
 	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
+	private PIDFDashboardTuner pidTuner = new PIDFDashboardTuner("shooter", pid);
 
-	double setPower;
+	private double powerSetPoint;
 
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
@@ -30,13 +31,18 @@ public class Shooter extends SubsystemBase {
 		shooterEncoder.setDistancePerPulse(1d/2048d); //encoder ticks per rev (or, the other way around)
 	}
 
-
-	public void runShooter(double shooterVelocity) {
+	
+	public void setPower(double power) {
 		//TODO: use falcon built-in functions
-		flywheelMotor.set(VictorSPXControlMode.PercentOutput, shooterVelocity); 
+		flywheelMotor.set(VictorSPXControlMode.PercentOutput, power); 
 	}
 
-	public void stopShooter() {
+	public void setVelocity(double shooterVelocity) {
+		//TODO: use falcon built-in functions
+		flywheelMotor.set(VictorSPXControlMode.Velocity, shooterVelocity); 
+	}
+
+	public void stop() {
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, 0);; 
 	}
 
@@ -57,10 +63,13 @@ public class Shooter extends SubsystemBase {
 		return shooterEncoder.getRaw(); 
 	}
 
-	public double setShooterRPMs(double targetRPMs) {
-		setPower = pid.calculate(getEncoderRPMs(), targetRPMs);
-		runShooter(setPower);
-		return setPower;
+	public void setRPM(double targetRPMs) {
+		powerSetPoint = pid.calculate(getEncoderRPMs(), targetRPMs);
+		setPower(powerSetPoint);
+	}
+
+	public double getPowerSetpoint() {
+		return powerSetPoint;
 	}
 
 	public void setPIDGains(double kP, double kD) {
