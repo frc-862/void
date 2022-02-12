@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class MoveShooter extends CommandBase {
+public class RunShooter extends CommandBase {
     private Shooter shooter;
     //   private NetworkTableEntry shooterVelocityDashboard;
     //   private NetworkTableEntry shooterTarget;
@@ -19,7 +19,7 @@ public class MoveShooter extends CommandBase {
 
 
     /** Creates a new moveShooter. */
-    public MoveShooter(Shooter shooter) {
+    public RunShooter(Shooter shooter) {
         this.shooter = shooter;
         addRequirements(shooter);
         // shooterVelocityDashboard = shooterTab
