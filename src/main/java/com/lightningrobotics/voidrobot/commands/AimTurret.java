@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
@@ -23,6 +22,7 @@ public class AimTurret extends CommandBase {
         addRequirements(turret);
     }
 
+	@Deprecated
     public AimTurret(Turret turret, DoubleSupplier degrees) { // for tmep use
         this.turret = turret;
         this.degrees = degrees;
@@ -37,9 +37,9 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void execute() {
-        // double targetAngle = vision.getTargetAngle(); TODO: dont comment this out (Nick did this and wrote this comment)
-        DoubleSupplier targetAngle = degrees;
-        turret.setTargetAngle(targetAngle.getAsDouble());
+        // var targetAngle = vision.getTargetAngle();
+        var targetAngle = degrees.getAsDouble();
+        turret.setTargetAngle(targetAngle);
     }
 
     @Override

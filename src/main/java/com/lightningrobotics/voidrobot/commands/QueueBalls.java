@@ -2,14 +2,10 @@ package com.lightningrobotics.voidrobot.commands;
 
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
-import org.opencv.ml.StatModel;
-
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class QueueBalls extends CommandBase {
-    /** Creates a new IndexBalls. */
 
     private Indexer indexer;
     private static double indexTime = 0.5d; // in seconds

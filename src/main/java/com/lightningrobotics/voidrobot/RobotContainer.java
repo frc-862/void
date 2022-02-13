@@ -5,7 +5,6 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
-import com.lightningrobotics.voidrobot.commands.Drive;
 import com.lightningrobotics.voidrobot.commands.QueueBalls;
 import com.lightningrobotics.voidrobot.commands.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
@@ -34,7 +33,6 @@ public class RobotContainer extends LightningContainer{
     // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
     // TODO commands shouldn't be here . . .
-    // Cap
 	// private static VoltageTestContinuous VContinous;
 	// private static MoveShooter moveShooter = new MoveShooter(shooter);
 
@@ -53,62 +51,37 @@ public class RobotContainer extends LightningContainer{
         // if(xbox.getBButtonPressed()) {
             //TODO: left trigger down (analogue) 
             // TODO: 
-                 
-        
     }
 
     @Override
     protected void configureDefaultCommands() {
         // turret.setDefaultCommand(new TurnTurret(turret));
-
 		// VContinous = new VoltageTestContinuous(shooter);
-
 		// VContinous = new VoltageTestContinuous(shooter);
-
 		// shooter.setDefaultCommand(new MoveShooter(shooter));
-
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
-
         // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
-
 		// leds = new LEDs();
-        
     }
 
     @Override
-    protected void configureFaultCodes() {
-        // TODO Auto-generated method stub
-        
-    }
+    protected void configureFaultCodes() { }
 
     @Override
-    protected void configureFaultMonitors() {
-        // TODO Auto-generated method stub
-        
-    }
+    protected void configureFaultMonitors() { }
 
     @Override
-    protected void configureSystemTests() {
-        // TODO Auto-generated method stub
-        
-    }
+    protected void configureSystemTests() { }
 
     @Override
     public LightningDrivetrain getDrivetrain() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected void initializeDashboardCommands() {
-        // TODO Auto-generated method stub
-        
-    }
-
+    protected void initializeDashboardCommands() { }
+	
     @Override
-    protected void releaseDefaultCommands() {
-        // TODO Auto-generated method stub
-        
-    }
+    protected void releaseDefaultCommands() { }
     
 }
