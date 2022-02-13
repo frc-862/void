@@ -15,18 +15,16 @@ import java.util.function.BiConsumer;
 
 
 public class LEDs extends SubsystemBase {
-    private final int ledCount = 30;
+    private static final int ledCount = 30;
+    private static Random rand = new Random();
+
     private AddressableLED led;
     private final AddressableLEDBuffer buffer;
-    private Random rand = new Random();
-
 
     private ShuffleboardTab LEDTab = Shuffleboard.getTab("LED");
 
     private NetworkTableEntry Red;
-	
 	private NetworkTableEntry Green;
-
 	private NetworkTableEntry Blue;
     int i = 0;
 
@@ -55,6 +53,7 @@ public class LEDs extends SubsystemBase {
     }
 
     public static final Color LightningOrange = new Color(1, .5, 0);
+    
     public void withEachLed(BiConsumer<AddressableLEDBuffer, Integer> l) {
         for (int i = 0; i < ledCount; ++i) {
             l.accept(buffer, i);

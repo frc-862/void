@@ -1,47 +1,77 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
+import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.voidrobot.Constants;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
-
-	// TalonFX on flywheel
-	// TalonSRX on hood
-
-	private VictorSPX flywheelMotor;//TODO: correctly set sign for motors
+	private VictorSPX flywheelMotor;//TODO: correctly set invert for motors
 	private TalonSRX hoodMotor;
-
 	private Encoder shooterEncoder;
 
-	private PIDFController pid = new PIDFController(0, 0, 0);
+	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
+    private NetworkTableEntry displayRPM;
+    private NetworkTableEntry setRPM;
+    private NetworkTableEntry shooterPower;
 
-	double setPower;
+	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
+	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
+
+	// private PIDFDashboardTuner pidTuner = new PIDFDashboardTuner("shooter test", pid);
+
+	private double powerSetPoint;
 
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(0, 1);
+		shooterEncoder = new Encoder(9, 8);
 
 		flywheelMotor.setInverted(true);
 
-		shooterEncoder.setDistancePerPulse(1d/2048d);
+		shooterEncoder.setDistancePerPulse(1d/2048d); //encoder ticks per rev (or, the other way around)
+
+		shooterPower = shooterTab
+			.add("shooter power output", getPowerSetpoint())
+			.getEntry();
+		setRPM = shooterTab
+			.add("set RPM", 0)
+			.getEntry(); 
+		displayRPM  = shooterTab
+			.add("RPM-From encoder", 0)
+			.getEntry();
+
 	}
 
-
-	public void runShooter(double shooterVelocity) {
-		flywheelMotor.set(VictorSPXControlMode.PercentOutput, shooterVelocity); 
+	public PIDFController getPIDFController(){
+		return pid;
+	}
+	
+	public FeedForwardController getFeedForwardController(){
+		return feedForward;
 	}
 
-	public void stopShooter() {
+	public void setPower(double power) {
+		//TODO: use falcon built-in functions
+		flywheelMotor.set(VictorSPXControlMode.PercentOutput, power); 
+	}
+
+	public void setVelocity(double shooterVelocity) {
+		//TODO: use falcon built-in functions
+		flywheelMotor.set(VictorSPXControlMode.Velocity, shooterVelocity); 
+	}
+
+	public void stop() {
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, 0);; 
 	}
 
@@ -51,7 +81,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public double getEncoderRPMs() {
-		return shooterEncoder.getRate() * 60;
+		return shooterEncoder.getRate() * 60; //converts from revs per second to revs per minute
 	}
 
 	public double getEncoderDist() {
@@ -62,15 +92,38 @@ public class Shooter extends SubsystemBase {
 		return shooterEncoder.getRaw(); 
 	}
 
-	public double shooterPID(double kP, double kD, double targetRPMs) {
-		pid.setP(kP);
-		pid.setD(kD);
-		setPower = pid.calculate(getEncoderRPMs(), targetRPMs);
-		runShooter(setPower);
-		return setPower;
+	public void setRPM(double targetRPMs) {
+		targetRPMs = feedForward.calculate(targetRPMs); // maybe not??
+		powerSetPoint = pid.calculate(getEncoderRPMs(), targetRPMs);
+		setPower(powerSetPoint);
+	}
+
+	public double getPowerSetpoint() {
+		return powerSetPoint;
+	}
+
+	// public void setPIDGains(double kP, double kD, double kI, double kS, double kV, double kA) {
+	// 	pid.setP(kP);
+	// 	pid.setD(kD);
+	// 	pid.setI(kV);
+
+		
+	// }
+
+	public void setSmartDashboardCommands() {
+		displayRPM.setDouble(getEncoderRPMs());
+		shooterPower.setDouble(getPowerSetpoint());
+
+		// pidTuner.periodic();
+	}
+
+	public double getRPMsFromDashboard() {
+		return setRPM.getDouble(0);
 	}
 
 	@Override
-	public void periodic() {}
+	public void periodic() {
+		setSmartDashboardCommands();
+	}
 
 }

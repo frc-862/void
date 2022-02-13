@@ -1,10 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package com.lightningrobotics.voidrobot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -12,29 +5,36 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 public class AutoIndex extends CommandBase {
+    // TODO: refacter this command to run in parallel with vision alin (im assumming that is the main functionality of this class)
 
-    double indexTimer = 0d;
+    private double indexTimer = 0d;
 
-    boolean ballPassed = false;
+    private boolean ballPassed = false;
 
-    final Indexer indexer;
+    private final double power;
+
+    private final Indexer indexer;
 
     /**
      * Creates a new Collect_Eject.
      */
-    public AutoIndex(Indexer indexer) {
+    public AutoIndex(Indexer indexer, double power) {
         this.indexer = indexer;
+        this.power = power;
         addRequirements(indexer);
     }    
 
     @Override
     public void execute() {
 
-        if((Timer.getFPGATimestamp() - indexTimer) < 0.19d) {
-            indexer.setPower(1d);
-        } else {
-            indexer.stop();
-        }
+        indexer.setPower(power);
+
+        // TODO: I dont think this block achives the true functionality of this command (QueBalls does this)
+        // if((Timer.getFPGATimestamp() - indexTimer) < 0.19d) {
+        //     indexer.setPower(1d);
+        // } else {
+        //     indexer.stop();
+        // }
 
     }
 

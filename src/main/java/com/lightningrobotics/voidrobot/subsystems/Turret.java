@@ -1,165 +1,61 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.util.Map;
-import java.util.function.DoubleSupplier;
-
+import com.lightningrobotics.common.controller.PIDFController;
+import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.Constants;
-import com.lightningrobotics.voidrobot.commands.TurnTurret;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
 
-  LEDs leds;
+	private final CANSparkMax turretMotor;
+	private final RelativeEncoder turretEncoder;
+	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
-  private double turretkP = 0.035;
+	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
-  private CANSparkMax twistMotor; 
+	private double target;
 
-  private RelativeEncoder twistMotorEncoder;
+	public Turret() {
+		turretMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
+		turretMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		turretMotor.setClosedLoopRampRate(.02); // too low?
+		turretEncoder = turretMotor.getEncoder();
 
-  private double target;
+	}
+	
+	@Override
+	public void periodic() {
+		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, -135, 135));
 
-  private boolean isDone = false;
+		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
 
-  DoubleSupplier joystickXInput;
+		SmartDashboard.putNumber("motor output", output);
 
-  private double joystickGain = 100;
+		turretMotor.set(output);
+	}
 
+	public void setTargetAngle(double target) {
+		this.target = target;
+	}
 
-  private ShuffleboardTab turretTab = Shuffleboard.getTab("turret");
+	public void stopTurret() {
+		turretMotor.set(0);
+	}
 
-  private NetworkTableEntry targetEntry;
+	public Rotation2d getTurretAngle() {
+		return Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d); 
+		
+	}
 
-  private NetworkTableEntry targetDegrees;
-  private NetworkTableEntry targetAngel;
-  private NetworkTableEntry Error;
-  private NetworkTableEntry currentDegrees;
+	public double getEncoderValue() {
+		return turretEncoder.getPosition();
+	}
 
-  private final double DEFAULT_TARGET = 0;
-
-  private static double turretTarget = 0; 
-
-  public Turret(DoubleSupplier joystickXInput) {
-    twistMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
-
-    twistMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-
-    twistMotor.setClosedLoopRampRate(.02);
-
-    twistMotorEncoder = twistMotor.getEncoder();
-
-    this.joystickXInput = joystickXInput;
-
-  currentDegrees = turretTab
-    .add("current turret degrees", turretRevToDeg())
-    .getEntry();
-     
-    targetDegrees = turretTab
-    .add("current turret target", 0)
-    .getEntry();
-
-    Error = turretTab
-    .add("current Error", 0)
-    .getEntry();
-
-    targetAngel = turretTab
-    .add("current turret Angel", 0)
-    .getEntry();
-
-    leds = new LEDs();
-
-  }
-
-  public void setTarget(double degrees) {
-    target = turretRevToDeg() + degrees;
-  }
-
-  public void twistTurret(double targetAngle) { // -135 -> 135
-    if (Math.abs(targetAngle) < 0.5) {
-      targetAngle = 0;
-      //deadban for controller; tune later
-    }
-    turretTarget += targetAngle;
-    double error = 0;
-
-    if(turretTarget > 180) {
-      turretTarget -= 360;
-    } 
-    if(turretTarget < -180) {
-      turretTarget += 360;
-    }
-
-    error = turretTarget - turretRevToDeg();
-
-    if(turretTarget >= 135) {
-      error = 135 - turretRevToDeg();
-
-      leds.setAllRGB(255, 0, 0);
-
-    } else if(turretTarget <= -135) {
-      error = -135 - turretRevToDeg(); // basically sets turretTarget to 135 without changing turretTarget so the turret can wrap around
-      
-      leds.setAllRGB(255, 0, 0);
-
-    } else if(Math.abs(error) > 5) { //TODO: tune the compliance angle, add vision
-      leds.setAllRGB(255, 255, 0);
-    } else {
-      leds.setAllRGB(0, 255, 0);
-    }
-
-    targetDegrees.setDouble(turretTarget);
-    targetAngel.setDouble(targetAngle);
-    Error.setDouble(error);
-
-    // if (Math.abs(error) < 1) {
-    //   isDone = true;  //TODO: fix later
-    // }
-
-  
-    double motorPower = turretkP*error; 
-
-    if(motorPower > 1) {
-      motorPower = 1;
-    } else if (motorPower <-1) {
-      motorPower = -1;
-    } //TODO: implement lightning's version of this
-
-
-    twistMotor.set(motorPower);    
-  }
-
-  
-  public void stopTurret() {
-    twistMotor.set(0);
-  }
-
-  public double turretRevToDeg() {
-    return twistMotorEncoder.getPosition() * 360 / Constants.TURN_TURRET_GEAR_RATIO;
-  }
-  
-  public double getEncoderValue() {
-    return twistMotorEncoder.getPosition();
-  }
-
-  public boolean isDone() {
-    return isDone;
-  }
-
-  @Override
-  public void periodic() {
-    twistTurret(joystickXInput.getAsDouble()*3);
-    currentDegrees.setDouble(turretRevToDeg());
-  }
 }

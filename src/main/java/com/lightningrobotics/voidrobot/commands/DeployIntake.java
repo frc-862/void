@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class DeployIntake extends CommandBase {
 
+    // TODO: get on this when we know the true deployment method of the collector
+
     private Intake intake;
 
     double deployTimer = 0d;
