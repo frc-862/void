@@ -9,11 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
 
-	private VictorSPX intakeMotor;//TODO: correctly set inverts for motors
+	private VictorSPX intakeMotor;
 
 
 	public Intake() {
 		intakeMotor = new VictorSPX(Constants.INTAKE_MOTOR_ID); 
+		// TODO correctly set inverts for motors
 	}
 
 	@Override
@@ -29,11 +30,11 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void deployIntake() {
-		//TODO: figure out how to deploy intake
+		// TODO figure out how to deploy intake
 	}
 
 	public void retractIntake() {
-		//TODO: figure out how to retract intake
+		// TODO figure out how to retract intake
 	}
 
 }

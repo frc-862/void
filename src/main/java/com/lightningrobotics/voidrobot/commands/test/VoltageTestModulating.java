@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands;
+package com.lightningrobotics.voidrobot.commands.test;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 

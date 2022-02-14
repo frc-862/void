@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class PDPSubsystem extends SubsystemBase {
+public class Core extends SubsystemBase {
 
-  
+  // 
   
   /** Creates a new PDPSubsystem. */
-  public PDPSubsystem() {}
+  public Core() {}
 
   @Override
   public void periodic() {

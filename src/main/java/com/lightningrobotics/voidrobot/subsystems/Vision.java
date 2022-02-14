@@ -1,12 +1,20 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
 
-	// No actuators here - just networktable stuff. Update in periodic
+	// Network Table for Vision
+	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
 
-	// TODO add nt entries for these -- cordinate with vision
+	// Entries for Angle & Distance	
+	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Angle");
+	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Distance");
+
+	// Placeholder Vars for Angle & Distance
 	private static double targetAngle = 0d;
 	private static double targetDistance = 0d;
 
@@ -14,11 +22,18 @@ public class Vision extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// TODO update targetAngle & targetDistance from nt entries
+		
+		// Update Target Angle
+		targetAngle = targetAngleEntry.getDouble(targetAngle);
+
+		// Update Target Distance
+		targetDistance = targetDistanceEntry.getDouble(targetDistance);
+
 	}
 
 	public double getTargetAngle() {
-		return targetAngle; // TODO: implement math for error to get target angle
+		// TODO: implement math for error to get target angle
+		return targetAngle; 
 	}
 
 	public double getTargetDistance() {
