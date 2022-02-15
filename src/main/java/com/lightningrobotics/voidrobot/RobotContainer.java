@@ -1,53 +1,88 @@
 package com.lightningrobotics.voidrobot;
 
-import com.lightningrobotics.voidrobot.commands.Drive;
-import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+import com.lightningrobotics.common.LightningContainer;
+import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
+import com.lightningrobotics.common.util.filter.JoystickFilter;
+import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
+import com.lightningrobotics.voidrobot.commands.AimTurret;
+import com.lightningrobotics.voidrobot.commands.QueueBalls;
+import com.lightningrobotics.voidrobot.commands.RunShooter;
+import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.subsystems.Indexer;
+import com.lightningrobotics.voidrobot.subsystems.LEDs;
+import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Turret;
+import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
-public class RobotContainer {
+public class RobotContainer extends LightningContainer{
 
-	private static final Drivetrain drivetrain = new Drivetrain();
+    // Subsystems
+    private static Turret turret = new Turret();
+    private static Vision vision = new Vision();
+	// private static LEDs leds = new LEDs();
+	// private static Shooter shooter = new Shooter();
+	// private static Indexer indexer = new Indexer();
 
-	private static final Joystick driver = new Joystick(0);
+    private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
-	public RobotContainer() {
-		// Configure the button bindings
-		configureButtonBindings();
+    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
-		drivetrain.setDefaultCommand(new Drive(drivetrain, () -> driver.getRawAxis(1), () -> driver.getRawAxis(5)));
-	}
+    // TODO commands shouldn't be here . . .
+	// private static VoltageTestContinuous VContinous;
+	// private static MoveShooter moveShooter = new MoveShooter(shooter);
 
-	/**
-	 * Use this method to define your button->command mappings. Buttons can be
-	 * created by
-	 * instantiating a {@link GenericHID} or one of its subclasses ({@link
-	 * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-	 * it to a {@link
-	 * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-	 */
-	private void configureButtonBindings() {
-	}
+    public RobotContainer() {
+        super();
+    }
 
-	/**
-	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
-	 * @return the command to run in autonomous
-	 */
-	public Command getAutonomousCommand() {
-		// An ExampleCommand will run in autonomous
-		return null;
-	}
+    @Override
+    protected void configureAutonomousCommands() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    protected void configureButtonBindings() {
+        // if(xbox.getBButtonPressed()) {
+            //TODO: left trigger down (analogue) 
+            // TODO: 
+    }
+
+    @Override
+    protected void configureDefaultCommands() {
+		// VContinous = new VoltageTestContinuous(shooter);
+		// VContinous = new VoltageTestContinuous(shooter);
+		// shooter.setDefaultCommand(new MoveShooter(shooter));
+		// indexer.setDefaultCommand(new QueueBalls(indexer));
+        turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
+		// leds = new LEDs();
+    }
+
+    @Override
+    protected void configureFaultCodes() { }
+
+    @Override
+    protected void configureFaultMonitors() { }
+
+    @Override
+    protected void configureSystemTests() { }
+
+    @Override
+    public LightningDrivetrain getDrivetrain() {
+        return null;
+    }
+
+    @Override
+    protected void initializeDashboardCommands() { }
+	
+    @Override
+    protected void releaseDefaultCommands() { }
+    
 }
