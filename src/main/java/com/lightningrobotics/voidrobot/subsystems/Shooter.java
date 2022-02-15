@@ -28,7 +28,7 @@ public class Shooter extends SubsystemBase {
 	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
 	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
 
-	// private PIDFDashboardTuner pidTuner = new PIDFDashboardTuner("shooter test", pid);
+	private PIDFDashboardTuner tuner = new PIDFDashboardTuner("shooter test", pid);
 
 	private double powerSetPoint;
 
@@ -102,19 +102,9 @@ public class Shooter extends SubsystemBase {
 		return powerSetPoint;
 	}
 
-	// public void setPIDGains(double kP, double kD, double kI, double kS, double kV, double kA) {
-	// 	pid.setP(kP);
-	// 	pid.setD(kD);
-	// 	pid.setI(kV);
-
-		
-	// }
-
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPMs());
 		shooterPower.setDouble(getPowerSetpoint());
-
-		// pidTuner.periodic();
 	}
 
 	public double getRPMsFromDashboard() {

@@ -16,8 +16,10 @@ public final class Constants {
     public static final int TURN_TURRET_ID = 2;    
     public static final int TURRET_MOTOR_ID = 13;
     public static final int TURRET_GEAR_RATIO = 11;
-    public static final double TURRET_kP = 0.035; //TODO: tune this
+    public static final double TURRET_kP = 0.0035; //TODO: tune this
     public static final double DEFAULT_ANGLE = 0;
+    public static final double MAX_TURRET_ANGLE = 135d;
+    public static final double MIN_TURRET_ANGLE = -135d;
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 3; //TODO: what is a number

@@ -12,6 +12,7 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
+import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
@@ -23,14 +24,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    // private static Turret turret = new Turret();
+    private static Turret turret = new Turret();
+    private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
-	private static Indexer indexer = new Indexer();
+	// private static Indexer indexer = new Indexer();
 
     private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
-    // private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
     // TODO commands shouldn't be here . . .
 	// private static VoltageTestContinuous VContinous;
@@ -55,12 +57,11 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureDefaultCommands() {
-        // turret.setDefaultCommand(new TurnTurret(turret));
 		// VContinous = new VoltageTestContinuous(shooter);
 		// VContinous = new VoltageTestContinuous(shooter);
 		// shooter.setDefaultCommand(new MoveShooter(shooter));
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
-        // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
+        turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
 		// leds = new LEDs();
     }
 

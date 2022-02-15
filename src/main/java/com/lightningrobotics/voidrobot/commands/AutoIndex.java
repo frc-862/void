@@ -15,9 +15,6 @@ public class AutoIndex extends CommandBase {
 
     private final Indexer indexer;
 
-    /**
-     * Creates a new Collect_Eject.
-     */
     public AutoIndex(Indexer indexer, double power) {
         this.indexer = indexer;
         this.power = power;
