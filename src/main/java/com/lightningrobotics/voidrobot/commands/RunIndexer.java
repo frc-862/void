@@ -8,17 +8,26 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class QueueBalls extends CommandBase {
+public class RunIndexer extends CommandBase {
 
     private Indexer indexer;
     private static double indexTime = 0.5d; // in seconds
     private static double startIndexTime = 0d;
 
-    public QueueBalls(Indexer indexer) {
+    private DoubleSupplier power;
+
+    public RunIndexer(Indexer indexer) {
             this.indexer = indexer;
 
             addRequirements(indexer);
         }
+
+    public RunIndexer(Indexer indexer, DoubleSupplier power) {
+        this.indexer = indexer;
+        this.power = power;
+
+        addRequirements(indexer);
+    }
 
     @Override
     public void initialize() {
@@ -27,7 +36,7 @@ public class QueueBalls extends CommandBase {
 
     @Override
     public void execute() {
-        indexer.setPower(0.2);
+        indexer.setPower(power.getAsDouble());
     }
 
     @Override
@@ -37,6 +46,6 @@ public class QueueBalls extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - startIndexTime > indexTime;
+        return false; //Timer.getFPGATimestamp() - startIndexTime > indexTime;
     }
 }

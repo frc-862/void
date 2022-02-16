@@ -23,8 +23,8 @@ public final class Constants {
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 3; //TODO: what is a number
-    public static final int ENTER_BEAM_BREAK = 0;
-    public static final int EXIT_BEAM_BREAK = 1;
+    public static final int ENTER_BEAM_BREAK = 8;
+    public static final int EXIT_BEAM_BREAK = 9;
 
 	// Shooter
     public static final int FLYWHEEL_MOTOR_ID = 3;
