@@ -8,6 +8,7 @@ import com.lightningrobotics.voidrobot.commands.AimTurret;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
@@ -29,10 +30,13 @@ public class RobotContainer extends LightningContainer{
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
+	private static final Drivetrain drivetrain = new Drivetrain();
+	
+	private static final Joystick driverLeft = new Joystick(Constants.DRIVER_LEFT_PORT);
+	private static final Joystick driverRight = new Joystick(Constants.DRIVER_RIGHT_PORT);
+	private static final XboxController driver = new XboxController(Constants.DRIVER_PORT); // changed from joystick to xboxcontroller
 
-    private static final XboxController driver = new XboxController(0); //TODO: set right ID
-
-    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.LINEAR); // TODO test this filters
 
     // TODO commands shouldn't be here . . .
 	// private static VoltageTestContinuous VContinous;
@@ -61,10 +65,12 @@ public class RobotContainer extends LightningContainer{
 		// VContinous = new VoltageTestContinuous(shooter);
 		// shooter.setDefaultCommand(new MoveShooter(shooter));
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
-        // turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
+        // turret.setDefaultCommand(new AimTurret(turret, vision, () -> FILTER.FILTER(driver.getLeftX()))); // this should return degrees
 		// leds = new LEDs();
 
         // shooter.setDefaultCommand(new MoveShooter(shooter));
+
+		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, ()-> -driver.getLeftY(), ()-> -driver.getRightY(), FILTER));
 
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 

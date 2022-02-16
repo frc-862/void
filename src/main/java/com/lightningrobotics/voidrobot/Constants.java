@@ -36,5 +36,42 @@ public final class Constants {
     public static final double SHOOTER_KV = 0.62326;//2.1597;
     public static final double SHOOTER_KA = 0.44521;//2.3746;
     
+    // Robot Map
+    public static final int LEFT_MOTOR_1 = 4;
+    public static final int LEFT_MOTOR_2 = 5;
+    public static final int LEFT_MOTOR_3 = 6;
+
+
+    public static final int RIGHT_MOTOR_1 = 1;
+    public static final int RIGHT_MOTOR_2 = 2;
+    public static final int RIGHT_MOTOR_3 = 3;
+
+    // Inverts
+    public static final boolean LEFT_1_INVERT = false;
+    public static final boolean LEFT_2_INVERT = false;
+    public static final boolean LEFT_3_INVERT = false;
+
+    
+    public static final boolean RIGHT_1_INVERT = true;
+    public static final boolean RIGHT_2_INVERT = true;
+    public static final boolean RIGHT_3_INVERT = true;
+
+    // Joystick Constants
+    public static final int DRIVER_PORT = 0;
+    public static final int DRIVER_LEFT_PORT = 0;
+    public static final int DRIVER_RIGHT_PORT = 1;
+
+    // Drivetrain Constants
+    public static final double KP = 0.00048688;
+    public static final double KI = 0.0;
+    public static final double KD = 0.0;
+
+    public static final double KS = 0.54496;
+    public static final double KV = 2.2556;
+    public static final double KA = 0.11811;
+
+    public static final double MAX_SPEED = 1.0;
+    public static final double MAX_ACCELERATION = 1.0;
+    public static final double TRACK_WIDTH = 0.5842;
 
 }
