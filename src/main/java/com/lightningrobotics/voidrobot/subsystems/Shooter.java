@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
+import com.lightningrobotics.util.InterpolatedMap;
 import com.lightningrobotics.voidrobot.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -32,6 +33,8 @@ public class Shooter extends SubsystemBase {
 
 	private double powerSetPoint;
 
+	private InterpolatedMap flywheelSpeedInterpolationTable  = new InterpolatedMap();
+
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
@@ -50,6 +53,8 @@ public class Shooter extends SubsystemBase {
 		displayRPM  = shooterTab
 			.add("RPM-From encoder", 0)
 			.getEntry();
+
+		configureShooterCurve();
 
 	}
 
@@ -73,11 +78,6 @@ public class Shooter extends SubsystemBase {
 
 	public void stop() {
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, 0);; 
-	}
-
-	public void hoodMove(double moveAmount) {
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, moveAmount);
-		//TODO: add logic to actually increment
 	}
 
 	public double getEncoderRPMs() {
@@ -109,6 +109,25 @@ public class Shooter extends SubsystemBase {
 
 	public double getRPMsFromDashboard() {
 		return setRPM.getDouble(0);
+	}
+
+	private void configureShooterCurve() {
+		for (double distance: Constants.DISTANCE_RPM_MAP.keySet()) {
+			flywheelSpeedInterpolationTable.put(distance, Constants.DISTANCE_RPM_MAP.get(distance));
+		}
+	}
+
+	/**
+	 * gets the optimal shooter RPM from an inputted height in pixels using an interpolation map
+	 * @param height in pixels
+	 * @return motor RPMs
+	 */
+	public double getRPMsFromHeight(double height) {
+		if (height > 0) {
+            return flywheelSpeedInterpolationTable.get(height);
+        } else {
+            return 0;
+        }
 	}
 
 	@Override

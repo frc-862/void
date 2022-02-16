@@ -18,18 +18,23 @@ public class Vision extends SubsystemBase {
 
 	private final ShuffleboardTab vision = Shuffleboard.getTab("vision");
 	private final NetworkTableEntry setTurretAngle;
+	private final NetworkTableEntry setTargetHeight;
 	private final double deltaAngle = 0.001;
 
 	// Placeholder Vars for Angle & Distance
 	private static double targetAngle = 0d;
 	private static double targetDistance = 0d;
+	private static double targetHeight = 0d;
     private static double offsetAngle = 0d;
 	private static boolean done = true;
 
 	public Vision() {
 		setTurretAngle = vision
-		.add("set turrent angle", 0)
-		.getEntry();
+			.add("set turrent angle", 0)
+			.getEntry();
+		setTargetHeight = vision
+			.add("set target height", 0)
+			.getEntry();
 	}
 
 	@Override
@@ -37,6 +42,8 @@ public class Vision extends SubsystemBase {
 		
 		// Update Target Angle
 		targetAngle = setTurretAngle.getDouble(0);
+
+		targetHeight = setTargetHeight.getDouble(0);
 
 		// targetAngleEntry.getDouble(targetAngle);
 
@@ -52,6 +59,10 @@ public class Vision extends SubsystemBase {
 
 	public double getTargetDistance() {
 		return targetDistance;
+	}
+
+	public double getTargetHeight() {
+		return targetHeight;
 	}
 
 }
