@@ -8,11 +8,7 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
@@ -27,11 +23,11 @@ public class Indexer extends SubsystemBase {
     private static boolean beamBreakExitStatus = false;
     private static boolean previousBeamBreakExitStatus = false;
 
-    private static boolean runIndexer = false;
-
     public static int ballCount = 0;
 
     private final VictorSPX indexer;
+
+    private boolean isReversing = false;
 
     private final I2C.Port i2cPort = I2C.Port.kMXP;
     private final ColorSensorV3 intakeSensor;
@@ -50,54 +46,57 @@ public class Indexer extends SubsystemBase {
         beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
         beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
 
-        if (beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus){ // checks to see of the beam break has seen a ball
+        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
             var cmd = new QueueBalls(this);
             cmd.schedule(true);
         }
 
-        if(previousBeamBreakEnterStatus && !beamBreakEnterStatus) {
-            ballCount++;
-        } 
+        isReversing = isMotorReversing();
 
-        if (previousBeamBreakExitStatus && !beamBreakExitStatus) {
-            ballCount--;
+        //increment and decrement ball count
+        if(isReversing) {
+            if(previousBeamBreakEnterStatus && !beamBreakEnterStatus) {
+                ballCount--;
+            } 
+            if(previousBeamBreakExitStatus && !beamBreakExitStatus) {
+                ballCount++;
+            }
+        } else {
+            if(!previousBeamBreakEnterStatus && beamBreakEnterStatus) {
+                ballCount++;
+            } 
+            if(!previousBeamBreakExitStatus && beamBreakExitStatus) {
+                ballCount--;
+
+                ball1Color = ball2Color;
+            }
         }
 
-        // returns 1 if red, 2 if blue.
-        if(getBallCount() == 1 && getColorSensorOutputs() == 1) {
-            ball1Color = 1;
-        } else if(getBallCount() == 1 && getColorSensorOutputs() == 2){
-            ball1Color = 2;
-        } 
-
-        // if there isn't any ball, reset ball1
-        if(getBallCount() == 0) {
+        // 1 is red, 2 is blue
+        if(getBallCount() == 1) {
+            //if the does not detect any color, then don't change the ball color,
+            // else (if the color sensor outputs something), change the color.
+            // did you know that the ? operator is generaelly used in code interviews                                                and according to 黄子铭 ,you will 100% fail if you don't know how to use it. to consider oneself to be (sth positive) 
+            ball1Color = getColorSensorOutputs() == 0 ? ball1Color : getColorSensorOutputs();
+        } else if(getBallCount() == 2) {
+            ball2Color = getColorSensorOutputs() == 0 ? ball2Color : getColorSensorOutputs();
+        } else if(getBallCount() == 0) {
             ball1Color = 0;
-        } 
-
-        if(getBallCount() == 2 && getColorSensorOutputs() == 1) {
-            ball2Color = 1;
-        } else if(getBallCount() == 2 && getColorSensorOutputs() == 2){
-            ball2Color = 2;
+            ball2Color = 0;
         }
 
-        // if one ball is ejected, make the 2nd ball 1st
-        if(previousBeamBreakExitStatus && !beamBreakExitStatus) { // previousBallCount - getBallCount() >= 1
-            ball1Color = ball2Color;
-        }
-
-        // if there aren't 2 balls, reset ball2
-        if(getBallCount() == 1 || getBallCount() == 0) {
+        if(getBallCount() != 2) {
             ball2Color = 0;
         }
 
         previousBeamBreakEnterStatus = beamBreakEnterStatus;
         previousBeamBreakExitStatus = beamBreakExitStatus;
 
-        SmartDashboard.putNumber("Ball Count", getBallCount()); // displays our ballcount to the dashboard
+        putSmartDashboard();
+}
 
-        // for the top todo
-        SmartDashboard.putBoolean("enter beam break", BEAM_BREAK_ENTER.get());
+    private void putSmartDashboard() {
+        SmartDashboard.putNumber("Ball Count", getBallCount()); // displays our ballcount to the dashboard
 
         switch(ball1Color) {
             case 0: SmartDashboard.putString("ball 1", "nonexistant");
@@ -119,53 +118,71 @@ public class Indexer extends SubsystemBase {
 
             case 2: SmartDashboard.putString("ball 2", "blue");
             break;        
-
+    }
     }
 
-}
-
-    public boolean getRunIndexer(){
-        return runIndexer;
+    private boolean isMotorReversing() {
+        if(indexer.getMotorOutputPercent() < 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void setRunIndexer(boolean running){
-        runIndexer = running;
+    private boolean getRunIndexer(){
+        return beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus;
     }
 
+    /**
+     * sets the power to the indexer motor
+     * @param power percent output [-1, 1]
+     */
     public void setPower(double power) {
         indexer.set(VictorSPXControlMode.PercentOutput, power);
     }
 
+    /**
+     * gets the status of the bottom (enter) beam break
+     * @return true if broken, false if not
+     */
     public boolean getBeamBreakEnterStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return !BEAM_BREAK_ENTER.get();
     }
 
+    /**
+     * gets the status of the top (exit) beam break
+     * @return true if broken, false if not
+     */
     public boolean getBeamBreakExitStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return !BEAM_BREAK_EXIT.get();
     }
 
-    public void closeBeamBreaks(){
-        BEAM_BREAK_ENTER.close();
-        BEAM_BREAK_EXIT.close();
-    }
-
+    /**
+     * gets the current amount of balls in the indexer
+     * @return number of balls
+     */
     public int getBallCount(){
         return ballCount;
     }
-    
+    /**
+     * stop
+     */
     public void stop() {
         indexer.set(VictorSPXControlMode.PercentOutput, 0);
     }
 
+    /**
+     * gets the output from the indexer color sensor
+     * @return 1 if red, 2 if blue, 0 if nothing currently being read
+     */
     public int getColorSensorOutputs() {
-        //TODO: make 255
         if(intakeSensor.getColor().red >= 0.4) {
-            SmartDashboard.putString("Color", "red");
+            // SmartDashboard.putString("Color", "red");
             return 1;
         } else if(intakeSensor.getColor().blue >= 0.4) {
-            SmartDashboard.putString("Color", "blue");
+            // SmartDashboard.putString("Color", "blue");
             return 2;
         }
 

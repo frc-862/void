@@ -5,7 +5,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
-import com.lightningrobotics.voidrobot.commands.QueueBalls;
+import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
@@ -28,7 +28,7 @@ public class RobotContainer extends LightningContainer{
     private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
-	// private static Indexer indexer = new Indexer();
+	private static Indexer indexer = new Indexer();
 
     private static final XboxController driver = new XboxController(0); //TODO: set right ID
 
@@ -61,8 +61,14 @@ public class RobotContainer extends LightningContainer{
 		// VContinous = new VoltageTestContinuous(shooter);
 		// shooter.setDefaultCommand(new MoveShooter(shooter));
 		// indexer.setDefaultCommand(new QueueBalls(indexer));
-        turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
+        // turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
 		// leds = new LEDs();
+
+        // shooter.setDefaultCommand(new MoveShooter(shooter));
+
+		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
+
+        // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
     }
 
     @Override
