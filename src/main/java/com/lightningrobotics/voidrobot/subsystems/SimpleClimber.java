@@ -11,15 +11,16 @@ public class SimpleClimber extends SubsystemBase {
 	// TODO: implement climber logic
 
 	// Two TalonFX to winch down climb arms
-
 	private TalonFX winch1Motor;
 	private TalonFX winch2Motor;
 
   	public SimpleClimber() {
+		  // Sets the IDs of our winch motors
 		  winch1Motor = new TalonFX(Constants.WINCH1_MOTOR_ID);
 		  winch2Motor = new TalonFX(Constants.WINCH2_MOTOR_ID);
 
-		  winch2Motor.setInverted(true); //TODO: correctly set sign for motors
+		  winch1Motor.setInverted(false); //TODO: correctly set the inverts of the motors
+		  winch2Motor.setInverted(false);
 	  }
 
 	@Override
@@ -31,8 +32,8 @@ public class SimpleClimber extends SubsystemBase {
 	}
 
 	public void climbStop() {
-		winch1Motor.set(TalonFXControlMode.PercentOutput, 0);
-		winch2Motor.set(TalonFXControlMode.PercentOutput, 0); //TODO: correctly set sign for motors
+		winch1Motor.set(TalonFXControlMode.PercentOutput, 0); //TODO: correctly set sign for motors
+		winch2Motor.set(TalonFXControlMode.PercentOutput, 0); 
 	}
 
 }

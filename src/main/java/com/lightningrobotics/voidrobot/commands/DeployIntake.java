@@ -11,8 +11,6 @@ public class DeployIntake extends CommandBase {
 
     private Intake intake;
 
-    double deployTimer = 0d;
-
     public DeployIntake(Intake intake) {
         this.intake = intake;
 

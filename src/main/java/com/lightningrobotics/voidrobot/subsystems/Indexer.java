@@ -13,44 +13,52 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
     
-    // VictorSPX to run
+    // Creates our indexer motor
+    private final VictorSPX indexer;
 
+    // Creates our beam breaks that count the balls
     private static final DigitalInput BEAM_BREAK_ENTER = new DigitalInput(Constants.ENTER_BEAM_BREAK);
     private static final DigitalInput BEAM_BREAK_EXIT = new DigitalInput(Constants.EXIT_BEAM_BREAK);
 
+    // Sets our default beam break status
     private static boolean beamBreakEnterStatus = false;
     private static boolean previousBeamBreakEnterStatus = false;
     private static boolean beamBreakExitStatus = false;
     private static boolean previousBeamBreakExitStatus = false;
 
+    // Sets our default ball count
     public static int ballCount = 0;
 
-    private final VictorSPX indexer;
-
+    // Sets the default value for letting us know if the idexer is running backwards
     private boolean isReversing = false;
 
+    // Creates the color sensor and creates a value for the port
     private final I2C.Port i2cPort = I2C.Port.kMXP;
     private final ColorSensorV3 intakeSensor;
     
+    // Sets the default numbers for ball color (0 = nonexistant)
     private static int ball1Color = 0;
     private static int ball2Color = 0;
 
     public Indexer() {
+        // Sets Motor and color ID/ports
         indexer = new VictorSPX(Constants.INDEXER_MOTOR_ID);
         intakeSensor = new ColorSensorV3(i2cPort);
-        SmartDashboard.putData(this);
     }
 
     @Override
     public void periodic() {
         beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
         beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
-
-        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
+        
+        // checks to see of the beam break has seen a ball
+        if (getRunIndexer()){ 
+            // Runs a new instance of Queue balls which puts balls into Queue
             var cmd = new QueueBalls(this);
             cmd.schedule(true);
         }
 
+        // Checks to see if the indexer is running in revers 
         isReversing = isMotorReversing();
 
         //increment and decrement ball count
@@ -89,6 +97,7 @@ public class Indexer extends SubsystemBase {
             ball2Color = 0;
         }
 
+        // Sets our previous beam break status
         previousBeamBreakEnterStatus = beamBreakEnterStatus;
         previousBeamBreakExitStatus = beamBreakExitStatus;
 

@@ -16,31 +16,38 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
-	private VictorSPX flywheelMotor;//TODO: correctly set invert for motors
+	// Creates the flywheel motor and hood motors
+	private VictorSPX flywheelMotor;
 	private TalonSRX hoodMotor;
 	private Encoder shooterEncoder;
 
+	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
     private NetworkTableEntry displayRPM;
     private NetworkTableEntry setRPM;
     private NetworkTableEntry shooterPower;
 
+	// Creates a PID and FeedForward controller for our shooter
 	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
 	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
 
+	// PID tuner for the shooter gains
 	private PIDFDashboardTuner tuner = new PIDFDashboardTuner("shooter test", pid);
 
+	// The power point we want the shooter to be at
 	private double powerSetPoint;
 
 	public Shooter() {
+		// Sets the IDs of the hood and shooter
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(9, 8);
+		shooterEncoder = new Encoder(9, 8); // sets encoder ports
 
-		flywheelMotor.setInverted(true);
+		flywheelMotor.setInverted(true); // Inverts the flywheel motor
 
-		shooterEncoder.setDistancePerPulse(1d/2048d); //encoder ticks per rev (or, the other way around)
+		shooterEncoder.setDistancePerPulse(1d/2048d); // encoder ticks per rev (or, the other way around)
 
+		// Creates the tables to see important values
 		shooterPower = shooterTab
 			.add("shooter power output", getPowerSetpoint())
 			.getEntry();
