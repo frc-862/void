@@ -1,42 +1,32 @@
 package com.lightningrobotics.voidrobot.commands;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RunIndexer extends CommandBase {
 
+    // Creates the indexer subsystem
     private Indexer indexer;
-    private static double indexTime = 0.5d; // in seconds
-    private static double startIndexTime = 0d;
 
+    // The power we want to supply to the indexer
     private DoubleSupplier power;
-
-    public RunIndexer(Indexer indexer) {
-            this.indexer = indexer;
-
-            addRequirements(indexer);
-        }
 
     public RunIndexer(Indexer indexer, DoubleSupplier power) {
         this.indexer = indexer;
-        this.power = power;
+        this.power = power; // The power that is comming from the controller
 
         addRequirements(indexer);
     }
 
     @Override
-    public void initialize() {
-        startIndexTime = Timer.getFPGATimestamp();
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
-        indexer.setPower(power.getAsDouble());
+        indexer.setPower(power.getAsDouble()); // Gets the supplied power, and sets it to the indexer motor
     }
 
     @Override
@@ -46,6 +36,6 @@ public class RunIndexer extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return false; //Timer.getFPGATimestamp() - startIndexTime > indexTime;
+        return false;
     }
 }

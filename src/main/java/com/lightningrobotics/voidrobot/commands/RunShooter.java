@@ -5,10 +5,13 @@ import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RunShooter extends CommandBase {
+    
+    // Creates the shooter subsystem
     private Shooter shooter;
 
     public RunShooter(Shooter shooter) {
         this.shooter = shooter;
+
         addRequirements(shooter);
     }
 
@@ -17,7 +20,7 @@ public class RunShooter extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(shooter.getRPMsFromDashboard());
+        shooter.setRPM(shooter.getRPMsFromDashboard()); // Gets the desired RPMs from the dashboard and sets them to the motor
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.lightningrobotics.voidrobot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -7,9 +9,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.Timer;
 
 public class RunIntake extends CommandBase {
-    final Intake intake;
-
-    double indexTimer = 0d;
+    
+    // Creates the intake subsystem
+    private final Intake intake;
+    // Sets a constant power that we want to supply to the intake motor
+    private static final double power = 0.5;
 
     public RunIntake(Intake intake) {
         this.intake = intake;
@@ -19,18 +23,12 @@ public class RunIntake extends CommandBase {
 
     @Override
     public void execute() {
-        
-        if((Timer.getFPGATimestamp() - indexTimer) < 0.19d) {
-            intake.runIntake(1d);
-        } else {
-            intake.stopIntake();
-        }
-
+        intake.setPower(power); // Sets the power to the intake motor
     }
 
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
-        intake.stopIntake();
+        intake.stop();
     }
 }
