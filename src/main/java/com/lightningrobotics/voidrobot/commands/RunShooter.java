@@ -7,9 +7,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class RunShooter extends CommandBase {
     private Shooter shooter;
 
-    public RunShooter(Shooter shooter) {
+    private double targetRPMs;
+    public RunShooter(Shooter shooter, double targetRPMs) {
         this.shooter = shooter;
         addRequirements(shooter);
+
+        this.targetRPMs = targetRPMs;
     }
 
     @Override
@@ -17,7 +20,7 @@ public class RunShooter extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(shooter.getRPMsFromDashboard());
+        shooter.setRPM(targetRPMs);
     }
 
     @Override

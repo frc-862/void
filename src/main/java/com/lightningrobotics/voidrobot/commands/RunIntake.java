@@ -24,6 +24,7 @@ public class RunIntake extends CommandBase {
             intake.runIntake(1d);
         } else {
             intake.stopIntake();
+
         }
 
     }

@@ -46,10 +46,7 @@ public class Indexer extends SubsystemBase {
         beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
         beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
 
-        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
-            var cmd = new QueueBalls(this);
-            cmd.schedule(true);
-        }
+        
 
         isReversing = isMotorReversing();
 
@@ -94,6 +91,14 @@ public class Indexer extends SubsystemBase {
 
         putSmartDashboard();
 }
+
+    public boolean startCommandSeq() {
+        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private void putSmartDashboard() {
         SmartDashboard.putNumber("Ball Count", getBallCount()); // displays our ballcount to the dashboard

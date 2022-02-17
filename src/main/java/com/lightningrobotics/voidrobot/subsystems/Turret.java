@@ -2,6 +2,8 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import javax.management.ConstructorParameters;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
@@ -20,7 +22,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
 
 	private final CANSparkMax turretMotor;
-	private final RelativeEncoder turretEncoder;
+	// private final RelativeEncoder turretEncoder;
+
+	private final TalonSRX turretController;
+
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
@@ -33,7 +38,11 @@ public class Turret extends SubsystemBase {
 		turretMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
 		turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		turretMotor.setClosedLoopRampRate(0); // too low?
-		turretEncoder = turretMotor.getEncoder();
+		// turretEncoder = turretMotor.getEncoder();
+
+		turretController = new TalonSRX(Constants.TURRET_CONTROLLER_ID);
+
+		turretController.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
 	}
 	
@@ -67,8 +76,14 @@ public class Turret extends SubsystemBase {
 		
 	}
 
+	/**
+	 * gets the encoder in rotations
+	 * @return the encoder value in rotations
+	 */
 	public double getEncoderValue() {
-		return turretEncoder.getPosition();
+		// return turretEncoder.getPosition();
+
+		return turretController.getSelectedSensorPosition() * 360 / 4096;
 	}
 
 }
