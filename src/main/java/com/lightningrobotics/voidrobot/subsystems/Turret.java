@@ -1,8 +1,12 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.time.chrono.IsoChronology;
+
 import javax.management.ConstructorParameters;
 
+import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 import com.lightningrobotics.common.controller.PIDFController;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.Constants;
@@ -11,6 +15,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,6 +25,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
 
+	private boolean isUsingNavX = false;
+
+	private Rotation2d navXHeading;
+	LightningIMU navX;
 	private final CANSparkMax turretMotor;
 	private final RelativeEncoder turretEncoder;
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
@@ -34,7 +44,7 @@ public class Turret extends SubsystemBase {
 		turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		turretMotor.setClosedLoopRampRate(0); // too low?
 		turretEncoder = turretMotor.getEncoder();
-
+		navX = LightningIMU.navX();
 	}
 	
 	@Override
@@ -45,10 +55,11 @@ public class Turret extends SubsystemBase {
 	
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE)); // Constraining our angle to compensate for our deadzone
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
+		SmartDashboard.putNumber("current angle", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
 
-		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
+		
+		double output = PID.calculate(getTurretAngleNoLimit().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
 		turretMotor.set(output);
 		
 		SmartDashboard.putNumber("motor output", output);
@@ -62,9 +73,40 @@ public class Turret extends SubsystemBase {
 		turretMotor.set(0);
 	}
 
-	public Rotation2d getTurretAngle() {
-		return Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d); 
+	/**
+	 * Gets the turret angle using turret encoder
+	 * @return An angle limited by min and max turret angle
+	 */
+	public Rotation2d getTurretAngle(){
+		return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
+	}
+
+	/**
+	 * Gets the turret angle as if it has no limit
+	 */
+
+	 /*Gets the turret angle and if it is past 135° it adds on the change of the robot heading based	 on the NavX IMU. 
+	  The idea is so that you can check if it hits 180° to loop it over without pushing the turret to 180°. */
+	public Rotation2d getTurretAngleNoLimit() {
+		Rotation2d turretAngle = getTurretAngle();
+		boolean isOverLimit = turretAngle.getDegrees() >= Constants.MAX_TURRET_ANGLE || turretAngle.getDegrees() <= Constants.MIN_TURRET_ANGLE;
 		
+		// If target angle is over the limit and we are not using the navx to calculate, then use the navx to calculate
+		if (isOverLimit && !isUsingNavX) {
+			isUsingNavX = true;
+			navXHeading = navX.getHeading(); // what the navx was at the second it hit the limit
+		} 
+		// If target angle is within the limit and we are using the navx, don't
+		else if (!isOverLimit && isUsingNavX){
+			isUsingNavX = false;
+		}
+
+		// If we are using the navx to calculate, add the change in navx reading from the moment we hit the limit
+		if(isUsingNavX){
+			turretAngle.rotateBy(navX.getHeading().minus(navXHeading));
+		} 
+		
+		return turretAngle;
 	}
 
 	public double getEncoderValue() {
