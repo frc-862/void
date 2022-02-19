@@ -2,7 +2,8 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -16,8 +17,8 @@ public class SimpleClimber extends SubsystemBase {
 
   	public SimpleClimber() {
 		  // Sets the IDs of our winch motors
-		  winch1Motor = new TalonFX(Constants.WINCH1_MOTOR_ID);
-		  winch2Motor = new TalonFX(Constants.WINCH2_MOTOR_ID);
+		  winch1Motor = new TalonFX(RobotMap.WINCH1_MOTOR_ID);
+		  winch2Motor = new TalonFX(RobotMap.WINCH2_MOTOR_ID);
 
 		  winch1Motor.setInverted(false); //TODO: correctly set the inverts of the motors
 		  winch2Motor.setInverted(false);

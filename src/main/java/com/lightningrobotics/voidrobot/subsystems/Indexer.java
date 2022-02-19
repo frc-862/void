@@ -2,7 +2,8 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.commands.QueueBalls;
 import com.revrobotics.ColorSensorV3;
 
@@ -17,8 +18,8 @@ public class Indexer extends SubsystemBase {
     private final VictorSPX indexer;
 
     // Creates our beam breaks that count the balls
-    private static final DigitalInput BEAM_BREAK_ENTER = new DigitalInput(Constants.ENTER_BEAM_BREAK);
-    private static final DigitalInput BEAM_BREAK_EXIT = new DigitalInput(Constants.EXIT_BEAM_BREAK);
+    private static final DigitalInput BEAM_BREAK_ENTER = new DigitalInput(RobotMap.ENTER_BEAM_BREAK);
+    private static final DigitalInput BEAM_BREAK_EXIT = new DigitalInput(RobotMap.EXIT_BEAM_BREAK);
 
     // Sets our default beam break status
     private static boolean beamBreakEnterStatus = false;
@@ -42,7 +43,7 @@ public class Indexer extends SubsystemBase {
 
     public Indexer() {
         // Sets Motor and color ID/ports
-        indexer = new VictorSPX(Constants.INDEXER_MOTOR_ID);
+        indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
         intakeSensor = new ColorSensorV3(i2cPort);
     }
 

@@ -3,7 +3,8 @@ package com.lightningrobotics.voidrobot.subsystems;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -28,7 +29,7 @@ public class Turret extends SubsystemBase {
 	
 	// TODO add java docs
 	public Turret() {
-		turretMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // Sets our turret motor ID
+		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless); // Sets our turret motor ID
 		turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast); // Sets the turret motor to coast
 		turretMotor.setClosedLoopRampRate(0);
 		turretEncoder = turretMotor.getEncoder(); // Gets the cansparkmax motor's built in motor controller

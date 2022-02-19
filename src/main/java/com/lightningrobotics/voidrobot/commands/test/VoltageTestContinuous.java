@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.lightningrobotics.common.logging.DataLogger;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 public class VoltageTestContinuous extends CommandBase {
@@ -63,7 +64,7 @@ public class VoltageTestContinuous extends CommandBase {
         shooter.setPower(0.5);
 
         voltageDrawn = powerDistributor.getVoltage(); 
-        currentDrawn = powerDistributor.getCurrent(Constants.FLYWHEEL_MOTOR_ID);
+        currentDrawn = powerDistributor.getCurrent(RobotMap.FLYWHEEL_MOTOR_ID);
         powerDrawn = powerDistributor.getTotalPower();
         energyDrawn = powerDistributor.getTotalEnergy();
 
