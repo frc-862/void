@@ -55,9 +55,10 @@ public class Turret extends SubsystemBase {
 	
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE)); // Constraining our angle to compensate for our deadzone
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", getTurretAngleNoLimit().getDegrees());
+		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
-
+		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
+		SmartDashboard.putNumber("navx readong", navX.getHeading().getDegrees());
 		
 		double output = PID.calculate(getTurretAngleNoLimit().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
 		turretMotor.set(output);
@@ -88,8 +89,10 @@ public class Turret extends SubsystemBase {
 	// to get the full explanation for what this does check the jira ticket (prog-195)
 	public Rotation2d getTurretAngleNoLimit() {
 		Rotation2d turretAngle = getTurretAngle();
-		boolean isOverLimit = turretAngle.getDegrees() >= Constants.MAX_TURRET_ANGLE || turretAngle.getDegrees() <= Constants.MIN_TURRET_ANGLE;
-		
+		final double tolerance = 5d;
+		boolean isOverLimit = turretAngle.getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) || turretAngle.getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
+
+
 		// If target angle is over the limit and we are not using the navx to calculate, then use the navx to calculate
 		if (isOverLimit && !isUsingNavX) {
 			isUsingNavX = true;
@@ -102,7 +105,10 @@ public class Turret extends SubsystemBase {
 
 		// If we are using the navx to calculate, add the change in navx reading from the moment we hit the limit
 		if(isUsingNavX){
-			turretAngle.rotateBy(navX.getHeading().minus(navXHeading));
+			// System.out.println("previous angle: " + turretAngle.getDegrees());
+			turretAngle = Rotation2d.fromDegrees(turretAngle.getDegrees() + (navX.getHeading().getDegrees() - navXHeading.getDegrees()));
+			// turretAngle.rotateBy(navX.getHeading().minus(navXHeading));
+			// System.out.println("NOW ANGLE: " + turretAngle.getDegrees());
 		} 
 		
 		return turretAngle;
