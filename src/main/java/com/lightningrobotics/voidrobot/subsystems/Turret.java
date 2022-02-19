@@ -1,9 +1,19 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import javax.management.ConstructorParameters;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.Robot;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -15,23 +25,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
 
 	// Creating turret motor, encoder, and PID controller
-	private final CANSparkMax turretMotor;
-	private final RelativeEncoder turretEncoder;
+	// private final CANSparkMax turretMotor;
+	// private final RelativeEncoder turretEncoder;
+
+	private final TalonSRX turretMotor;
+
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
-	
-	private double target; // Target turret angle
-	private static double motorOutput; // Output thats is supplied to the motor -1 to 1
+	private double target;
+
+	private boolean isOnTarget = false;
 	
 	// TODO add java docs
 	public Turret() {
-		turretMotor = new CANSparkMax(Constants.TURN_TURRET_ID, MotorType.kBrushless); // Sets our turret motor ID
-		turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast); // Sets the turret motor to coast
-		turretMotor.setClosedLoopRampRate(0);
-		turretEncoder = turretMotor.getEncoder(); // Gets the cansparkmax motor's built in motor controller
+		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
+		// turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		// turretMotor.setClosedLoopRampRate(0); // too low?
+		// turretEncoder = turretMotor.getEncoder();
+
+		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
+
+		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
 	}
 	
@@ -47,11 +64,11 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
 
-		// uses pid to set the turret power
-		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		turretMotor.set(motorOutput);
+		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
+
+		turretMotor.set(TalonSRXControlMode.PercentOutput, output);
 		
-		SmartDashboard.putNumber("motor output", motorOutput);
+		SmartDashboard.putNumber("motor output", output);
 	}
 
 	public void setTargetAngle(double target) {
@@ -59,7 +76,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void stopTurret() {
-		turretMotor.set(0);
+		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 	}
 
 	public Rotation2d getTurretAngle() {
@@ -67,8 +84,14 @@ public class Turret extends SubsystemBase {
 		
 	}
 
+	/**
+	 * gets the encoder in rotations
+	 * @return the encoder value in rotations
+	 */
 	public double getEncoderValue() {
-		return turretEncoder.getPosition();
+		// return turretEncoder.getPosition();
+
+		return turretMotor.getSelectedSensorPosition() * 360 / 4096;
 	}
 
 }

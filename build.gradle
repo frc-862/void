@@ -2,7 +2,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2022.2.1"
+    id "edu.wpi.first.GradleRIO" version "2022.3.1"
 }
 
 repositories {
@@ -63,7 +63,7 @@ def includeDesktopSupport = false
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-     implementation 'com.lightningrobotics:common:0.0.2'
+     implementation 'com.lightningrobotics:common:0.0.3'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -99,3 +99,13 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+// Custom tasks
+tasks.register('paths', Copy) {
+    from "PathWeaver/Paths/"
+    include "*.path"
+    into "src/main/deploy/paths"
+}
+
+// Automatically copy paths over on build
+build.dependsOn('paths')
