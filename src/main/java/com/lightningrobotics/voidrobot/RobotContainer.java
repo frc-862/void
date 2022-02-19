@@ -68,7 +68,7 @@ public class RobotContainer extends LightningContainer{
 
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 
-        // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
+        turret.setDefaultCommand(new AimTurret(turret, vision)); // this should return degrees
     }
 
     @Override
