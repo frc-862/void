@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.management.ConstructorParameters;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
@@ -10,17 +8,14 @@ import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
 
+	// Creating turret motor, encoder, and PID controller
 	private final CANSparkMax turretMotor;
 	// private final RelativeEncoder turretEncoder;
 
@@ -32,10 +27,8 @@ public class Turret extends SubsystemBase {
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
 	private boolean armed = false;
-
 	private double target;
-
-	private boolean isOnTarget = false;
+	private static double motorOutput;
 	
 	// TODO add java docs
 	public Turret() {
@@ -56,16 +49,17 @@ public class Turret extends SubsystemBase {
 		double sign = -Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 	
-		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE)); // Constraining our angle to compensate for our deadzone
+		// Constraining our angle to compensate for our deadzone
+		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
 
-		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
-
-		turretMotor.set(output);
+		// uses pid to set the turret power
+		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+		turretMotor.set(motorOutput);
 		
-		SmartDashboard.putNumber("motor output", output);
+		SmartDashboard.putNumber("motor output", motorOutput);
 	}
 
 	/**

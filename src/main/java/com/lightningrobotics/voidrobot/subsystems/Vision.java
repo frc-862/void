@@ -25,19 +25,11 @@ public class Vision extends SubsystemBase {
 	public void periodic() {
 		
 		// Update Target Angle
-		targetAngleEntry.getDouble(targetAngle);
+		offsetAngle = targetAngleEntry.getDouble(targetAngle);
 
 		// Update Target Distance
 		targetDistance = targetDistanceEntry.getDouble(targetDistance);
 
-	}
-
-	public boolean isOnTarget() {
-		if(Math.abs(getOffsetAngle()) < 3) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	public double getOffsetAngle() {
