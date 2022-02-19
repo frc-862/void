@@ -20,6 +20,7 @@ public final class Constants {
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 135d;
     public static final double MIN_TURRET_ANGLE = -135d;
+    public static final int TURRET_CONTROLLER_ID = 13;
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 3; //TODO: what is a number
@@ -36,6 +37,8 @@ public final class Constants {
     public static final double SHOOTER_KS = 1.4864;//-.81807;
     public static final double SHOOTER_KV = 0.62326;//2.1597;
     public static final double SHOOTER_KA = 0.44521;//2.3746;
+
+
     
 
 }

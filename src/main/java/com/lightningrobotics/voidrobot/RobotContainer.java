@@ -7,6 +7,7 @@ import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
 import com.lightningrobotics.voidrobot.commands.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.RetractIntake;
+import com.lightningrobotics.voidrobot.commands.RunAutoShoot;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.ShootClose;
@@ -66,7 +67,7 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         //DRIVER
-        // (new JoystickButton(driverRight, 1)).whileHeld(new AutoShoot()); //Auto shoot
+        (new JoystickButton(driverRight, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
         (new TriggerAndThumb((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
         
 
