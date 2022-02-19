@@ -45,6 +45,14 @@ public class Vision extends SubsystemBase {
 
 	}
 
+	public boolean isOnTarget() {
+		if(Math.abs(getOffsetAngle()) < 3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public double getOffsetAngle() {
 		// TODO: implement math for error to get target angle
 		return offsetAngle; 
