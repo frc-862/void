@@ -2,7 +2,7 @@ package com.lightningrobotics.voidrobot.constants;
 
 public final class JoystickConstants {
     // Joystick Constants
-    public static final int DRIVER_PORT = 0;
+    public static final int CO_PILOT_PORT = 2;
     public static final int DRIVER_LEFT_PORT = 0;
     public static final int DRIVER_RIGHT_PORT = 1;
 

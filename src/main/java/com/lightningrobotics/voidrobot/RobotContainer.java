@@ -52,19 +52,19 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    private static Turret turret = new Turret();
-    private static Vision vision = new Vision();
-	private static LEDs leds = new LEDs();
-	private static Shooter shooter = new Shooter();
+    // private static Turret turret = new Turret();
+    // private static Vision vision = new Vision();
+	// private static LEDs leds = new LEDs();
+	// private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
 	private static Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
-	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.DRIVER_PORT); // changed from joystick to xboxcontroller
+	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.CO_PILOT_PORT); // changed from joystick to xboxcontroller
 
-	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.LINEAR); // TODO test this filters
+	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.CUBED); // TODO test this filters
 
     public RobotContainer() {
         super();
@@ -157,7 +157,7 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureDefaultCommands() {
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY()));
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
 	}
 
     @Override
