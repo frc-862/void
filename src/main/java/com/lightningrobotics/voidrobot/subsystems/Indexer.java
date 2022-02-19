@@ -8,6 +8,7 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -31,6 +32,8 @@ public class Indexer extends SubsystemBase {
 
     // Sets the default value for letting us know if the idexer is running backwards
     private boolean isReversing = false;
+    private boolean doMeasure = true;
+    private double startTime = 0;
 
     // Creates the color sensor and creates a value for the port
     private final I2C.Port i2cPort = I2C.Port.kMXP;
@@ -48,12 +51,15 @@ public class Indexer extends SubsystemBase {
 
     @Override
     public void periodic() {
-        beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
-        beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
-        
-        // checks to see of the beam break has seen a ball
-        if (getRunIndexer()){ 
-            // Runs a new instance of Queue balls which puts balls into Queue
+
+        doMeasure = Timer.getFPGATimestamp() - startTime > 0.2;
+
+        if(doMeasure) {
+            beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
+            beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
+        }
+
+        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
             var cmd = new QueueBalls(this);
             cmd.schedule(true);
         }
@@ -96,12 +102,16 @@ public class Indexer extends SubsystemBase {
         if(getBallCount() != 2) {
             ball2Color = 0;
         }
-
-        // Sets our previous beam break status
-        previousBeamBreakEnterStatus = beamBreakEnterStatus;
-        previousBeamBreakExitStatus = beamBreakExitStatus;
+        if(doMeasure) {
+            previousBeamBreakEnterStatus = beamBreakEnterStatus;
+            previousBeamBreakExitStatus = beamBreakExitStatus;
+        }
 
         putSmartDashboard();
+
+        if(beamBreakEnterStatus != previousBeamBreakEnterStatus) {
+            startTime = Timer.getFPGATimestamp();
+        }
 }
 
     private void putSmartDashboard() {
