@@ -4,6 +4,7 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
+import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class RunAutoShoot extends CommandBase {
+public class RunManualShoot extends CommandBase {
   /** Creates a new RunAutoShoot. */
   private Shooter shooter;
   private Indexer indexer;
@@ -24,7 +25,7 @@ public class RunAutoShoot extends CommandBase {
   private double shootingStartTime; 
   private double shootTime = 0.5d; // Time after we hit the top beam break before we end command
 
-  public RunAutoShoot(Shooter shooter, Indexer indexer, Turret turret) {
+  public RunManualShoot(Shooter shooter, Indexer indexer, Turret turret) {
     this.shooter = shooter;
     this.indexer = indexer;
     this.turret = turret;
@@ -35,7 +36,7 @@ public class RunAutoShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    (new ParallelCommandGroup(new AimTurret(turret, vision),  new RunShooter(shooter, 3000))).schedule();
+    (new ParallelCommandGroup(new AimTurret(turret, vision),  new RunShooter(shooter, Constants.SHOOTER_CLOSE_RPMS))).schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -4,9 +4,11 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
+import com.lightningrobotics.voidrobot.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +19,9 @@ public class ManualShooting extends CommandBase {
 
   ShuffleboardTab shooterTab = Shuffleboard.getTab("shooterTab");
   NetworkTableEntry targetRPMs;
+
+  private double shootingStartTime; 
+  private double shootTime = 0.5d; // Time after we hit the top beam break before we end command
 
   /** Creates a new ManualShooting. */
   public ManualShooting(Shooter shooter) {
@@ -37,6 +42,7 @@ public class ManualShooting extends CommandBase {
   @Override
   public void execute() {
     shooter.setRPM(targetRPMs.getDouble(0));
+    // shooter.setRPM(Constants.SHOOTER_CLOSE_RPMS);
   }
 
   // Called once the command ends or is interrupted.
@@ -46,6 +52,6 @@ public class ManualShooting extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return Timer.getFPGATimestamp() - shootingStartTime > shootTime;
   }
 }
