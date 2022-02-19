@@ -85,8 +85,7 @@ public class Turret extends SubsystemBase {
 	 * Gets the turret angle as if it has no limit
 	 */
 
-	 /*Gets the turret angle and if it is past 135° it adds on the change of the robot heading based	 on the NavX IMU. 
-	  The idea is so that you can check if it hits 180° to loop it over without pushing the turret to 180°. */
+	// to get the full explanation for what this does check the jira ticket (prog-195)
 	public Rotation2d getTurretAngleNoLimit() {
 		Rotation2d turretAngle = getTurretAngle();
 		boolean isOverLimit = turretAngle.getDegrees() >= Constants.MAX_TURRET_ANGLE || turretAngle.getDegrees() <= Constants.MIN_TURRET_ANGLE;
