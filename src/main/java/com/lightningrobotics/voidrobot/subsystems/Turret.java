@@ -34,6 +34,8 @@ public class Turret extends SubsystemBase {
 	private boolean armed = false;
 
 	private double target;
+
+	private boolean isOnTarget = false;
 	
 	// TODO add java docs
 	public Turret() {
@@ -60,6 +62,7 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("target angle", target);
 
 		double output = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees()); // uses pid to set the turret power
+
 		turretMotor.set(output);
 		
 		SmartDashboard.putNumber("motor output", output);

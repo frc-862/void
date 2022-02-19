@@ -129,6 +129,14 @@ public class Shooter extends SubsystemBase {
 		return setRPM.getDouble(0);
 	}
 
+	public boolean isOnTarget() {
+		if(Math.abs(pid.getP()) < 100) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	public void periodic() {
 		setSmartDashboardCommands();
