@@ -177,7 +177,7 @@ public class Turret extends SubsystemBase {
 		}
 		currentX = 0; // <---- TODO insert live pose2d feed
 
-		return Math.atan(knownDistanceFromTarget/currentX);
+		return Math.toDegrees(Math.atan2(knownDistanceFromTarget,currentX));
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class Turret extends SubsystemBase {
 		currentX = 0; // <---- TODO insert live pose2d feed
 		currentY = 0; // <---- TODO insert live pose2d feed
 
-		return (Math.atan(currentX/(knownDistanceFromTarget-currentY)));
+		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)));
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class Turret extends SubsystemBase {
 		currentX = 0; // <---- TODO insert live pose2d feed
 		currentY = 0; // <---- TODO insert live pose2d feed
 
-		return (Math.atan(currentX/(knownDistanceFromTarget-currentY)))-(navXOrigin-navXCurrent);
+		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))-(navXOrigin-navXCurrent);
 	}
 
 }
