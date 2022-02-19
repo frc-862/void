@@ -44,6 +44,10 @@ public class Drivetrain extends SubsystemBase {
         setPower(0, 0);
     }
 
+    public boolean isMoving() {
+        return left1.getSelectedSensorVelocity() < 0.05 && right1.getSelectedSensorVelocity() < 0.05;
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

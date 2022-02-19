@@ -139,7 +139,7 @@ public class Indexer extends SubsystemBase {
     }
 
     private boolean getRunIndexer(){
-        return beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus;
+        return !previousBeamBreakEnterStatus && beamBreakEnterStatus;
     }
 
     /**
