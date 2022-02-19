@@ -52,8 +52,6 @@ public class Indexer extends SubsystemBase {
         beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
         beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
 
-        
-
         // Checks to see if the indexer is running in revers 
         isReversing = isMotorReversing();
 
@@ -82,8 +80,10 @@ public class Indexer extends SubsystemBase {
             // else (if the color sensor outputs something), change the color.
             // did you know that the ? operator is generaelly used in code interviews                                                and according to 黄子铭 ,you will 100% fail if you don't know how to use it. to consider oneself to be (sth positive) 
             ball1Color = getColorSensorOutputs() == 0 ? ball1Color : getColorSensorOutputs();
+            
         } else if(getBallCount() == 2) {
             ball2Color = getColorSensorOutputs() == 0 ? ball2Color : getColorSensorOutputs();
+
         } else if(getBallCount() == 0) {
             ball1Color = 0;
             ball2Color = 0;
@@ -98,7 +98,11 @@ public class Indexer extends SubsystemBase {
         previousBeamBreakExitStatus = beamBreakExitStatus;
 
         putSmartDashboard();
-}
+    }
+
+    public void resetBallCount() {
+        ballCount = 0;
+    } 
 
     public boolean startCommandSeq() {
         if (getRunIndexer()){ // checks to see of the beam break has seen a ball

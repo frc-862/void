@@ -9,11 +9,13 @@ import com.lightningrobotics.voidrobot.commands.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.RetractIntake;
 import com.lightningrobotics.voidrobot.commands.RunAutoShoot;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
+import com.lightningrobotics.voidrobot.commands.RunIntake;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.ShootClose;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.JoystickConstants;
+import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
@@ -42,6 +44,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -62,10 +65,6 @@ public class RobotContainer extends LightningContainer{
 	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.DRIVER_PORT); // changed from joystick to xboxcontroller
 
 	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.LINEAR); // TODO test this filters
-
-    // TODO commands shouldn't be here . . .
-	// private static VoltageTestContinuous VContinous;
-	// private static MoveShooter moveShooter = new MoveShooter(shooter);
 
     public RobotContainer() {
         super();
@@ -128,23 +127,31 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         //DRIVER
-        (new JoystickButton(DRIVER_RIGHT, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
-        (new TriggerAndThumb((new JoystickButton(DRIVER_RIGHT, 1)), (new JoystickButton(DRIVER_RIGHT, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
+        // (new JoystickButton(DRIVER_RIGHT, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
+        // (new TriggerAndThumb((new JoystickButton(DRIVER_RIGHT, 1)), (new JoystickButton(DRIVER_RIGHT, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
         
 
         //COPILOT
-        (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
-        (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
-        (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
-        (new JoystickButton(CO_PILOT, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
-        (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
-        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
-        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
+        // (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
+        // (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        // (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        // (new JoystickButton(CO_PILOT, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
+        // (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
+        // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
+        // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
         //TODO: add bias stuff
         /*
         (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         */
+
+		(new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(    
+        new ParallelCommandGroup(   
+        new RunIndexer(indexer, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())), 
+        new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
+        ));
+
+        (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 
     }
 
