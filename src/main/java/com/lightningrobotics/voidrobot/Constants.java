@@ -25,6 +25,7 @@ public final class Constants {
     public static final int INDEXER_MOTOR_ID = 3; //TODO: what is a number
     public static final int ENTER_BEAM_BREAK = 8;
     public static final int EXIT_BEAM_BREAK = 9;
+    public static final double DEFAULT_INDEXER_POWER = 0.7;
 
 	// Shooter
     public static final int FLYWHEEL_MOTOR_ID = 3;

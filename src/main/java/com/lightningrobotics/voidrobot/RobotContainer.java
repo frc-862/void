@@ -5,21 +5,31 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
+import com.lightningrobotics.voidrobot.commands.DeployIntake;
+import com.lightningrobotics.voidrobot.commands.RetractIntake;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
+import com.lightningrobotics.voidrobot.commands.ShootClose;
+import com.lightningrobotics.voidrobot.commands.VoidDrivetrain;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
+import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.TriggerAndThumb;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer{
 
@@ -27,10 +37,15 @@ public class RobotContainer extends LightningContainer{
     private static Turret turret = new Turret();
     private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
-	// private static Shooter shooter = new Shooter();
+	private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
+    private static Drivetrain drivetrain = new Drivetrain();
+    private static Intake intake = new Intake();
 
-    private static final XboxController driver = new XboxController(0); //TODO: set right ID
+    private static final XboxController copilot = new XboxController(0); //TODO: set right ID
+    private static final XboxController climb = new XboxController(1); //TODO: set right ID
+    private static final Joystick driverLeft = new Joystick(6); //TODO: nice (set right ID)
+    private static final Joystick driverRight = new Joystick(9); //TODO: nice (set right ID)
 
     private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
 
@@ -50,25 +65,30 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
-        // if(xbox.getBButtonPressed()) {
-            //TODO: left trigger down (analogue) 
-            // TODO: 
+        //DRIVER
+        // (new JoystickButton(driverRight, 1)).whileHeld(new AutoShoot()); //Auto shoot
+        (new TriggerAndThumb((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
+        
+
+        //COPILOT
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(copilot.getRightTriggerAxis()), intake)); //intake 
+        (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        (new JoystickButton(copilot, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
+        (new JoystickButton(copilot, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-copilot.getLeftTriggerAxis()), indexer)); //indexer out
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-copilot.getLeftTriggerAxis()), intake)); //intake out
+        //TODO: add bias stuff
+        /*
+        (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
+        (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
+        */
+
     }
 
     @Override
     protected void configureDefaultCommands() {
-		// VContinous = new VoltageTestContinuous(shooter);
-		// VContinous = new VoltageTestContinuous(shooter);
-		// shooter.setDefaultCommand(new MoveShooter(shooter));
-		// indexer.setDefaultCommand(new QueueBalls(indexer));
-        // turret.setDefaultCommand(new AimTurret(turret, vision, () -> filter.filter(driver.getLeftX()))); // this should return degrees
-		// leds = new LEDs();
-
-        // shooter.setDefaultCommand(new MoveShooter(shooter));
-
-		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
-
-        // turret.setDefaultCommand(new AimTurret(turret, () -> driver.getLeftX() * 180)); // this should return degrees
+		drivetrain.setDefaultCommand(new VoidDrivetrain(drivetrain, () -> -driverLeft.getY(), () -> -driverLeft.getY()));
     }
 
     @Override
