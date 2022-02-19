@@ -12,10 +12,10 @@ public class QueueBalls extends CommandBase {
 
     // Creates our indexer subsystem
     private Indexer indexer;
-    private static double indexTime = 0.5d; // The time we want the indexer to index in seconds
+    private static double indexTime = 0.1d; // The time we want the indexer to index in seconds
     private static double startIndexTime = 0d; // Setting a default start time of 0
 
-    private static double power = 0.2; // the power we want the indexer to run at
+    private static double power = 0.75; // the power we want the indexer to run at
 
     public QueueBalls(Indexer indexer) {
             this.indexer = indexer;

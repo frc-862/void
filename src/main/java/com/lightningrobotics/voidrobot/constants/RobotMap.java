@@ -26,8 +26,8 @@ public final class RobotMap {
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 16;
-    public static final int ENTER_BEAM_BREAK = 8;
-    public static final int EXIT_BEAM_BREAK = 9;
+    public static final int ENTER_BEAM_BREAK = 1;
+    public static final int EXIT_BEAM_BREAK = 0;
 
     // Shooter
     public static final int FLYWHEEL_MOTOR_ID = 11;
