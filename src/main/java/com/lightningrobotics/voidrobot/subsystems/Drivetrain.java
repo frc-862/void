@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import java.lang.invoke.ConstantCallSite;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
@@ -52,6 +53,12 @@ public class Drivetrain extends DifferentialDrivetrain {
             () -> LightningMath.ticksToDistance( (((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d),
             () -> LightningMath.ticksToDistance( (((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d)
         );
+
+        for (int i = 0; i < RIGHT_MOTORS.length; i++){
+            ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
+            ((WPI_TalonFX)LEFT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
+        }
+
     }
 
 }

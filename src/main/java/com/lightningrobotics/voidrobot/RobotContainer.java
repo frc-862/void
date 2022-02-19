@@ -5,9 +5,12 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
+import com.lightningrobotics.voidrobot.commands.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.constants.JoystickConstants;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
@@ -33,6 +36,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer{
 
@@ -42,14 +46,13 @@ public class RobotContainer extends LightningContainer{
 	private static LEDs leds = new LEDs();
 	private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
-    private static Drivetrain drivetrain = new Drivetrain();
+	private static final Drivetrain drivetrain = new Drivetrain();
+	
+	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
+	private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
+	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.DRIVER_PORT); // changed from joystick to xboxcontroller
 
-    private static final XboxController copilot = new XboxController(0); //TODO: set right ID
-    private static final XboxController climb = new XboxController(1); //TODO: set right ID
-    private static final Joystick driverLeft = new Joystick(6); //TODO: nice (set right ID)
-    private static final Joystick driverRight = new Joystick(9); //TODO: nice (set right ID)
-
-    private static final JoystickFilter filter = new JoystickFilter(0.15, 0.01, 1, Mode.LINEAR);
+	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.LINEAR); // TODO test this filters
 
     // TODO commands shouldn't be here . . .
 	// private static VoltageTestContinuous VContinous;
@@ -115,32 +118,32 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
-        // if(xbox.getBButtonPressed()) {
-            //TODO: left trigger down (analogue) 
-            // TODO: 
-    }
-
-    @Override
-    protected void configureDefaultCommands() {
-		//DRIVER
-        // (new JoystickButton(driverRight, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
-        // (new TriggerAndThumb((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
+        //DRIVER
+        (new JoystickButton(driverRight, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
+        (new TriggerAndThumb((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
         
 
         //COPILOT
-        // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(copilot.getRightTriggerAxis()), intake)); //intake 
-        // (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
-        // (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
-        // (new JoystickButton(copilot, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
-        // (new JoystickButton(copilot, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-copilot.getLeftTriggerAxis()), indexer)); //indexer out
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-copilot.getLeftTriggerAxis()), intake)); //intake out
-        //TODO: add bias stuff
+        (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
+        (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        (new JoystickButton(CO_PILOT, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
+        (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
+        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
+        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
+        
+		
+		//TODO: add bias stuff
         /*
         (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         */
     }
+
+    @Override
+    protected void configureDefaultCommands() {
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY()));
+	}
 
     @Override
     protected void configureFaultCodes() { }
