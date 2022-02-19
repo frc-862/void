@@ -4,23 +4,25 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
-import com.lightningrobotics.voidrobot.subsystems.Intake;
+import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class DeployIntake extends CommandBase {
-  Intake intake;
+public class ShootClose extends CommandBase {
+  Shooter shooter;
 
-  /** Creates a new DeployIntake. */
-  public DeployIntake(Intake intake) {
-    this.intake = intake;
+  /** Creates a new ShootClose. */
+  public ShootClose(Shooter shooter) {
+    this.shooter = shooter;
 
-    addRequirements(intake);
+    addRequirements(shooter);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    //TODO: add shooter stuff idk
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

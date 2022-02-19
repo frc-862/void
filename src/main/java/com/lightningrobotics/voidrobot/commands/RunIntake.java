@@ -6,24 +6,20 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.Timer;
-
 public class RunIntake extends CommandBase {
-    
-    // Creates the intake subsystem
     private final Intake intake;
-    // Sets a constant power that we want to supply to the intake motor
-    private static final double power = 0.5;
+    private DoubleSupplier power;
 
-    public RunIntake(Intake intake) {
+    public RunIntake(Intake intake, DoubleSupplier power) {
         this.intake = intake;
+        this.power = power;
 
         addRequirements(intake);
     }    
 
     @Override
     public void execute() {
-        intake.setPower(power); // Sets the power to the intake motor
+        intake.setPower(power.getAsDouble());
     }
 
     @Override
