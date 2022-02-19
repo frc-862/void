@@ -9,10 +9,13 @@ public class RunShooter extends CommandBase {
     // Creates the shooter subsystem
     private Shooter shooter;
 
-    public RunShooter(Shooter shooter) {
+    private double targetRPMs;
+    public RunShooter(Shooter shooter, double targetRPMs) {
         this.shooter = shooter;
 
         addRequirements(shooter);
+
+        this.targetRPMs = targetRPMs;
     }
 
     @Override
@@ -20,7 +23,7 @@ public class RunShooter extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(shooter.getRPMsFromDashboard()); // Gets the desired RPMs from the dashboard and sets them to the motor
+        shooter.setRPM(targetRPMs);
     }
 
     @Override

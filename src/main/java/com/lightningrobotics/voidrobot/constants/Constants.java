@@ -23,6 +23,10 @@ public final class Constants {
     public static final double MAX_TURRET_ANGLE = 135d;
     public static final double MIN_TURRET_ANGLE = -135d;
 
+    // Indexer Constants
+    public static final double DEFAULT_INDEXER_POWER = 0.5;
+
+
 	// Shooter Constants
     public static final double SHOOTER_KP = 0.00013484;
     public static final double SHOOTER_KI = 0;
@@ -31,7 +35,7 @@ public final class Constants {
     public static final double SHOOTER_KV = 0.62326;//2.1597;
     public static final double SHOOTER_KA = 0.44521;//2.3746;
 
-    // Inverts
+    // Drivetrain Inverts
     public static final boolean LEFT_1_INVERT = false;
     public static final boolean LEFT_2_INVERT = false;
     public static final boolean LEFT_3_INVERT = false;

@@ -6,14 +6,20 @@ import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
 import com.lightningrobotics.voidrobot.commands.DeployIntake;
+import com.lightningrobotics.voidrobot.commands.RetractIntake;
+import com.lightningrobotics.voidrobot.commands.RunAutoShoot;
 import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
+import com.lightningrobotics.voidrobot.commands.ShootClose;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.JoystickConstants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
+import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.TriggerAndThumb;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
@@ -31,11 +37,13 @@ import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer{
@@ -46,6 +54,7 @@ public class RobotContainer extends LightningContainer{
 	private static LEDs leds = new LEDs();
 	private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
+	private static Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -119,25 +128,24 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         //DRIVER
-        // (new JoystickButton(driverRight, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
-        // (new TriggerAndThumb((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
+        (new JoystickButton(DRIVER_RIGHT, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
+        (new TriggerAndThumb((new JoystickButton(DRIVER_RIGHT, 1)), (new JoystickButton(DRIVER_RIGHT, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
         
 
-        // //COPILOT
-        // (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
-        // (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
-        // (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
-        // (new JoystickButton(CO_PILOT, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
-        // (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
-        // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
-        // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
-        
-		
-		//TODO: add bias stuff
+        //COPILOT
+        (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
+        (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        (new JoystickButton(CO_PILOT, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
+        (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
+        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
+        (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
+        //TODO: add bias stuff
         /*
         (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         */
+
     }
 
     @Override
