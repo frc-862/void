@@ -5,14 +5,16 @@ import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RunShooter extends CommandBase {
+    
     private Shooter shooter;
 
-    private double targetRPMs;
-    public RunShooter(Shooter shooter, double targetRPMs) {
+    private double targetRPM;
+
+    public RunShooter(Shooter shooter, double targetRPM) {
         this.shooter = shooter;
         addRequirements(shooter);
 
-        this.targetRPMs = targetRPMs;
+        this.targetRPM = targetRPM;
     }
 
     @Override
@@ -20,7 +22,7 @@ public class RunShooter extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(targetRPMs);
+        shooter.setRPM(targetRPM);
     }
 
     @Override

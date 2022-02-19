@@ -31,6 +31,8 @@ public class Shooter extends SubsystemBase {
 	private PIDFDashboardTuner tuner = new PIDFDashboardTuner("shooter test", pid);
 
 	private double powerSetPoint;
+	private double targetRPM;
+	private static boolean armed;
 
 	public Shooter() {
 		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
@@ -80,7 +82,7 @@ public class Shooter extends SubsystemBase {
 		//TODO: add logic to actually increment
 	}
 
-	public double getEncoderRPMs() {
+	public double getEncoderRPM() {
 		return shooterEncoder.getRate() * 60; //converts from revs per second to revs per minute
 	}
 
@@ -92,10 +94,26 @@ public class Shooter extends SubsystemBase {
 		return shooterEncoder.getRaw(); 
 	}
 
-	public void setRPM(double targetRPMs) {
-		targetRPMs = feedForward.calculate(targetRPMs); // maybe not??
-		powerSetPoint = pid.calculate(getEncoderRPMs(), targetRPMs);
+	public void setRPM(double targetRPM) {
+		this.targetRPM = targetRPM;
+		targetRPM = feedForward.calculate(targetRPM); // maybe not??
+		powerSetPoint = pid.calculate(getEncoderRPM(), targetRPM);
 		setPower(powerSetPoint);
+	}
+
+	/**
+	 * Checks if flywheel RPM is within a threshold
+	 */
+	public void setArmed() {
+		armed = Math.abs(getEncoderRPM() - targetRPM) < 50;
+	}
+
+	/**
+	 * 
+	 * @return Whether flywheel RPM is within a threshold and ready to shoot
+	 */
+	public boolean getArmed() {
+		return armed;	
 	}
 
 	public double getPowerSetpoint() {
@@ -103,17 +121,18 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setSmartDashboardCommands() {
-		displayRPM.setDouble(getEncoderRPMs());
+		displayRPM.setDouble(getEncoderRPM());
 		shooterPower.setDouble(getPowerSetpoint());
 	}
 
-	public double getRPMsFromDashboard() {
+	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
 	}
 
 	@Override
 	public void periodic() {
 		setSmartDashboardCommands();
+		setArmed(); // Checks to see the shooter is at desired RPMS
 	}
 
 }

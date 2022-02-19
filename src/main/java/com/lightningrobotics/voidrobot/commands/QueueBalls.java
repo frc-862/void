@@ -15,10 +15,9 @@ public class QueueBalls extends CommandBase {
     private static double startIndexTime = 0d;
 
     public QueueBalls(Indexer indexer) {
-            this.indexer = indexer;
-
-            addRequirements(indexer);
-        }
+        this.indexer = indexer;
+        addRequirements(indexer);
+    }
 
     @Override
     public void initialize() {

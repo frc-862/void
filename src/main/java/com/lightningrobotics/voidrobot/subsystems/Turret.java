@@ -31,6 +31,8 @@ public class Turret extends SubsystemBase {
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
+	private boolean armed = false;
+
 	private double target;
 	
 	// TODO add java docs
@@ -63,8 +65,21 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("motor output", output);
 	}
 
-	public void setTargetAngle(double target) {
-		this.target = target;
+	/**
+	 * Sets the offset angle and updates to see if we are within the angle threshold to shoot
+	 * @param offsetAngle relative angle to turn
+	 */
+	public void setVisionOffset(double offsetAngle) {
+		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
+	}
+
+	/**
+	 * 
+	 * @return If the turret is turned to the correct degree and ready to shoot
+	 */
+	public boolean getArmed() {
+		return armed;
 	}
 
 	public void stopTurret() {
@@ -82,7 +97,6 @@ public class Turret extends SubsystemBase {
 	 */
 	public double getEncoderValue() {
 		// return turretEncoder.getPosition();
-
 		return turretController.getSelectedSensorPosition() * 360 / 4096;
 	}
 
