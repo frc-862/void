@@ -8,13 +8,13 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class DeployIntake extends CommandBase {
+public class RetractIntake extends CommandBase {
   Intake intake;
 
   /** Creates a new DeployIntake. */
-  public DeployIntake(Intake intake) {
+  public RetractIntake(Intake intake) {
     this.intake = intake;
-    
+
     addRequirements(intake);
   }
 

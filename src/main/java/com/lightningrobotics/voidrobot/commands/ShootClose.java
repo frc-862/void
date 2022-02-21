@@ -4,32 +4,29 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
-import com.lightningrobotics.voidrobot.subsystems.Turret;
+import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class GetTurretAngle extends CommandBase {
-  /** Creates a new GetTurretAngle. */
+public class ShootClose extends CommandBase {
+  Shooter shooter;
 
-  Turret turret;
-  public GetTurretAngle(Turret turret) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  /** Creates a new ShootClose. */
+  public ShootClose(Shooter shooter) {
+    this.shooter = shooter;
 
-    this.turret = turret;
-
-    addRequirements(turret);
+    addRequirements(shooter);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    //TODO: add shooter stuff idk
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    SmartDashboard.putNumber("raw encoder ticks", turret.getEncoderValue());
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

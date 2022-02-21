@@ -8,7 +8,8 @@ import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.util.InterpolatedMap;
-import com.lightningrobotics.voidrobot.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Encoder;
@@ -44,8 +45,8 @@ public class Shooter extends SubsystemBase {
 
 	public Shooter() {
 		// Sets the IDs of the hood and shooter
-		flywheelMotor = new VictorSPX(Constants.FLYWHEEL_MOTOR_ID);
-		hoodMotor = new TalonSRX(Constants.HOOD_MOTOR_ID);
+		flywheelMotor = new VictorSPX(RobotMap.FLYWHEEL_MOTOR_ID);
+		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
 		shooterEncoder = new Encoder(9, 8); // sets encoder ports
 
 		flywheelMotor.setInverted(true); // Inverts the flywheel motor
