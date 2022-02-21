@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
+import com.lightningrobotics.common.geometry.LightningOdometer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
@@ -18,6 +19,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +35,17 @@ public class Turret extends SubsystemBase {
 	// private final RelativeEncoder turretEncoder;
 
 	private final TalonSRX turretMotor;
+	//variables I need to run the tests
+	private boolean testOneHasInit = false;
+	private boolean testTwoHasInit = false;
+	private boolean testThreeHasInit = false;
+	private boolean testFourHasInit = false;
+	private double navXOrigin = 0d;
+	private double navXCurrent = 0d;
+	private double currentX = 0d;
+	private double currentY = 0d;
+	private double knownDistanceFromTarget = 5d;
+	private double originX = 0d;	
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
@@ -82,11 +95,10 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
-		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
-		
-		SmartDashboard.putNumber("motor output", motorOutput);
+		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		//this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
+
+		this.target = testOne(); //pull values from my testing function temporarily
 	}
 
 	/**
@@ -112,8 +124,6 @@ public class Turret extends SubsystemBase {
 	/**
 	 * Gets the turret angle as if it has no limit
 	 */
-
-	// to get the full explanation for what this does check the jira ticket (prog-195)
 	public Rotation2d getTurretAngleNoLimit() {
 		Rotation2d turretAngle = getTurretAngle();
 		final double tolerance = 5d;
@@ -132,10 +142,7 @@ public class Turret extends SubsystemBase {
 
 		// If we are using the navx to calculate, add the change in navx reading from the moment we hit the limit
 		if(isUsingNavX){
-			// System.out.println("previous angle: " + turretAngle.getDegrees());
 			turretAngle = Rotation2d.fromDegrees(turretAngle.getDegrees() + (navX.getHeading().getDegrees() - navXHeading.getDegrees()));
-			// turretAngle.rotateBy(navX.getHeading().minus(navXHeading));
-			// System.out.println("NOW ANGLE: " + turretAngle.getDegrees());
 		} 
 		
 		return turretAngle;
@@ -149,6 +156,66 @@ public class Turret extends SubsystemBase {
 		// return turretEncoder.getPosition();
 
 		return turretMotor.getSelectedSensorPosition() * 360 / 4096;
+	}
+
+	/**
+	 * Test of tracking target based on just rotation
+	 * @return test offfset angle to set the turret to in degrees
+	 */
+	public double testOne(){
+		if (!testOneHasInit){
+			navXOrigin = navX.getHeading().getDegrees();
+			testOneHasInit = true;
+		}
+		navXCurrent = navX.getHeading().getDegrees();
+
+		return (navXOrigin - navXCurrent);
+	}
+
+	/**
+	 * Test of tracking target based on just horizontal movement
+	 * @return test offfset angle to set the turret to in degrees
+	 */
+	public double testTwo(){
+		if (!testTwoHasInit){
+			// <---- TODO reset pose2d here
+			testTwoHasInit = true;
+		}
+		currentX = 0; // <---- TODO insert live pose2d feed
+
+		return Math.toDegrees(Math.atan2(knownDistanceFromTarget,currentX));
+	}
+
+	/**
+	 * Test of locking based on variable movement
+	 * @return test offfset angle to set the turret to in degrees
+	 */
+	public double testThree(){
+		if (!testThreeHasInit){
+			// <---- TODO reset pose2d here
+			testThreeHasInit = true;
+		}
+		currentX = 0; // <---- TODO insert live pose2d feed
+		currentY = 0; // <---- TODO insert live pose2d feed
+
+		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)));
+	}
+
+	/**
+	 * This should be able to track the target from any position and angle
+	 * @return test offfset angle to set the turret to in degrees
+	 */
+	public double testFour(){
+		if (!testFourHasInit){
+			// <---- TODO reset pose2d here
+			testFourHasInit = true;
+			navXOrigin = navX.getHeading().getDegrees();
+		}
+		navXCurrent = navX.getHeading().getDegrees();
+		currentX = 0; // <---- TODO insert live pose2d feed
+		currentY = 0; // <---- TODO insert live pose2d feed
+
+		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))-(navXOrigin-navXCurrent);
 	}
 
 }
