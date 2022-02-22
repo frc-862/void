@@ -50,7 +50,7 @@ public class Indexer extends SubsystemBase {
         // Sets Motor and color ID/ports
         indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
         intakeSensor = new ColorSensorV3(i2cPort);
-        }
+    }
 
     @Override
     public void periodic() {
@@ -125,14 +125,14 @@ public class Indexer extends SubsystemBase {
         if(doMeasure) {
             previousBeamBreakEnterStatus = beamBreakEnterStatus;
             previousBeamBreakExitStatus = beamBreakExitStatus;
-       }
-
+        }
+ 
         putSmartDashboard();
 
     //     if(beamBreakExitStatus) {
     //         return;
     //    }
-}
+	}
     
 
     public void resetBallCount() {

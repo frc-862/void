@@ -1,8 +1,5 @@
 package com.lightningrobotics.voidrobot.commands;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -12,17 +9,17 @@ public class QueueBalls extends CommandBase {
 
     // Creates our indexer subsystem
     private Indexer indexer;
-    private static double indexTimeBall1 = 0.185d; // The time we want the indexer to index in seconds
-    private static double indexTimeBall2 = 0.2d; // The time we want the indexer to index in seconds
+    private static double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
+    private static double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
     private static double startIndexTime = 0d; // Setting a default start time of 0
 
     private static double power = 0.75; // the power we want the indexer to run at
 
     public QueueBalls(Indexer indexer) {
-            this.indexer = indexer;
+		this.indexer = indexer;
 
-            addRequirements(indexer);
-        }
+		addRequirements(indexer);
+	}
 
     @Override
     public void initialize() {
