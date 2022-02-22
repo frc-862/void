@@ -59,7 +59,7 @@ public class Turret extends SubsystemBase {
 	private double target;
 	private static double motorOutput;
 
-	private ShuffleboardTab turretNoVisionTab = Shuffleboard.getTab("Turret No Vision");
+	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 
     private NetworkTableEntry dxEntry;
 	private NetworkTableEntry dyEntry;
@@ -78,15 +78,15 @@ public class Turret extends SubsystemBase {
 
 		navX = LightningIMU.navX();
 
-		dxEntry = turretNoVisionTab
+		dxEntry = turretTab
             .add("dx", 0)
             .getEntry();
 
-		dyEntry = turretNoVisionTab
+		dyEntry = turretTab
             .add("dy", 0)
             .getEntry();
 
-		targetDistanceEntry = turretNoVisionTab.add("distance from target", 0).getEntry();
+		targetDistanceEntry = turretTab.add("distance from target", 0).getEntry();
 	}
 	
 	@Override
