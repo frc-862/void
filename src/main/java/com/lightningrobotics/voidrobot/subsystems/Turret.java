@@ -121,7 +121,7 @@ public class Turret extends SubsystemBase {
 		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 		//this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
 
-		this.target = testOne() + getTurretAngle().getDegrees(); //pull values from my testing function temporarily
+		this.target = testOne() + getTurretAngleNoLimit().getDegrees(); //pull values from my testing function temporarily
 	}
 
 	/**
