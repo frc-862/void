@@ -1,5 +1,7 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.security.DomainCombiner;
+
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
@@ -48,21 +50,28 @@ public class Indexer extends SubsystemBase {
         // Sets Motor and color ID/ports
         indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
         intakeSensor = new ColorSensorV3(i2cPort);
-    }
+        }
 
     @Override
     public void periodic() {
+        getColorSensorOutputs();
 
         SmartDashboard.putBoolean("enter", getBeamBreakEnterStatus());
 
-        doMeasure =true; // Timer.getFPGATimestamp() - startTime > 0.2;
+        doMeasure = Timer.getFPGATimestamp() - startTime > 0.0;
 
-        if(doMeasure) {
+        SmartDashboard.putBoolean("the thing", doMeasure);
+
+        // if(!doMeasure){return;}
+
+       if(doMeasure) {
             beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
             beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
-        }
+       }
 
-        if (getRunIndexer()){ // checks to see of the beam break has seen a ball
+       
+
+        if (getRunIndexer() && !isReversing){ // checks to see of the beam break has seen a ball
             var cmd = new QueueBalls(this);
             cmd.schedule(true);
         }
@@ -70,19 +79,21 @@ public class Indexer extends SubsystemBase {
         // Checks to see if the indexer is running in revers 
         isReversing = isMotorReversing();
 
+        
+
         //increment and decrement ball count
         if(isReversing) {
-            if(previousBeamBreakEnterStatus && !beamBreakEnterStatus) {
+            if(!previousBeamBreakEnterStatus && beamBreakEnterStatus) {
                 ballCount--;
             } 
-            if(previousBeamBreakExitStatus && !beamBreakExitStatus) {
+            if(!previousBeamBreakExitStatus && beamBreakExitStatus) {
                 ballCount++;
             }
         } else {
-            if(!previousBeamBreakEnterStatus && beamBreakEnterStatus) {
+            if(previousBeamBreakEnterStatus && !beamBreakEnterStatus) {
                 ballCount++;
             } 
-            if(!previousBeamBreakExitStatus && beamBreakExitStatus) {
+            if(previousBeamBreakExitStatus && !beamBreakExitStatus) {
                 ballCount--;
 
                 ball1Color = ball2Color;
@@ -107,16 +118,20 @@ public class Indexer extends SubsystemBase {
         if(getBallCount() != 2) {
             ball2Color = 0;
         }
+
+        if(beamBreakEnterStatus != previousBeamBreakEnterStatus && doMeasure) {
+            startTime = Timer.getFPGATimestamp();
+        }
         if(doMeasure) {
             previousBeamBreakEnterStatus = beamBreakEnterStatus;
             previousBeamBreakExitStatus = beamBreakExitStatus;
-        }
+       }
 
         putSmartDashboard();
 
-        if(beamBreakEnterStatus != previousBeamBreakEnterStatus) {
-            startTime = Timer.getFPGATimestamp();
-        }
+    //     if(beamBreakExitStatus) {
+    //         return;
+    //    }
 }
     
 
@@ -215,10 +230,10 @@ public class Indexer extends SubsystemBase {
      * @return 1 if red, 2 if blue, 0 if nothing currently being read
      */
     public int getColorSensorOutputs() {
-        if(intakeSensor.getColor().red >= 0.4) {
+        if(intakeSensor.getColor().red >= 0.295) {
             // SmartDashboard.putString("Color", "red");
             return 1;
-        } else if(intakeSensor.getColor().blue >= 0.4) {
+        } else if(intakeSensor.getColor().blue >= 0.25) {
             // SmartDashboard.putString("Color", "blue");
             return 2;
         }

@@ -12,7 +12,8 @@ public class QueueBalls extends CommandBase {
 
     // Creates our indexer subsystem
     private Indexer indexer;
-    private static double indexTime = 0.1d; // The time we want the indexer to index in seconds
+    private static double indexTimeBall1 = 0.185d; // The time we want the indexer to index in seconds
+    private static double indexTimeBall2 = 0.2d; // The time we want the indexer to index in seconds
     private static double startIndexTime = 0d; // Setting a default start time of 0
 
     private static double power = 0.75; // the power we want the indexer to run at
@@ -40,6 +41,14 @@ public class QueueBalls extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - startIndexTime > indexTime; // Checks to see if we have reached the amount of time we want to index, then stops
+        if(indexer.getBallCount() == 0) {
+            return Timer.getFPGATimestamp() - startIndexTime > indexTimeBall1;
+        }
+         else if(indexer.getBallCount() == 1) {
+            return /*indexer.getBeamBreakExitStatus();*/Timer.getFPGATimestamp() - startIndexTime > indexTimeBall2; // Checks to see if we have reached the amount of time we want to index, then stops
+        } 
+        else {
+            return true;
+        }
     }
 }
