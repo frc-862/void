@@ -21,6 +21,9 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -44,7 +47,7 @@ public class Turret extends SubsystemBase {
 	private double navXCurrent = 0d;
 	private double currentX = 0d;
 	private double currentY = 0d;
-	private double knownDistanceFromTarget = 5d;
+	private double knownDistanceFromTarget = 0d;
 	private double originX = 0d;	
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
@@ -55,6 +58,12 @@ public class Turret extends SubsystemBase {
 	private boolean armed = false;
 	private double target;
 	private static double motorOutput;
+
+	private ShuffleboardTab turretNoVisionTab = Shuffleboard.getTab("Turret No Vision");
+
+    private NetworkTableEntry dxEntry;
+	private NetworkTableEntry dyEntry;
+	private NetworkTableEntry targetDistanceEntry;
 	
 	// TODO add java docs
 	public Turret() {
@@ -68,6 +77,16 @@ public class Turret extends SubsystemBase {
 		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
 		navX = LightningIMU.navX();
+
+		dxEntry = turretNoVisionTab
+            .add("dx", 0)
+            .getEntry();
+
+		dyEntry = turretNoVisionTab
+            .add("dy", 0)
+            .getEntry();
+
+		targetDistanceEntry = turretNoVisionTab.add("distance from target", 0).getEntry();
 	}
 	
 	@Override
@@ -88,6 +107,10 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx readong", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
+
+		currentX = dxEntry.getDouble(0);
+		currentY= dyEntry.getDouble(0);
+		knownDistanceFromTarget = targetDistanceEntry.getDouble(0);
 	}
 
 	/**
@@ -98,7 +121,7 @@ public class Turret extends SubsystemBase {
 		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 		//this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
 
-		this.target = testOne(); //pull values from my testing function temporarily
+		this.target = testOne() + getTurretAngle().getDegrees(); //pull values from my testing function temporarily
 	}
 
 	/**
@@ -178,12 +201,10 @@ public class Turret extends SubsystemBase {
 	 */
 	public double testTwo(){
 		if (!testTwoHasInit){
-			// <---- TODO reset pose2d here
+			currentX = 0;
 			testTwoHasInit = true;
 		}
-		currentX = 0; // <---- TODO insert live pose2d feed
-
-		return Math.toDegrees(Math.atan2(knownDistanceFromTarget,currentX));
+		return Math.toDegrees(Math.atan2(currentX, knownDistanceFromTarget)); // TODO: flip this around???
 	}
 
 	/**
@@ -192,12 +213,10 @@ public class Turret extends SubsystemBase {
 	 */
 	public double testThree(){
 		if (!testThreeHasInit){
-			// <---- TODO reset pose2d here
+			currentX = 0;
+			currentY = 0;
 			testThreeHasInit = true;
 		}
-		currentX = 0; // <---- TODO insert live pose2d feed
-		currentY = 0; // <---- TODO insert live pose2d feed
-
 		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)));
 	}
 
@@ -209,11 +228,11 @@ public class Turret extends SubsystemBase {
 		if (!testFourHasInit){
 			// <---- TODO reset pose2d here
 			testFourHasInit = true;
+			currentX = 0;
+			currentY = 0;
 			navXOrigin = navX.getHeading().getDegrees();
 		}
 		navXCurrent = navX.getHeading().getDegrees();
-		currentX = 0; // <---- TODO insert live pose2d feed
-		currentY = 0; // <---- TODO insert live pose2d feed
 
 		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))-(navXOrigin-navXCurrent);
 	}

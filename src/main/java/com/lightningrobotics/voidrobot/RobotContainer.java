@@ -5,6 +5,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
+import com.lightningrobotics.voidrobot.commands.AimTurretNoVision;
 import com.lightningrobotics.voidrobot.commands.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.RetractIntake;
 import com.lightningrobotics.voidrobot.commands.RunAutoShoot;
@@ -17,6 +18,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.JoystickConstants;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+import com.lightningrobotics.voidrobot.subsystems.HowitzerDrivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
@@ -27,6 +29,8 @@ import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import java.nio.file.DirectoryStream.Filter;
 import java.util.Arrays;
+
+import javax.print.attribute.standard.Copies;
 
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.auto.Autonomous;
@@ -58,6 +62,8 @@ public class RobotContainer extends LightningContainer{
 	// private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
 	private static Intake intake = new Intake();
+	private static Turret turret = new Turret();
+	private static HowitzerDrivetrain howitzerDrivetrain = new HowitzerDrivetrain();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -152,7 +158,7 @@ public class RobotContainer extends LightningContainer{
         ));
 
         (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
-
+		(new JoystickButton(CO_PILOT, 1)).whenPressed(new AimTurretNoVision(turret, howitzerDrivetrain));
     }
 
     @Override
