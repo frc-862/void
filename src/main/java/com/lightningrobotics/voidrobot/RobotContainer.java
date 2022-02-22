@@ -1,7 +1,9 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningContainer;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
+import com.lightningrobotics.common.subsystem.drivetrain.LightningGains;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
@@ -36,6 +38,7 @@ import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.auto.Autonomous;
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
+import com.lightningrobotics.common.command.drivetrain.swerve.SwerveDriveCommand;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
@@ -65,7 +68,7 @@ public class RobotContainer extends LightningContainer{
 	private static Turret turret = new Turret();
 	private static HowitzerDrivetrain howitzerDrivetrain = new HowitzerDrivetrain();
 	private static final Drivetrain drivetrain = new Drivetrain();
-	
+	private static LightningIMU IMU;
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
 	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.CO_PILOT_PORT); // changed from joystick to xboxcontroller
@@ -74,6 +77,8 @@ public class RobotContainer extends LightningContainer{
 
     public RobotContainer() {
         super();
+		IMU = LightningIMU.navX();
+		howitzerDrivetrain.setDefaultCommand(new SwerveDriveCommand(howitzerDrivetrain, IMU, CO_PILOT, true));
     }
 
     @Override
