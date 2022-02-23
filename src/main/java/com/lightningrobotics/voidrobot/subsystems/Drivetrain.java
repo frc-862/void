@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.lang.invoke.ConstantCallSite;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.controller.FeedForwardController;
