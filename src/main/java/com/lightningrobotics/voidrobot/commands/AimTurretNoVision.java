@@ -5,7 +5,6 @@
 package com.lightningrobotics.voidrobot.commands;
 
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
-import com.lightningrobotics.voidrobot.subsystems.HowitzerDrivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -14,13 +13,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AimTurretNoVision extends CommandBase {
 
   private Turret turret;
-  private HowitzerDrivetrain drivetrain;
   /** Creates a new AimTurretNoVision. */
-  public AimTurretNoVision(Turret turret, HowitzerDrivetrain drivetrain) {
+  public AimTurretNoVision(Turret turret) {
     this.turret = turret;
-    this.drivetrain = drivetrain;
 
-    addRequirements(turret, drivetrain);
+    addRequirements(turret);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

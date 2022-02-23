@@ -20,7 +20,6 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.JoystickConstants;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
-import com.lightningrobotics.voidrobot.subsystems.HowitzerDrivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
@@ -66,7 +65,6 @@ public class RobotContainer extends LightningContainer{
 	private static Indexer indexer = new Indexer();
 	private static Intake intake = new Intake();
 	private static Turret turret = new Turret();
-	private static HowitzerDrivetrain howitzerDrivetrain = new HowitzerDrivetrain();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	private static LightningIMU IMU;
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -78,7 +76,6 @@ public class RobotContainer extends LightningContainer{
     public RobotContainer() {
         super();
 		IMU = LightningIMU.navX();
-		howitzerDrivetrain.setDefaultCommand(new SwerveDriveCommand(howitzerDrivetrain, IMU, CO_PILOT, true));
     }
 
     @Override
@@ -163,7 +160,7 @@ public class RobotContainer extends LightningContainer{
         ));
 
         (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
-		(new JoystickButton(CO_PILOT, 1)).whenPressed(new AimTurretNoVision(turret, howitzerDrivetrain));
+		//(new JoystickButton(CO_PILOT, 3)).whenPressed(new AimTurretNoVision(turret));
     }
 
     @Override
@@ -180,7 +177,7 @@ public class RobotContainer extends LightningContainer{
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 
         //turret.setDefaultCommand(new AimTurret(turret, vision)); // this should return degrees
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
+		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
 	}
 
     @Override

@@ -37,7 +37,7 @@ public class Turret extends SubsystemBase {
 	// private final CANSparkMax turretMotor;
 	// private final RelativeEncoder turretEncoder;
 
-	private final TalonSRX turretMotor;
+	private final CANSparkMax turretMotor;
 	//variables I need to run the tests
 	private boolean testOneHasInit = false;
 	private boolean testTwoHasInit = false;
@@ -47,8 +47,8 @@ public class Turret extends SubsystemBase {
 	private double navXCurrent = 0d;
 	private double currentX = 0d;
 	private double currentY = 0d;
-	private double knownDistanceFromTarget = 0d;
-	private double originX = 0d;	
+	private double knownDistanceFromTarget = 6.5d;
+	private double originX = 0d;
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
@@ -72,9 +72,9 @@ public class Turret extends SubsystemBase {
 		// turretMotor.setClosedLoopRampRate(0); // too low?
 		// turretEncoder = turretMotor.getEncoder();
 
-		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
+		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
 
-		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
 		navX = LightningIMU.navX();
 
@@ -91,19 +91,22 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
+		setVisionOffset(0);
+
 		// To make the dgress in terms of -180 to 180
-		double sign = -Math.signum(target);
+		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 	
 		// Constraining our angle to compensate for our deadzone
-		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
+		Rotation2d constrainedAngle = Rotation2d.fromDegrees(target); //Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
+		//turretTab.add("Gyro", target);
 
 		// uses pid to set the turret power
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
+		turretMotor.set(motorOutput);
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx readong", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
@@ -121,7 +124,7 @@ public class Turret extends SubsystemBase {
 		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 		//this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
 
-		this.target = testOne() + getTurretAngleNoLimit().getDegrees(); //pull values from my testing function temporarily
+		this.target = testFour(); //+ getTurretAngleNoLimit().getDegrees(); //pull values from my testing function temporarily
 	}
 
 	/**
@@ -133,7 +136,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void stopTurret() {
-		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		turretMotor.set(0);
 	}
 
 	/**
@@ -141,6 +144,7 @@ public class Turret extends SubsystemBase {
 	 * @return An angle limited by min and max turret angle
 	 */
 	public Rotation2d getTurretAngle(){
+		//return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 		return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 	}
 
@@ -178,8 +182,9 @@ public class Turret extends SubsystemBase {
 	public double getEncoderValue() {
 		// return turretEncoder.getPosition();
 
-		return turretMotor.getSelectedSensorPosition() * 360 / 4096;
-	}
+		//return turretMotor.getEncoder().getPosition() * 360 / 4096;
+		return turretMotor.getEncoder().getPosition();
+}
 
 	/**
 	 * Test of tracking target based on just rotation
@@ -233,8 +238,9 @@ public class Turret extends SubsystemBase {
 			navXOrigin = navX.getHeading().getDegrees();
 		}
 		navXCurrent = navX.getHeading().getDegrees();
+		SmartDashboard.putNumber("change in navX", navXOrigin-navXCurrent);
 
-		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))-(navXOrigin-navXCurrent);
+		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))+(navXOrigin-navXCurrent);
 	}
 
 }
