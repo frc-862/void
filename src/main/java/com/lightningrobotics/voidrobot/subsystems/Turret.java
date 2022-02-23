@@ -1,25 +1,16 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.management.ConstructorParameters;
+import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
-import com.lightningrobotics.common.geometry.LightningOdometer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
-import com.lightningrobotics.voidrobot.Robot;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -30,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
 	// Creating turret motor, encoder, and PID controller
 	private boolean isUsingNavX = false;
+	private boolean hasVision = true;
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
@@ -45,10 +37,10 @@ public class Turret extends SubsystemBase {
 	private boolean testFourHasInit = false;
 	private double navXOrigin = 0d;
 	private double navXCurrent = 0d;
-	private double currentX = 0d;
-	private double currentY = 0d;
+	private double realX = 0d;
+	private double realY = 0d;
 	private double knownDistanceFromTarget = 6.5d;
-	private double originX = 0d;
+	private double realHeadingTowardsTarget = 0;
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
@@ -60,10 +52,6 @@ public class Turret extends SubsystemBase {
 	private static double motorOutput;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-
-    private NetworkTableEntry dxEntry;
-	private NetworkTableEntry dyEntry;
-	private NetworkTableEntry targetDistanceEntry;
 	
 	// TODO add java docs
 	public Turret() {
@@ -77,54 +65,27 @@ public class Turret extends SubsystemBase {
 		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
 		navX = LightningIMU.navX();
-
-		dxEntry = turretTab
-            .add("dx", 0)
-            .getEntry();
-
-		dyEntry = turretTab
-            .add("dy", 0)
-            .getEntry();
-
-		targetDistanceEntry = turretTab.add("distance from target", 0).getEntry();
 	}
 	
 	@Override
 	public void periodic() {
-		setVisionOffset(0);
 
 		// To make the dgress in terms of -180 to 180
 		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 	
 		// Constraining our angle to compensate for our deadzone
-		Rotation2d constrainedAngle = Rotation2d.fromDegrees(target); //Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
+		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
-		//turretTab.add("Gyro", target);
 
 		// uses pid to set the turret power
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
 		turretMotor.set(motorOutput);
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
-		SmartDashboard.putNumber("navx readong", navX.getHeading().getDegrees());
+		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
-
-		currentX = dxEntry.getDouble(0);
-		currentY= dyEntry.getDouble(0);
-		knownDistanceFromTarget = targetDistanceEntry.getDouble(0);
-	}
-
-	/**
-	 * Sets the offset angle and updates to see if we are within the angle threshold to shoot
-	 * @param offsetAngle relative angle to turn
-	 */
-	public void setVisionOffset(double offsetAngle) {
-		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		//this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
-
-		this.target = testFour(); //+ getTurretAngleNoLimit().getDegrees(); //pull values from my testing function temporarily
 	}
 
 	/**
@@ -181,66 +142,43 @@ public class Turret extends SubsystemBase {
 	 */
 	public double getEncoderValue() {
 		// return turretEncoder.getPosition();
-
 		//return turretMotor.getEncoder().getPosition() * 360 / 4096;
 		return turretMotor.getEncoder().getPosition();
 }
 
+
 	/**
-	 * Test of tracking target based on just rotation
-	 * @return test offfset angle to set the turret to in degrees
+	 * Sets the offset angle and updates to see if we are within the angle threshold to shoot
+	 * @param offsetAngle relative angle to turn
 	 */
-	public double testOne(){
-		if (!testOneHasInit){
+	public void setVisionOffset(double offsetAngle) {
+		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
+		hasVision = true;
+	}
+
+	/**
+	 * Sets an offset based on tracking with no vision
+	 */
+	public void setOffsetNoVision(double relativeX, double relativeY, double lastOffset, double lastVisionDistance){
+		if (hasVision){
+			//currentX = 0;
+			//currentY = 0;
 			navXOrigin = navX.getHeading().getDegrees();
-			testOneHasInit = true;
+			realHeadingTowardsTarget = getTurretAngle().getDegrees() + lastOffset;
+			knownDistanceFromTarget = lastVisionDistance;
+			hasVision = false;
 		}
+
+		realX = rotateX(relativeX, 0);
+		realY = rotateY(relativeY, 0);
+
 		navXCurrent = navX.getHeading().getDegrees();
 
-		return (navXOrigin - navXCurrent);
+		this.target = Math.toDegrees(Math.atan2(realX,(knownDistanceFromTarget-realY)))+(navXOrigin-navXCurrent);
 	}
 
-	/**
-	 * Test of tracking target based on just horizontal movement
-	 * @return test offfset angle to set the turret to in degrees
-	 */
-	public double testTwo(){
-		if (!testTwoHasInit){
-			currentX = 0;
-			testTwoHasInit = true;
-		}
-		return Math.toDegrees(Math.atan2(currentX, knownDistanceFromTarget)); // TODO: flip this around???
-	}
-
-	/**
-	 * Test of locking based on variable movement
-	 * @return test offfset angle to set the turret to in degrees
-	 */
-	public double testThree(){
-		if (!testThreeHasInit){
-			currentX = 0;
-			currentY = 0;
-			testThreeHasInit = true;
-		}
-		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)));
-	}
-
-	/**
-	 * This should be able to track the target from any position and angle
-	 * @return test offfset angle to set the turret to in degrees
-	 */
-	public double testFour(){
-		if (!testFourHasInit){
-			// <---- TODO reset pose2d here
-			testFourHasInit = true;
-			currentX = 0;
-			currentY = 0;
-			navXOrigin = navX.getHeading().getDegrees();
-		}
-		navXCurrent = navX.getHeading().getDegrees();
-		SmartDashboard.putNumber("change in navX", navXOrigin-navXCurrent);
-
-		return Math.toDegrees(Math.atan2(currentX,(knownDistanceFromTarget-currentY)))+(navXOrigin-navXCurrent);
-	}
+	public double rotateX (double xValue, double angleInDegrees){return xValue;} // <--- TODO actually program this function
+	public double rotateY (double yValue, double angleInDegrees){return yValue;} // <--- TODO actually program this function
 
 }

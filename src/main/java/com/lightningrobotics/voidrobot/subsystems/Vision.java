@@ -67,4 +67,7 @@ public class Vision extends SubsystemBase {
 		return targetHeight;
 	}
 
+	public boolean hasVision(){
+		return true;
+	}
 }
