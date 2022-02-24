@@ -43,6 +43,7 @@ public class Turret extends SubsystemBase {
 	private static double motorOutput;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+	private NetworkTableEntry setTargetAngleEntry;
 	
 	// TODO add java docs
 	public Turret() {
@@ -53,6 +54,7 @@ public class Turret extends SubsystemBase {
 
 		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
 		target = 0;
+		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
 
 		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
@@ -63,6 +65,7 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 
 		// To make the dgress in terms of -180 to 180
+		target = setTargetAngleEntry.getDouble(0); // TODO: temporary for testing
 		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 	
@@ -145,7 +148,7 @@ public class Turret extends SubsystemBase {
 	 */
 	public void setVisionOffset(double offsetAngle) {
 		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
+		this.armed = Math.abs(offsetAngle) < Constants.TURRET_ANGLE_TOLERANCE; // Checks to see if our turret is within our vision threashold
 	}
 
 	/**
@@ -158,8 +161,8 @@ public class Turret extends SubsystemBase {
 	 */
 	public void setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
 		
-		realX = rotateX(relativeX, relativeY, 0);
-		realY = rotateY(relativeX, relativeY, 0);
+		realX = rotateX(relativeX, relativeY, realTargetHeading);
+		realY = rotateY(relativeX, relativeY, realTargetHeading);
 
 		this.target = realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
 	}

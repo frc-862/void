@@ -7,7 +7,6 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningGains;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.AimTurret;
-import com.lightningrobotics.voidrobot.commands.AimTurretNoVision;
 import com.lightningrobotics.voidrobot.commands.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.RetractIntake;
 import com.lightningrobotics.voidrobot.commands.RunAutoShoot;

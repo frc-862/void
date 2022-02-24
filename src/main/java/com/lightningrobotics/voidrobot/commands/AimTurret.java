@@ -23,7 +23,6 @@ public class AimTurret extends CommandBase {
     private Turret turret;
     private Vision vision;
     private double lastVisionOffset;
-    private double lastVisionDistance;
     private Drivetrain drivetrain;
     private boolean isUsingVision = true;
 	private double realHeadingTowardsTarget = 0d;
