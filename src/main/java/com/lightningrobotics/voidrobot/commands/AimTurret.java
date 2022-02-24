@@ -3,12 +3,17 @@ package com.lightningrobotics.voidrobot.commands;
 import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -20,7 +25,8 @@ public class AimTurret extends CommandBase {
     private double lastVisionOffset;
     private double lastVisionDistance;
     private Drivetrain drivetrain;
-    boolean isUsingVision;
+    private boolean isUsingVision = true;
+	private double realHeadingTowardsTarget = 0d;
 
     private static double targetAngle = 0; // this is the angle that we are setting to the turret
 
@@ -38,7 +44,8 @@ public class AimTurret extends CommandBase {
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
@@ -49,17 +56,23 @@ public class AimTurret extends CommandBase {
             isUsingVision = true;
         } else {
             
-            if (isUsingVision){
-                //navXOrigin = navX.getHeading().getDegrees();
-                drivetrain.resetPose();
-                isUsingVision = false;
-            } 
-            
-            double relativeX = drivetrain.getPose().getX();
-            double relativeY = drivetrain.getPose().getY();
+        if (isUsingVision){
+            // As soon as we lose vision, we reset drivetrain pose/axis, get current angle degree
+            //navXOrigin = navX.getHeading().getDegrees();
+            drivetrain.resetPose();
+            isUsingVision = false;
+            realHeadingTowardsTarget = turret.getTurretAngle().getDegrees();// + lastVisionOffset;
+        } 
 
-            //DrivetrainSpeed absPose = DrivetrainSpeed.fromFieldCentricSpeed(relativeX, relativeY, 0, drivetrain.getPose().getRotation());
-            turret.setOffsetNoVision(relativeX, relativeY, lastVisionOffset, lastVisionDistance);
+        // get (x,y) relative to the robot. the X and Y axis is created when we reset the drivetrain odometer
+        double relativeX = drivetrain.getPose().getX();
+        double relativeY = drivetrain.getPose().getY();
+        // Get the last time vision saw a distance
+        double lastVisionDistance = lastVisionOffset;
+        // Get the change in rotation from the time we lose vision
+        double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+
+        turret.setOffsetNoVision(relativeX, relativeY, realHeadingTowardsTarget, lastVisionDistance, changeInRotation);
         }
     }
 

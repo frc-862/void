@@ -59,7 +59,7 @@ public class RobotContainer extends LightningContainer{
 
     // Subsystems
     // private static Turret turret = new Turret();
-    // private static Vision vision = new Vision();
+    private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
@@ -176,7 +176,7 @@ public class RobotContainer extends LightningContainer{
 
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 
-        //turret.setDefaultCommand(new AimTurret(turret, vision)); // this should return degrees
+        turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain)); // this should return degrees
 		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
 	}
 

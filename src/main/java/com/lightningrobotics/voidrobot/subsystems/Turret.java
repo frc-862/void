@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
 	// Creating turret motor, encoder, and PID controller
 	private boolean isUsingNavX = false;
-	private boolean hasVision = true;
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
@@ -31,16 +30,8 @@ public class Turret extends SubsystemBase {
 
 	private final CANSparkMax turretMotor;
 	//variables I need to run the tests
-	private boolean testOneHasInit = false;
-	private boolean testTwoHasInit = false;
-	private boolean testThreeHasInit = false;
-	private boolean testFourHasInit = false;
-	private double navXOrigin = 0d;
-	private double navXCurrent = 0d;
 	private double realX = 0d;
 	private double realY = 0d;
-	private double knownDistanceFromTarget = 6.5d;
-	private double realHeadingTowardsTarget = 0;
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
 
@@ -61,6 +52,7 @@ public class Turret extends SubsystemBase {
 		// turretEncoder = turretMotor.getEncoder();
 
 		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
+		target = 0;
 
 		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
@@ -154,31 +146,38 @@ public class Turret extends SubsystemBase {
 	public void setVisionOffset(double offsetAngle) {
 		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
-		hasVision = true;
 	}
 
 	/**
 	 * Sets an offset based on tracking with no vision
+	 * @param relativeX the x of the odometer reading (its relative to the robot)
+	 * @param relativeY the y of the odometer reading (its relative to the robot)
+	 * @param realTargetHeading the angle of where the target is relative to the robot at the loss of fata
+	 * @param lastVisionDistance the distance that was last recorded before vision stopped giving data
+	 * @param changeInRotation the change in rotation from the second the robot lost vision
 	 */
-	public void setOffsetNoVision(double relativeX, double relativeY, double lastOffset, double lastVisionDistance){
-		if (hasVision){
-			//currentX = 0;
-			//currentY = 0;
-			navXOrigin = navX.getHeading().getDegrees();
-			realHeadingTowardsTarget = getTurretAngle().getDegrees() + lastOffset;
-			knownDistanceFromTarget = lastVisionDistance;
-			hasVision = false;
-		}
+	public void setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+		
+		realX = rotateX(relativeX, relativeY, 0);
+		realY = rotateY(relativeX, relativeY, 0);
 
-		realX = rotateX(relativeX, 0);
-		realY = rotateY(relativeY, 0);
-
-		navXCurrent = navX.getHeading().getDegrees();
-
-		this.target = Math.toDegrees(Math.atan2(realX,(knownDistanceFromTarget-realY)))+(navXOrigin-navXCurrent);
+		this.target = realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
 	}
 
-	public double rotateX (double xValue, double angleInDegrees){return xValue;} // <--- TODO actually program this function
-	public double rotateY (double yValue, double angleInDegrees){return yValue;} // <--- TODO actually program this function
+	/**
+	 * Rotates a point in the x y plane by an angle in degrees
+	 * @return x value of rotated point
+	 */
+	public double rotateX (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
+	}	
+
+	/**
+	 * Rotates a point in the x y plane by an angle in degrees
+	 * @return y value of rotated point
+	 */
+	public double rotateY (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
+	}
 
 }
