@@ -1,12 +1,18 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.lang.invoke.ConstantBootstraps;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.util.InterpolatedMap;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -30,15 +36,20 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry shooterPower;
 
 	// Creates a PID and FeedForward controller for our shooter
-	private PIDFController pid = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
+	private PIDFController shooterPID = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
+	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+	
 	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
 
 	// PID tuner for the shooter gains
-	private PIDFDashboardTuner tuner = new PIDFDashboardTuner("shooter test", pid);
+	private PIDFDashboardTuner shooterTuner = new PIDFDashboardTuner("shooter test", shooterPID);
+	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", hoodPID);
 
 	// The power point we want the shooter to be at
-	private double powerSetPoint;
+	private double shooterPowerSetPoint;
+	private double hoodPowerSetPoint;
 	private double targetRPM;
+	private double hoodAngle;
 	private static boolean armed;
 
 	private InterpolatedMap flywheelSpeedInterpolationTable  = new InterpolatedMap();
@@ -48,7 +59,8 @@ public class Shooter extends SubsystemBase {
 		// Sets the IDs of the hood and shooter
 		flywheelMotor = new VictorSPX(RobotMap.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(9, 8); // sets encoder ports
+		shooterEncoder = new Encoder(RobotMap.SHOOTER_ENCODER_A, RobotMap.SHOOTER_ENCODER_B); // sets encoder ports
+		hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog);
 
 		flywheelMotor.setInverted(true); // Inverts the flywheel motor
 
@@ -70,8 +82,18 @@ public class Shooter extends SubsystemBase {
 
 	}
 
+	public double getHoodAngle() {
+		return hoodMotor.getSelectedSensorPosition() / 4090 * 360; // Should retrun the angle
+	}
+
+	public void setHoodAngle(double hoodAngle) {
+		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+		hoodPowerSetPoint = hoodPID.calculate(getHoodAngle(), hoodAngle);
+		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
+	}
+
 	public PIDFController getPIDFController(){
-		return pid;
+		return shooterPID;
 	}
 	
 	public FeedForwardController getFeedForwardController(){
@@ -112,8 +134,8 @@ public class Shooter extends SubsystemBase {
 	public void setRPM(double targetRPM) {
 		this.targetRPM = targetRPM;
 		targetRPM = feedForward.calculate(targetRPM); // maybe not??
-		powerSetPoint = pid.calculate(getEncoderRPM(), targetRPM);
-		setPower(powerSetPoint);
+		shooterPowerSetPoint = shooterPID.calculate(getEncoderRPM(), targetRPM);
+		setPower(shooterPowerSetPoint);
 	}
 
 	/**
@@ -132,7 +154,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public double getPowerSetpoint() {
-		return powerSetPoint;
+		return shooterPowerSetPoint;
 	}
 
 	public void setSmartDashboardCommands() {

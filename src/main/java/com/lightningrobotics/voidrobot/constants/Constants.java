@@ -28,7 +28,6 @@ public final class Constants {
     // Indexer Constants
     public static final double DEFAULT_INDEXER_POWER = 0.5;
 
-
 	// Shooter Constants
     public static final double SHOOTER_KP = 0.00013484;
     public static final double SHOOTER_KI = 0;
@@ -36,6 +35,13 @@ public final class Constants {
     public static final double SHOOTER_KS = 1.4864;//-.81807;
     public static final double SHOOTER_KV = 0.62326;//2.1597;
     public static final double SHOOTER_KA = 0.44521;//2.3746;
+
+    public static final double HOOD_KP = 0d; // TODO Change these
+    public static final double HOOD_KI = 0d;
+    public static final double HOOD_KD = 0d;
+
+    public static final double MAX_HOOD_ANGLE = 70; // TODO get these soft limit values that we want
+    public static final double MIN_HOOD_ANGLE = 0;
 
     //height in pixels, power in RPMs //TODO: distance or pixels? Also tune.
     public static final HashMap<Double, Double> DISTANCE_RPM_MAP = new HashMap<Double, Double>() {
