@@ -4,13 +4,7 @@ import java.util.HashMap;
 
 public final class Constants {
 
-    //height in pixels, power in RPMs
-    public static final HashMap<Double, Double> DISTANCE_RPM_MAP = new HashMap<Double, Double>() {
-        {
-            put(0.0, 0.0);
-            put(1.0, 1.0);
-        }
-    };
+    
 
 	// Climber
     public static final int WINCH1_MOTOR_ID = 11;

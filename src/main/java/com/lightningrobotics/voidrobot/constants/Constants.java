@@ -37,8 +37,16 @@ public final class Constants {
     public static final double SHOOTER_KV = 0.62326;//2.1597;
     public static final double SHOOTER_KA = 0.44521;//2.3746;
 
-    //height in pixels, power in RPMs
+    //height in pixels, power in RPMs //TODO: distance or pixels? Also tune.
     public static final HashMap<Double, Double> DISTANCE_RPM_MAP = new HashMap<Double, Double>() {
+        {
+            put(0.0, 0.0);
+            put(1.0, 1.0);
+        }
+    };
+
+    //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
+    public static final HashMap<Double, Double> HOOD_ANGLE_MAP = new HashMap<Double, Double>() {
         {
             put(0.0, 0.0);
             put(1.0, 1.0);

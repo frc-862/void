@@ -14,8 +14,6 @@ public class RunShooter extends CommandBase {
     public RunShooter(Shooter shooter, double targetRPM) {
         this.shooter = shooter;
 
-        addRequirements(shooter);
-
         this.targetRPM = targetRPM;
     }
 
@@ -25,6 +23,7 @@ public class RunShooter extends CommandBase {
     @Override
     public void execute() {
         shooter.setRPM(shooter.getRPMFromDashboard()); // Gets the desired RPM from the dashboard and sets them to the motor
+        //shooter.setRPM(targetRPM);
     }
 
     @Override
