@@ -18,9 +18,9 @@ public final class Constants {
     public static final double TRACK_WIDTH = 0.5842;
 
     // Turret Constants
-    public static final double TURN_TURRET_GEAR_RATIO = 77;
-    public static final int TURRET_GEAR_RATIO = 11;
-    public static final double TURRET_kP = 0.0035; //TODO: tune this
+    public static final double TURN_TURRET_GEAR_RATIO = 14;
+    public static final double TURRET_kP = 0.02; 
+    public static final double TURRET_kI = 0.005; 
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 135d;
     public static final double MIN_TURRET_ANGLE = -135d;

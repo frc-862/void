@@ -16,6 +16,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,15 +29,15 @@ public class Turret extends SubsystemBase {
 	private Rotation2d navXHeading;
 	LightningIMU navX;
 	// Creating turret motor, encoder, and PID controller
-	// private final CANSparkMax turretMotor;
-	// private final RelativeEncoder turretEncoder;
-
 	private final TalonFX turretMotor;
 	//variables I need to run the tests
 	private double realX = 0d;
 	private double realY = 0d;
 
-	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
+	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_LEFT_ID);
+	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_RIGHT_ID);
+
+	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
@@ -79,8 +80,13 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		SmartDashboard.putNumber("target angle", target);
 
-		// uses pid to set the turret power
-		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+		if(limitSwitchLeft.get() || limitSwitchRight.get()) {
+			motorOutput = 0;
+		} else {
+			// uses pid to set the turret power
+			motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+		}
+
 		turretMotor.set(TalonFXControlMode.PercentOutput, motorOutput);
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
@@ -104,7 +110,7 @@ public class Turret extends SubsystemBase {
 	 * @return An angle limited by min and max turret angle
 	 */
 	public Rotation2d getTurretAngle(){
-		return  Rotation2d.fromDegrees(getEncoderValue() / 4096d / Constants.TURN_TURRET_GEAR_RATIO * 360d);
+		return  Rotation2d.fromDegrees(getEncoderRotation() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 	}
 
 	/**
@@ -136,10 +142,10 @@ public class Turret extends SubsystemBase {
 
 	/**
 	 * gets the encoder in rotations
-	 * @return the value of encoder in ticks
+	 * @return the value of encoder in rotations
 	 */
-	public double getEncoderValue() {
-		return turretMotor.getSelectedSensorPosition();
+	public double getEncoderRotation() {
+		return turretMotor.getSelectedSensorPosition() / 4096;
 }
 
 
