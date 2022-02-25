@@ -2,6 +2,8 @@ package com.lightningrobotics.voidrobot.constants;
 
 import java.util.HashMap;
 
+import com.lightningrobotics.util.InterpolatedMap;
+
 public final class Constants {
 
     // Drivetrain Constants
@@ -44,7 +46,7 @@ public final class Constants {
     public static final double MIN_HOOD_ANGLE = 0;
 
     //height in pixels, power in RPMs //TODO: distance or pixels? Also tune.
-    public static final HashMap<Double, Double> DISTANCE_RPM_MAP = new HashMap<Double, Double>() {
+    public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
             put(0.0, 0.0);
             put(1.0, 1.0);
@@ -52,7 +54,7 @@ public final class Constants {
     };
 
     //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
-    public static final HashMap<Double, Double> HOOD_ANGLE_MAP = new HashMap<Double, Double>() {
+    public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
         {
             put(0.0, 0.0);
             put(1.0, 1.0);

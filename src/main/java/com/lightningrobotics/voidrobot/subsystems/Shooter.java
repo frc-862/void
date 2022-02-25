@@ -51,10 +51,7 @@ public class Shooter extends SubsystemBase {
 	private double targetRPM;
 	private double hoodAngle;
 	private static boolean armed;
-
-	private InterpolatedMap flywheelSpeedInterpolationTable  = new InterpolatedMap();
-	private InterpolatedMap hoodAngleInterpolationTable  = new InterpolatedMap();
-
+	
 	public Shooter() {
 		// Sets the IDs of the hood and shooter
 		flywheelMotor = new VictorSPX(RobotMap.FLYWHEEL_MOTOR_ID);
@@ -77,8 +74,6 @@ public class Shooter extends SubsystemBase {
 			.add("RPM-From encoder", 0)
 			.getEntry();
 
-		configureShooterCurve();
-		configureHoodCurve();
 	}
 
 	public double getHoodAngle() {
@@ -165,18 +160,6 @@ public class Shooter extends SubsystemBase {
 		return setRPM.getDouble(0);
 	}
 
-	private void configureShooterCurve() {
-		for (double distance: Constants.DISTANCE_RPM_MAP.keySet()) {
-			flywheelSpeedInterpolationTable.put(distance, Constants.DISTANCE_RPM_MAP.get(distance));
-		}
-	}
-
-	private void configureHoodCurve() {
-		for (double distance: Constants.DISTANCE_RPM_MAP.keySet()) {
-			hoodAngleInterpolationTable.put(distance, Constants.HOOD_ANGLE_MAP.get(distance));
-		}
-	}
-
 	/**
 	 * gets the optimal shooter RPM from an inputted height in pixels using an interpolation map
 	 * @param height in pixels
@@ -184,7 +167,7 @@ public class Shooter extends SubsystemBase {
 	 */
 	public double getRPMsFromHeight(double height) {
 		if (height > 0) {
-            return flywheelSpeedInterpolationTable.get(height);
+            return Constants.DISTANCE_RPM_MAP.get(height);
         } else {
             return 0;
         }
@@ -197,7 +180,7 @@ public class Shooter extends SubsystemBase {
 	 */
 	public double getAngleFromHeight(double distance) {
 		if (distance > 0) {
-            return hoodAngleInterpolationTable.get(distance);
+            return Constants.HOOD_ANGLE_MAP.get(distance);
         } else {
             return 0;
         }
