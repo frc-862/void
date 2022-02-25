@@ -2,6 +2,9 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
@@ -28,7 +31,7 @@ public class Turret extends SubsystemBase {
 	// private final CANSparkMax turretMotor;
 	// private final RelativeEncoder turretEncoder;
 
-	private final CANSparkMax turretMotor;
+	private final TalonFX turretMotor;
 	//variables I need to run the tests
 	private double realX = 0d;
 	private double realY = 0d;
@@ -52,7 +55,8 @@ public class Turret extends SubsystemBase {
 		// turretMotor.setClosedLoopRampRate(0); // too low?
 		// turretEncoder = turretMotor.getEncoder();
 
-		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
+		turretMotor = new TalonFX(RobotMap.TURRET_MOTOR_ID);
+		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
 		target = 0;
 		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
 
@@ -77,7 +81,7 @@ public class Turret extends SubsystemBase {
 
 		// uses pid to set the turret power
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		turretMotor.set(motorOutput);
+		turretMotor.set(TalonFXControlMode.PercentOutput, motorOutput);
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
@@ -92,7 +96,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void stopTurret() {
-		turretMotor.set(0);
+		turretMotor.set(TalonFXControlMode.PercentOutput, 0);
 	}
 
 	/**
@@ -100,8 +104,7 @@ public class Turret extends SubsystemBase {
 	 * @return An angle limited by min and max turret angle
 	 */
 	public Rotation2d getTurretAngle(){
-		//return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
-		return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
+		return  Rotation2d.fromDegrees(getEncoderValue() / 4096d / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 	}
 
 	/**
@@ -133,12 +136,10 @@ public class Turret extends SubsystemBase {
 
 	/**
 	 * gets the encoder in rotations
-	 * @return the encoder value in rotations
+	 * @return the value of encoder in ticks
 	 */
 	public double getEncoderValue() {
-		// return turretEncoder.getPosition();
-		//return turretMotor.getEncoder().getPosition() * 360 / 4096;
-		return turretMotor.getEncoder().getPosition();
+		return turretMotor.getSelectedSensorPosition();
 }
 
 

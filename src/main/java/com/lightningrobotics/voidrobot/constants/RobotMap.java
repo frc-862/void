@@ -22,7 +22,7 @@ public final class RobotMap {
     public static final int DEPLOY_INTAKE_MOTOR_ID = 14;
 
     // Turret
-    public static final int TURRET_MOTOR_ID = 2;
+    public static final int TURRET_MOTOR_ID = 12;
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 16;
