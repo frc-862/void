@@ -34,8 +34,10 @@ public class Turret extends SubsystemBase {
 	private double realX = 0d;
 	private double realY = 0d;
 
-	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_LEFT_ID);
-	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_RIGHT_ID);
+	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_NEGATIVE_ID);
+	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
+
+	// private final DigitalInput isCentered = new DigitalInput(RobotMap.IS_CENTERED_ID);
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
@@ -48,6 +50,8 @@ public class Turret extends SubsystemBase {
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry setTargetAngleEntry;
+	private NetworkTableEntry isOnLimitSwitchEntry;
+	private NetworkTableEntry isCenteredEntry;
 	
 	// TODO add java docs
 	public Turret() {
@@ -60,9 +64,10 @@ public class Turret extends SubsystemBase {
 		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
 		target = 0;
 		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
+		isOnLimitSwitchEntry = turretTab.add("Hit Limit Switch", "false").getEntry();
+		isCenteredEntry = turretTab.add("Hit Center Censor", "false").getEntry();
 
-		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-
+		// resetEncoder();
 		navX = LightningIMU.navX();
 	}
 	
@@ -78,14 +83,26 @@ public class Turret extends SubsystemBase {
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
-		SmartDashboard.putNumber("target angle", target);
+		// SmartDashboard.putNumberl("target angle", target);
 
-		if(limitSwitchLeft.get() || limitSwitchRight.get()) {
+		if(!limitSwitchLeft.get() || !limitSwitchRight.get()) {
+			isOnLimitSwitchEntry.setString("true");
 			motorOutput = 0;
-		} else {
+		} 
+		 else {
 			// uses pid to set the turret power
+			isOnLimitSwitchEntry.setString("false");
 			motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+			motorOutput *= Constants.TURRET_SPEED_MULTIPLIER;
+		 }
+/*
+		if(isCentered.get()) {
+			isCenteredEntry.setString("true");
+			resetEncoder();
 		}
+		else{
+			isCenteredEntry.setString("false");
+		}*/
 
 		turretMotor.set(TalonFXControlMode.PercentOutput, motorOutput);
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
@@ -188,6 +205,10 @@ public class Turret extends SubsystemBase {
 	 */
 	public double rotateY (double xValue, double yValue, double angleInDegrees){
 		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
+	}
+
+	public void resetEncoder() {
+		turretMotor.setSelectedSensorPosition(0);
 	}
 
 }

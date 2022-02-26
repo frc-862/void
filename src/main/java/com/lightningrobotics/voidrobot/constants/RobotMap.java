@@ -23,8 +23,10 @@ public final class RobotMap {
 
     // Turret
     public static final int TURRET_MOTOR_ID = 12;
-    public static final int LIMIT_SWITCH_LEFT_ID = 69; //TODO: nice
-    public static final int LIMIT_SWITCH_RIGHT_ID = 420; //TODO: nice
+    public static final int LIMIT_SWITCH_NEGATIVE_ID = 2; 
+    public static final int LIMIT_SWITCH_POSITIVE_ID = 3; 
+    public static final int IS_CENTERED_ID = 69420;
+
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 16;

@@ -63,8 +63,8 @@ public class RobotContainer extends LightningContainer{
 	// private static Shooter shooter = new Shooter();
 
 	private static final Turret turret = new Turret();
-	private static final Indexer indexer = new Indexer();
-	private static final Intake intake = new Intake();
+	// private static final Indexer indexer = new Indexer();
+	// private static final Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	private static LightningIMU IMU;
 	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -153,12 +153,12 @@ public class RobotContainer extends LightningContainer{
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         */
 
-		(new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(new ParallelCommandGroup(    
-			new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
-        ));
-		(new JoystickButton(CO_PILOT, JoystickConstants.BUTTON_BACK)).whileHeld(new RunIndexer(indexer, () -> 0.75d));
+		// (new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(new ParallelCommandGroup(    
+		// 	new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
+        // ));
+		// (new JoystickButton(CO_PILOT, JoystickConstants.BUTTON_BACK)).whileHeld(new RunIndexer(indexer, () -> 0.75d));
 
-        (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
+        // (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 		//(new JoystickButton(CO_PILOT, 3)).whenPressed(new AimTurretNoVision(turret));
     }
 
@@ -175,7 +175,7 @@ public class RobotContainer extends LightningContainer{
 
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 
-        turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain)); // this should return degrees
+        // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain)); // this should return degrees
 		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
 	}
 
