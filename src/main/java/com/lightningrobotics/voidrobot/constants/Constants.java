@@ -3,17 +3,17 @@ package com.lightningrobotics.voidrobot.constants;
 public final class Constants {
 
     // Drivetrain Constants
-    public static final double KP = 0.00602;
+    public static final double KP = 0.00058943;
     public static final double KI = 0.01;
     public static final double KD = 0.04;
     
-    public static final double KS = 0.71254;
-    public static final double KV = 1.9331;
-    public static final double KA = 0.23729;
+    public static final double KS = 0.6848;
+    public static final double KV = 2.0829;
+    public static final double KA = 0.22588;
 
-    public static final double MAX_SPEED = 1.0;
-    public static final double MAX_ACCELERATION = 1.0;
-    public static final double TRACK_WIDTH = 0.7499; // 0.6565; 
+    public static final double MAX_SPEED = 2.2;
+    public static final double MAX_ACCELERATION = 0.75;
+    public static final double TRACK_WIDTH = 0.76211; // 0.6565; 
 
     // Turret Constants
     public static final double TURN_TURRET_GEAR_RATIO = 77;

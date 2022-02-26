@@ -37,14 +37,10 @@ public class FourBallTerminal extends CommandBase {
     @Override
     public void initialize() {
         try {
-            new ParallelCommandGroup( 
-            new InstantCommand(() -> indexer.setPower(0.5)), 
-            new InstantCommand(() -> intake.setPower(0.5)), 
-            new InstantCommand(() -> shooter.setPower(0.75)),
             new SequentialCommandGroup(
                 start4BallPath.getCommand(drivetrain),
                 middle4BallPath.getCommand(drivetrain), 
-                end4BallPath.getCommand(drivetrain)))
+                end4BallPath.getCommand(drivetrain))
                 .schedule();
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
