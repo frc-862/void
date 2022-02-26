@@ -12,6 +12,7 @@ import com.lightningrobotics.voidrobot.commands.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.RunIntake;
 import com.lightningrobotics.voidrobot.commands.RunShooter;
 import com.lightningrobotics.voidrobot.commands.ShootClose;
+import com.lightningrobotics.voidrobot.commands.auto.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.FourBallTerminal;
 import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -53,8 +54,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    private static Turret turret = new Turret();
-    private static Vision vision = new Vision();
+    // private static Turret turret = new Turret();
+    // private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	private static Shooter shooter = new Shooter();
 	private static Indexer indexer = new Indexer();
@@ -73,7 +74,8 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureAutonomousCommands() {
-		Autonomous.register("4 Ball Terminal", new FourBallTerminal(indexer, intake, turret, vision, drivetrain));
+		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter));
+		// Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain));
         // try {
 		// 	Autonomous.register("Test Differential Auton 0.5", 
 		// 	(new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0d)), 
@@ -111,18 +113,18 @@ public class RobotContainer extends LightningContainer{
 		// } catch(Exception e) {
 		// 	System.err.println("Unexpected Error: " + e.getMessage());
 		// }
-		// try {
-		// 	Autonomous.register("1 meter", 
-		// 	(new Path("1Meter.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("1 meter forward 1 meter right", 
-		// 	(new Path("1Forward1right.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
+		try {
+			Autonomous.register("1 meter", 
+			(new Path("1Meter.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("1 meter forward 1 meter right", 
+			(new Path("1Forward1right.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
         
     }
 
@@ -147,13 +149,13 @@ public class RobotContainer extends LightningContainer{
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
         */
 
-		(new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(    
-        new ParallelCommandGroup(   
-        new RunIndexer(indexer, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())), 
-        new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
-        ));
+	// 	(new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(    
+    //     new ParallelCommandGroup(   
+    //     new RunIndexer(indexer, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())), 
+    //     new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
+    //     ));
 
-        (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
+    //     (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 
     }
 

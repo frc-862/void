@@ -23,7 +23,7 @@ public class RunShooter extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(targetRPMs);
+        // shooter.setRPM(targetRPMs);
     }
 
     @Override
