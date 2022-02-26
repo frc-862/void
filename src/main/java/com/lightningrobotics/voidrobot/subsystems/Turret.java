@@ -14,6 +14,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -53,7 +54,10 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry isOnLimitSwitchEntry;
 	private NetworkTableEntry isCenteredEntry;
 	
-	// TODO add java docs
+	/**
+	 * The turret subsystem has functions for aiming the turret based on three modes - vision,
+	 *  no vision, and manual control (manual should only be used in emergencies or testing)
+	 */ 
 	public Turret() {
 		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
 		// turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -108,6 +112,7 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
+		SmartDashboard.putData("Gyro", navX); //<---I'm bored, lets see if this works
 	}
 
 	/**
@@ -177,9 +182,9 @@ public class Turret extends SubsystemBase {
 
 	/**
 	 * Sets an offset based on tracking with no vision
-	 * @param relativeX the x of the odometer reading (its relative to the robot)
-	 * @param relativeY the y of the odometer reading (its relative to the robot)
-	 * @param realTargetHeading the angle of where the target is relative to the robot at the loss of fata
+	 * @param relativeX the x of the odometer reading (relative to the robot)
+	 * @param relativeY the y of the odometer reading (relative to the robot)
+	 * @param realTargetHeading the angle of where the target is relative to the robot at the loss of data
 	 * @param lastVisionDistance the distance that was last recorded before vision stopped giving data
 	 * @param changeInRotation the change in rotation from the second the robot lost vision
 	 */
@@ -189,6 +194,14 @@ public class Turret extends SubsystemBase {
 		realY = rotateY(relativeX, relativeY, realTargetHeading);
 
 		this.target = realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
+	}
+
+	/**
+	 * Don't use this. I only have this for emergency manual control. Use "setOffset" instead.
+	 */
+	public void setTarget(double targetAngle) {
+		this.target = targetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		//this.armed = true; // Checks to see if our turret is within our vision threashold
 	}
 
 	/**

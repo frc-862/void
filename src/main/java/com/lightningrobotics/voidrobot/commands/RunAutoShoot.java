@@ -37,7 +37,8 @@ public class RunAutoShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    (new ParallelCommandGroup(new AimTurret(turret, vision, drivetrain),  new RunShooter(shooter, 3000))).schedule();
+    // \/--- Commented this out for now to avoid errors TODO figure out what to do with this
+    //(new ParallelCommandGroup(new AimTurret(turret, vision, drivetrain),  new RunShooter(shooter, 3000))).schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
