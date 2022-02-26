@@ -76,58 +76,57 @@ public class Shooter extends SubsystemBase {
 
 	}
 
+	/**
+	 * gets the hood angle in degrees
+	 */
 	public double getHoodAngle() {
 		return hoodMotor.getSelectedSensorPosition() / 4096 * 360; // Should retrun the angle; maybe 4096
 	}
 
+	/**
+	 * commands the hood to move to an angle using a PID
+	 * @param hoodAngle target hood angle in degrees
+	 */
 	public void setHoodAngle(double hoodAngle) {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
 		hoodPowerSetPoint = hoodPID.calculate(getHoodAngle(), this.hoodAngle);
 		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
 	}
 
-	public PIDFController getPIDFController(){
-		return shooterPID;
-	}
-	
-	public FeedForwardController getFeedForwardController(){
-		return feedForward;
-	}
-
-	public void setPower(double power) {
-		//TODO: use falcon built-in functions
-		flywheelMotor.set(VictorSPXControlMode.PercentOutput, power); 
-	}
-
 	public void setVelocity(double shooterVelocity) {
-		//TODO: use falcon built-in functions
 		flywheelMotor.set(VictorSPXControlMode.Velocity, shooterVelocity); 
 	}
 
+	/**
+	 * sets the target RPMs for the shooter using a PID
+	 * @param targetRPM the... target RPMs
+	 */
 	public void setRPM(double targetRPM) {
 		this.targetRPM = targetRPM;
 		targetRPM = feedForward.calculate(targetRPM); // maybe not??
 		shooterPower = shooterPID.calculate(getEncoderRPM(), targetRPM);
-		setPower(shooterPower);
+		flywheelMotor.set(VictorSPXControlMode.PercentOutput, shooterPower);
 	}
 
+	/**
+	 * stops the shooter motor
+	 */
 	public void stop() {
 		flywheelMotor.set(VictorSPXControlMode.PercentOutput, 0);; 
 	}
 
-	public void hoodMove(double moveAmount) {
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, moveAmount);
-		//TODO: add logic to actually increment
-	}
-
+	/**
+	 * gets the shooter's RPMs
+	 * @return the RPM's of the shooter
+	 */
 	public double getEncoderRPM() {
 		return shooterEncoder.getRate() * 60; //converts from revs per second to revs per minute
 	}
 
-	public double getEncoderDist() {
-		return shooterEncoder.getDistancePerPulse();
-	}
-
+	/**
+	 * gets the raw encoder ticks of the shooter
+	 * @return the raw value returned by the shooter encoder
+	 */
 	public double currentEncoderTicks() {
 		return shooterEncoder.getRaw(); 
 	}
@@ -147,15 +146,26 @@ public class Shooter extends SubsystemBase {
 		return armed;	
 	}
 
+	/**
+	 * 
+	 * @return the target power for the shooter
+	 */
 	public double getPowerSetpoint() {
 		return shooterPower;
 	}
 
+	/**
+	 * sets the dashboard commands for the shooter
+	 */
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getPowerSetpoint());
 	}
 
+	/**
+	 * 
+	 * @return the target RPMs for the shooter taken from the dashboard
+	 */
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
 	}
@@ -176,7 +186,7 @@ public class Shooter extends SubsystemBase {
 	/**
 	 * gets the optimal hood angle from an inputted distance in X using an interpolation map
 	 * @param height in pixels
-	 * @return motor RPMs
+	 * @return target angle
 	 */
 	public double getAngleFromHeight(double distance) {
 		if (distance > 0) {
