@@ -3,8 +3,12 @@ package com.lightningrobotics.voidrobot.subsystems;
 import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
@@ -30,7 +34,7 @@ public class Turret extends SubsystemBase {
 	private Rotation2d navXHeading;
 	LightningIMU navX;
 	// Creating turret motor, encoder, and PID controller
-	private final TalonFX turretMotor;
+	private final TalonSRX turretMotor;
 	//variables I need to run the tests
 	private double realX = 0d;
 	private double realY = 0d;
@@ -53,26 +57,36 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry isOnLimitSwitchEntry;
 	private NetworkTableEntry isCenteredEntry;
+	private NetworkTableEntry leftSensor;
+	private NetworkTableEntry rightSensor;
 	
 	/**
 	 * The turret subsystem has functions for aiming the turret based on three modes - vision,
 	 *  no vision, and manual control (manual should only be used in emergencies or testing)
 	 */ 
 	public Turret() {
-		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
+		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
 		// turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		// turretMotor.setClosedLoopRampRate(0); // too low?
 		// turretEncoder = turretMotor.getEncoder();
 
-		turretMotor = new TalonFX(RobotMap.TURRET_MOTOR_ID);
+		navX = LightningIMU.navX();
+
+		// Motor config
+		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
+		turretMotor.setNeutralMode(NeutralMode.Brake);
 		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-		target = 0;
+
+		// Dashboard info
 		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
 		isOnLimitSwitchEntry = turretTab.add("Hit Limit Switch", "false").getEntry();
 		isCenteredEntry = turretTab.add("Hit Center Censor", "false").getEntry();
+		leftSensor = turretTab.add("left sensor", false).getEntry();
+		rightSensor = turretTab.add("right sensor", false).getEntry();
 
-		// resetEncoder();
-		navX = LightningIMU.navX();
+		// Reset values
+	    resetEncoder();
+		target = 0;
 	}
 	
 	@Override
@@ -89,16 +103,11 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
 		// SmartDashboard.putNumberl("target angle", target);
 
-		if(!limitSwitchLeft.get() || !limitSwitchRight.get()) {
-			isOnLimitSwitchEntry.setString("true");
-			motorOutput = 0;
-		} 
-		 else {
-			// uses pid to set the turret power
-			isOnLimitSwitchEntry.setString("false");
-			motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-			motorOutput *= Constants.TURRET_SPEED_MULTIPLIER;
-		 }
+		leftSensor.setBoolean(!limitSwitchLeft.get());
+		rightSensor.setBoolean(!limitSwitchRight.get());
+
+		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
+		motorOutput = motorOutput > Constants.TURRET_MAX_MOTOR_OUTPUT ? Constants.TURRET_MAX_MOTOR_OUTPUT : motorOutput;
 /*
 		if(isCentered.get()) {
 			isCenteredEntry.setString("true");
@@ -108,11 +117,11 @@ public class Turret extends SubsystemBase {
 			isCenteredEntry.setString("false");
 		}*/
 
-		turretMotor.set(TalonFXControlMode.PercentOutput, motorOutput);
-		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
+		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
+		SmartDashboard.putNumber("turret angle no limit", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
-		SmartDashboard.putData("Gyro", navX); //<---I'm bored, lets see if this works
+		SmartDashboard.putData("Gyro", navX); 
 	}
 
 	/**
@@ -124,7 +133,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void stopTurret() {
-		turretMotor.set(TalonFXControlMode.PercentOutput, 0);
+		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 	}
 
 	/**
@@ -176,8 +185,8 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		this.armed = Math.abs(offsetAngle) < Constants.TURRET_ANGLE_TOLERANCE; // Checks to see if our turret is within our vision threashold
+		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		//this.armed = Math.abs(offsetAngle) < Constants.TURRET_ANGLE_TOLERANCE; // Checks to see if our turret is within our vision threashold
 	}
 
 	/**

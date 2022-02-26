@@ -42,7 +42,7 @@ public class AimTurret extends CommandBase {
         AUTO_VISION
     }
     TargetingState targetingState;
-    
+
     /**
 	 * Command to aim the turret
 	 */ 
