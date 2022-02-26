@@ -61,7 +61,7 @@ public class RobotContainer extends LightningContainer{
     // private static Turret turret = new Turret();
     // private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
-	// private static Shooter shooter = new Shooter();
+	private static Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
