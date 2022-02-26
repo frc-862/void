@@ -2,6 +2,8 @@ package com.lightningrobotics.voidrobot.constants;
 
 public final class RobotMap {
 
+    // PDH
+    public static final int PDH_ID = 1;
     // Drivetain
     public static final int LEFT_MOTOR_1 = 4;
     public static final int LEFT_MOTOR_2 = 5;

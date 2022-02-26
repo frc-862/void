@@ -1,8 +1,12 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +24,9 @@ public class Vision extends SubsystemBase {
 	private static double targetAngle = 0d;
 	private static double targetDistance = 0d;
     private static double offsetAngle = 0d;
+
+	//PDH
+	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
 	public Vision() {}
 
@@ -49,6 +56,20 @@ public class Vision extends SubsystemBase {
 
 	public double getTargetDistance() {
 		return targetDistance;
+	}
+
+	/**
+	 * Set the switchable port on the REV PDH to true
+	 */
+	public void turnOnVisionLight(){
+		pdh.setSwitchableChannel(true);
+	}
+
+		/**
+	 * Set the switchable port on the REV PDH to false
+	 */
+	public void turnOffVisionLight(){
+		pdh.setSwitchableChannel(false);
 	}
 
 }
