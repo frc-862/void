@@ -3,8 +3,6 @@ package com.lightningrobotics.voidrobot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
@@ -21,34 +19,26 @@ public class Vision extends SubsystemBase {
 	private static double targetDistance = 0d;
     private static double offsetAngle = 0d;
 
-	public Vision() {}
-
 	@Override
 	public void periodic() {
 		
 		// Update Target Angle
 		offsetAngle = targetAngleEntry.getDouble(targetAngle);
-
 		// Update Target Distance
 		targetDistance = targetDistanceEntry.getDouble(targetDistance);
 
 	}
 
-	public boolean isOnTarget() {
-		if(Math.abs(getOffsetAngle()) < 3) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public double getOffsetAngle() {
-		// TODO: implement math for error to get target angle
 		return offsetAngle; 
 	}
 
 	public double getTargetDistance() {
 		return targetDistance;
+	}
+
+	public boolean hasVision(){
+		return true;
 	}
 
 }

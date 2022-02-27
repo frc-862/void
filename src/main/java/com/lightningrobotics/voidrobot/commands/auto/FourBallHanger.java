@@ -51,4 +51,5 @@ public class FourBallHanger extends CommandBase {
     public boolean isFinished() {
         return false;
     }
+	
 }

@@ -1,6 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -15,6 +14,7 @@ import java.util.function.BiConsumer;
 
 
 public class LEDs extends SubsystemBase {
+
     private static final int ledCount = 30;
     private static Random rand = new Random();
 
@@ -60,11 +60,9 @@ public class LEDs extends SubsystemBase {
         }
     }
 
-
-
     public void snake() {
         try{
-        Thread.sleep(250);
+        	Thread.sleep(250);
         }
         catch (InterruptedException e){
 
@@ -80,8 +78,9 @@ public class LEDs extends SubsystemBase {
             buffer.setRGB(i - 1, 255, 30, 0);
             buffer.setRGB(i - 2, 0, 0, 0);
         }
-        if(Math.round(Timer.getFPGATimestamp()*50)%1==0)
-        {i++;}
+        if(Math.round(Timer.getFPGATimestamp()*50)%1==0){
+			i++;
+		}
         if(i > 16) {i = 0;}
     }
 

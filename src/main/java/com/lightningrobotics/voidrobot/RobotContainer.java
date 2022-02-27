@@ -1,60 +1,31 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningContainer;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-import com.lightningrobotics.voidrobot.commands.AimTurret;
-import com.lightningrobotics.voidrobot.commands.DeployIntake;
-import com.lightningrobotics.voidrobot.commands.RetractIntake;
-import com.lightningrobotics.voidrobot.commands.RunAutoShoot;
-import com.lightningrobotics.voidrobot.commands.RunIndexer;
-import com.lightningrobotics.voidrobot.commands.RunIntake;
-import com.lightningrobotics.voidrobot.commands.RunShooter;
-import com.lightningrobotics.voidrobot.commands.ShootClose;
 import com.lightningrobotics.voidrobot.commands.auto.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.FourBallTerminal;
-import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.JoystickConstants;
-import com.lightningrobotics.voidrobot.commands.test.VoltageTestContinuous;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.TriggerAndThumb;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
-
-import java.nio.file.DirectoryStream.Filter;
-import java.util.Arrays;
-
-import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.auto.Autonomous;
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
-import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
-import com.lightningrobotics.common.util.filter.JoystickFilter;
-import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-	private static final Drivetrain drivetrain = new Drivetrain();
+	private static final LightningIMU imu = LightningIMU.navX();
+	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();

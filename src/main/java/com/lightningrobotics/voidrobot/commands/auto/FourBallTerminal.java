@@ -63,4 +63,5 @@ public class FourBallTerminal extends CommandBase {
     public boolean isFinished() {
         return false;
     }
+	
 }

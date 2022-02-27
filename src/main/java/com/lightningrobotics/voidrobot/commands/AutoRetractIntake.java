@@ -4,29 +4,31 @@
 
 package com.lightningrobotics.voidrobot.commands;
 
-import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Indexer;
+import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootClose extends CommandBase {
-  Shooter shooter;
-
-  /** Creates a new ShootClose. */
-  public ShootClose(Shooter shooter) {
-    this.shooter = shooter;
-
-    addRequirements(shooter);
+public class AutoRetractIntake extends CommandBase {
+  /** Creates a new AutoRetractIntake. */
+  private Intake intake;
+  private Indexer beam_Break;
+  public AutoRetractIntake(Intake intake, Indexer beam_Break) {
+    this.intake = intake;
+    this.beam_Break = beam_Break;
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    //TODO: add shooter stuff idk
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    
+
+  }
 
   // Called once the command ends or is interrupted.
   @Override

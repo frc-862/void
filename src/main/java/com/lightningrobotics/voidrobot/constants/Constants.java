@@ -3,6 +3,7 @@ package com.lightningrobotics.voidrobot.constants;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
+import com.lightningrobotics.util.InterpolatedMap;
 
 public final class Constants {
 
@@ -30,7 +31,7 @@ public final class Constants {
 	public static final double GEAR_REDUCTION = 6.7d;
 	public static final double TICKS_PER_REV_FALCON = 2048d;
 
-	private static final DifferentialGains DIFFERENTIAL_GAINS = new DifferentialGains(
+	public static final DifferentialGains DIFFERENTIAL_GAINS = new DifferentialGains(
         Constants.MAX_SPEED,
         Constants.MAX_ACCELERATION,
         Constants.TRACK_WIDTH,
@@ -63,5 +64,31 @@ public final class Constants {
     public static final double SHOOTER_KS = 0; //0.58093;//-.81807;
     public static final double SHOOTER_KF = 0.0455;//2.1597;
     public static final double SHOOTER_KA = 0; //0.02415;//2.3746;
+
+	public static final double HOOD_KP = 0d; // TODO tune these
+    public static final double HOOD_KI = 0d;
+    public static final double HOOD_KD = 0d;
+	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+
+    public static final double MAX_HOOD_ANGLE = 70; // TODO get these soft limit values that we want
+    public static final double MIN_HOOD_ANGLE = 0;
+
+    //height in pixels, power in RPMs //TODO: distance or pixels? Also tune.
+    public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
+        {
+            put(0.0, 0.0);
+            put(1.0, 1.0);
+        }
+    };
+
+    //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
+    public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
+        {
+            put(0.0, 0.0);
+            put(1.0, 1.0);
+        }
+    };
+
+
 
 }

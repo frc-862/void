@@ -40,12 +40,12 @@ public class Drivetrain extends DifferentialDrivetrain {
 	private static final DoubleSupplier rightPositionSupplier = 
 		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
     
-    public Drivetrain() {
+    public Drivetrain(LightningIMU imu) {
         super(
             Constants.DIFFERENTIAL_GAINS, 
             LEFT_MOTORS, 
             RIGHT_MOTORS, 
-            LightningIMU.navX(), 
+            imu, 
             leftVelocitySupplier,
 			rightVelocitySupplier,
 			leftPositionSupplier, 
@@ -59,4 +59,12 @@ public class Drivetrain extends DifferentialDrivetrain {
 
     }
 
+    public boolean isMoving() {
+        return ((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() < 0.05 && ((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() < 0.05;
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
 }

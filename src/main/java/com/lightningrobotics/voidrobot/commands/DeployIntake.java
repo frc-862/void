@@ -14,7 +14,7 @@ public class DeployIntake extends CommandBase {
   /** Creates a new DeployIntake. */
   public DeployIntake(Intake intake) {
     this.intake = intake;
-
+    
     addRequirements(intake);
   }
 
