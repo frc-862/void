@@ -3,8 +3,6 @@ package com.lightningrobotics.voidrobot.subsystems;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
-import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.commands.QueueBalls;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -49,6 +47,7 @@ public class Indexer extends SubsystemBase {
 
     @Override
     public void periodic() {
+		
         beamBreakEnterStatus = getBeamBreakEnterStatus(); // getting our current enter status 
         beamBreakExitStatus = getBeamBreakExitStatus(); // getting our current exit status 
 
@@ -78,7 +77,7 @@ public class Indexer extends SubsystemBase {
         if(getBallCount() == 1) {
             //if the does not detect any color, then don't change the ball color,
             // else (if the color sensor outputs something), change the color.
-            // did you know that the ? operator is generaelly used in code interviews                                                and according to 黄子铭 ,you will 100% fail if you don't know how to use it. to consider oneself to be (sth positive) 
+            // did you know that the ? operator is generaelly used in code interviews and according to 黄子铭, you will 100% fail if you don't know how to use it. to consider oneself to be (sth positive) 
             ball1Color = getColorSensorOutputs() == 0 ? ball1Color : getColorSensorOutputs();
             
         } else if(getBallCount() == 2) {
@@ -98,6 +97,7 @@ public class Indexer extends SubsystemBase {
         previousBeamBreakExitStatus = beamBreakExitStatus;
 
         putSmartDashboard();
+		
     }
 
     public void resetBallCount() {
@@ -135,7 +135,7 @@ public class Indexer extends SubsystemBase {
 
             case 2: SmartDashboard.putString("ball 2", "blue");
             break;        
-    }
+   		}
     }
 
     private boolean isMotorReversing() {
@@ -150,63 +150,35 @@ public class Indexer extends SubsystemBase {
         return beamBreakEnterStatus != previousBeamBreakEnterStatus && beamBreakEnterStatus;
     }
 
-    /**
-     * sets the power to the indexer motor
-     * @param power percent output [-1, 1]
-     */
     public void setPower(double power) {
         indexer.set(VictorSPXControlMode.PercentOutput, power);
     }
 
-    /**
-     * gets the status of the bottom (enter) beam break
-     * @return true if broken, false if not
-     */
     public boolean getBeamBreakEnterStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return !BEAM_BREAK_ENTER.get();
     }
 
-    /**
-     * gets the status of the top (exit) beam break
-     * @return true if broken, false if not
-     */
     public boolean getBeamBreakExitStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return !BEAM_BREAK_EXIT.get();
     }
 
-    /**
-     * gets the current amount of balls in the indexer
-     * @return number of balls
-     */
     public int getBallCount(){
         return ballCount;
     }
-    /**
-     * stop
-     */
+
     public void stop() {
         indexer.set(VictorSPXControlMode.PercentOutput, 0);
     }
 
-    /**
-     * gets the output from the indexer color sensor
-     * @return 1 if red, 2 if blue, 0 if nothing currently being read
-     */
     public int getColorSensorOutputs() {
         if(intakeSensor.getColor().red >= 0.4) {
-            // SmartDashboard.putString("Color", "red");
             return 1;
         } else if(intakeSensor.getColor().blue >= 0.4) {
-            // SmartDashboard.putString("Color", "blue");
             return 2;
         }
 
-        // SmartDashboard.putNumber("Red", intakeSensor.getColor().red);
-        // SmartDashboard.putNumber("Green", intakeSensor.getColor().green);
-        // SmartDashboard.putNumber("Blue", intakeSensor.getColor().blue);
-        
         return 0;
     }
 }

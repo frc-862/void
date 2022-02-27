@@ -6,7 +6,6 @@ public final class RobotMap {
     public static final int LEFT_MOTOR_1 = 4;
     public static final int LEFT_MOTOR_2 = 5;
     public static final int LEFT_MOTOR_3 = 6;
-
     public static final int RIGHT_MOTOR_1 = 1;
     public static final int RIGHT_MOTOR_2 = 2;
     public static final int RIGHT_MOTOR_3 = 3;
@@ -32,6 +31,5 @@ public final class RobotMap {
     // Shooter
     public static final int FLYWHEEL_MOTOR_ID = 11;
     public static final int HOOD_MOTOR_ID = 13;
-
 
 }

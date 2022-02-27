@@ -54,88 +54,35 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    // private static Turret turret = new Turret();
-    // private static Vision vision = new Vision();
-	// private static LEDs leds = new LEDs();
-	private static Shooter shooter = new Shooter();
-	private static Indexer indexer = new Indexer();
-	private static Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
+    private static final Turret turret = new Turret();
+	private static final Shooter shooter = new Shooter();
+	private static final Indexer indexer = new Indexer();
+	private static final Intake intake = new Intake();
+    private static final Vision vision = new Vision();
+	private static final LEDs leds = new LEDs();
 	
-	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
-	private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
-	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.CO_PILOT_PORT); // changed from joystick to xboxcontroller
-
-	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.CUBED); // TODO test this filters
-
-    public RobotContainer() {
-        super();
-    }
+	// Joysticks
+	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
+	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
+	private static final XboxController copilot = new XboxController(JoystickConstants.CO_PILOT_PORT);
+	private static final JoystickFilter driverFilter = new JoystickFilter(0.07, 0.1, 1, Mode.CUBED);
 
     @Override
     protected void configureAutonomousCommands() {
 		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter));
 		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter));
-        // try {
-		// 	Autonomous.register("Test Differential Auton 0.5", 
-		// 	(new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0d)), 
-		// 		new Pose2d(0.5d, 0d, Rotation2d.fromDegrees(0d))))).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("1/2 ball path", 
-		// 	(new Path("1-2Ball.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("3 ball hanger", 
-		// 	(new Path("3BallHanger.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("3 ball terminal", 
-		// 	(new Path("3BallTerminal.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("4/5 ball terminal", 
-		// 	(new Path("4-5BallTerminal.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		// try {
-		// 	Autonomous.register("5/6 ball terminal", 
-		// 	(new Path("5-6BallTerminal.path", false)).getCommand(drivetrain));
-		// } catch(Exception e) {
-		// 	System.err.println("Unexpected Error: " + e.getMessage());
-		// }
-		try {
-			Autonomous.register("1 meter", 
-			(new Path("1Meter.path", false)).getCommand(drivetrain));
-		} catch(Exception e) {
-			System.err.println("Unexpected Error: " + e.getMessage());
-		}
-		try {
-			Autonomous.register("1 meter forward 1 meter right", 
-			(new Path("1Forward1right.path", false)).getCommand(drivetrain));
-		} catch(Exception e) {
-			System.err.println("Unexpected Error: " + e.getMessage());
-		}
-        
+        registerTestPaths();        
     }
 
     @Override
     protected void configureButtonBindings() {
-        //DRIVER
+		
+        // DRIVER
         // (new JoystickButton(DRIVER_RIGHT, 1)).whileHeld(new RunAutoShoot(shooter, indexer)); //Auto shoot
         // (new TriggerAndThumb((new JoystickButton(DRIVER_RIGHT, 1)), (new JoystickButton(DRIVER_RIGHT, 2)))).whenPressed(new ShootClose(shooter)); // shoot close
         
-
-        //COPILOT
+        // COPILOT
         // (new Trigger(() -> CO_PILOT.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(CO_PILOT.getRightTriggerAxis()), intake)); //intake 
         // (new JoystickButton(CO_PILOT, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
         // (new JoystickButton(CO_PILOT, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
@@ -143,25 +90,21 @@ public class RobotContainer extends LightningContainer{
         // (new JoystickButton(CO_PILOT, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
         // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-CO_PILOT.getLeftTriggerAxis()), indexer)); //indexer out
         // (new Trigger(() -> CO_PILOT.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-CO_PILOT.getLeftTriggerAxis()), intake)); //intake out
-        //TODO: add bias stuff
-        /*
-        (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
-        (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
-        */
-
-	// 	(new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(    
-    //     new ParallelCommandGroup(   
-    //     new RunIndexer(indexer, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())), 
-    //     new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
-    //     ));
-
-    //     (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
+        // TODO: add bias stuff
+        // (new POVButton(climb, 0)).whenPressed(new InstantCommand()); //TODO: add climber stuff
+        // (new POVButton(climb, 180)).whenPressed(new InstantCommand()); //TODO: add climber stuff
+		// (new Trigger(() -> Math.abs((CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())) > 0.03)).whenActive(    
+        // 	new ParallelCommandGroup(   
+		// 		new RunIndexer(indexer, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis())), 
+		// 		new RunIntake(intake, () -> (CO_PILOT.getRightTriggerAxis() - CO_PILOT.getLeftTriggerAxis()))
+        // ));
+        // (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 
     }
 
     @Override
     protected void configureDefaultCommands() {
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
 	}
 
     @Override
@@ -175,7 +118,7 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     public LightningDrivetrain getDrivetrain() {
-        return null;
+        return drivetrain;
     }
 
     @Override
@@ -183,5 +126,20 @@ public class RobotContainer extends LightningContainer{
 	
     @Override
     protected void releaseDefaultCommands() { }
+
+	private void registerTestPaths() {
+		try {
+			Autonomous.register("1 meter", 
+			(new Path("1Meter.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+		try {
+			Autonomous.register("1 meter forward 1 meter right", 
+			(new Path("1Forward1right.path", false)).getCommand(drivetrain));
+		} catch(Exception e) {
+			System.err.println("Unexpected Error: " + e.getMessage());
+		}
+	}
     
 }

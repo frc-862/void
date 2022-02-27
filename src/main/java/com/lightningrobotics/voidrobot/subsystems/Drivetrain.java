@@ -1,29 +1,22 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.lang.invoke.ConstantCallSite;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.lightningrobotics.common.controller.FeedForwardController;
-import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
-import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class Drivetrain extends DifferentialDrivetrain {
 
-    private static PIDFController PID = new PIDFController(Constants.KP, Constants.KI, Constants.KD);
-    private static FeedForwardController feedForward = new FeedForwardController(Constants.KS, Constants.KV, Constants.KA); 
-
-    private PIDFDashboardTuner tuner = new PIDFDashboardTuner("drivetrain", PID);
+    private static PIDFDashboardTuner tuner = new PIDFDashboardTuner("drivetrain", Constants.PID);
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -37,40 +30,32 @@ public class Drivetrain extends DifferentialDrivetrain {
         new WPI_TalonFX(RobotMap.RIGHT_MOTOR_3)
     };
 
-    private static final DifferentialGains DIFFERENTIAL_GAINS = new DifferentialGains(
-        Constants.MAX_SPEED,
-        Constants.MAX_ACCELERATION,
-        Constants.TRACK_WIDTH,
-        new boolean[]{Constants.LEFT_1_INVERT, Constants.LEFT_2_INVERT, Constants.LEFT_3_INVERT},
-        new boolean[]{Constants.RIGHT_1_INVERT, Constants.RIGHT_2_INVERT, Constants.RIGHT_3_INVERT},
-        PID,
-        feedForward
-    );
-
+	// This function only deals wit ticks to a distance, so the *10 handles the per second operation needed
+	private static final DoubleSupplier leftVelocitySupplier = 
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+	private static final DoubleSupplier rightVelocitySupplier = 
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+	private static final DoubleSupplier leftPositionSupplier =  
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+	private static final DoubleSupplier rightPositionSupplier = 
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
     
     public Drivetrain() {
         super(
-            DIFFERENTIAL_GAINS, 
+            Constants.DIFFERENTIAL_GAINS, 
             LEFT_MOTORS, 
             RIGHT_MOTORS, 
             LightningIMU.navX(), 
-            // This finction only deals wit ticks to a distance, so the *10 handles the per second operation needed
-            () -> LightningMath.ticksToDistance( (((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(4.0725), 6.7d, 2048d ), 
-            () -> LightningMath.ticksToDistance( (((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(4.0725), 6.7d, 2048d ),
-            () -> LightningMath.ticksToDistance( (((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d),
-            () -> LightningMath.ticksToDistance( (((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d)
+            leftVelocitySupplier,
+			rightVelocitySupplier,
+			leftPositionSupplier, 
+			rightPositionSupplier
         );
 
         for (int i = 0; i < RIGHT_MOTORS.length; i++){
             ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
             ((WPI_TalonFX)LEFT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
         }
-
-        var tab = Shuffleboard.getTab("Drivetrain");
-        tab.addNumber("Left Distance", () -> LightningMath.ticksToDistance( (((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d));
-        tab.addNumber("Right Distance", () -> LightningMath.ticksToDistance( (((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(4.0725), 6.7d, 2048d));
-        tab.addNumber("Left Velocity", () -> LightningMath.ticksToDistance( (((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(4.0725), 6.7d, 2048d ));
-        tab.addNumber("Right Velocity", () -> LightningMath.ticksToDistance( (((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(4.0725), 6.7d, 2048d ));
 
     }
 
