@@ -4,6 +4,7 @@ import java.lang.invoke.ConstantBootstraps;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -25,9 +26,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 	// Creates the flywheel motor and hood motors
-	private VictorSPX flywheelMotor;
+	private TalonFX flywheelMotor;
 	private TalonSRX hoodMotor;
-	private Encoder shooterEncoder;
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
@@ -36,13 +36,9 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry displayShooterPower;
 
 	// Creates a PID and FeedForward controller for our shooter
-	private PIDFController shooterPID = new PIDFController(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD);
 	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
-	
-	private FeedForwardController feedForward = new FeedForwardController(Constants.SHOOTER_KS,  Constants.SHOOTER_KV, Constants.SHOOTER_KA);
 
 	// PID tuner for the shooter gains
-	private PIDFDashboardTuner shooterTuner = new PIDFDashboardTuner("shooter test", shooterPID);
 	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", hoodPID);
 
 	// The power point we want the shooter to be at
@@ -54,18 +50,17 @@ public class Shooter extends SubsystemBase {
 	
 	public Shooter() {
 		// Sets the IDs of the hood and shooter
-		flywheelMotor = new VictorSPX(RobotMap.FLYWHEEL_MOTOR_ID);
+		flywheelMotor = new TalonFX(RobotMap.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
-		shooterEncoder = new Encoder(RobotMap.SHOOTER_ENCODER_A, RobotMap.SHOOTER_ENCODER_B); // sets encoder ports
 		hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog);
 
 		flywheelMotor.setInverted(true); // Inverts the flywheel motor
 
-		shooterEncoder.setDistancePerPulse(1d/2048d); // encoder ticks per rev (or, the other way around)
+		changePIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
 
 		// Creates the tables to see important values
 		displayShooterPower = shooterTab
-			.add("shooter power output", getPowerSetpoint())
+			.add("shooter power output", getShooterPower())
 			.getEntry();
 		setRPM = shooterTab
 			.add("set RPM", 0)
@@ -93,26 +88,21 @@ public class Shooter extends SubsystemBase {
 		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
 	}
 
-	public void setVelocity(double shooterVelocity) {
-		flywheelMotor.set(VictorSPXControlMode.Velocity, shooterVelocity); 
+	public void setPower(double power) {
+		//TODO: use falcon built-in functions
+		flywheelMotor.set(TalonFXControlMode.PercentOutput, power); 
 	}
 
-	/**
-	 * sets the target RPMs for the shooter using a PID
-	 * @param targetRPM the... target RPMs
-	 */
-	public void setRPM(double targetRPM) {
-		this.targetRPM = targetRPM;
-		targetRPM = feedForward.calculate(targetRPM); // maybe not??
-		shooterPower = shooterPID.calculate(getEncoderRPM(), targetRPM);
-		flywheelMotor.set(VictorSPXControlMode.PercentOutput, shooterPower);
+	public void setVelocity(double shooterVelocity) {
+		//TODO: use falcon built-in functions
+		flywheelMotor.set(TalonFXControlMode.Velocity, shooterVelocity); 
 	}
 
 	/**
 	 * stops the shooter motor
 	 */
 	public void stop() {
-		flywheelMotor.set(VictorSPXControlMode.PercentOutput, 0);; 
+		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0);; 
 	}
 
 	/**
@@ -120,15 +110,19 @@ public class Shooter extends SubsystemBase {
 	 * @return the RPM's of the shooter
 	 */
 	public double getEncoderRPM() {
-		return shooterEncoder.getRate() * 60; //converts from revs per second to revs per minute
+		return flywheelMotor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
 	}
 
-	/**
-	 * gets the raw encoder ticks of the shooter
-	 * @return the raw value returned by the shooter encoder
-	 */
+	public void setRPM(double targetRPMs) {
+		setVelocity(targetRPMs / 600 * 2048);
+	}
+
+	public double getShooterPower() {
+		return shooterPower;
+	}
+
 	public double currentEncoderTicks() {
-		return shooterEncoder.getRaw(); 
+		return flywheelMotor.getSelectedSensorPosition();
 	}
 
 	/**
@@ -146,20 +140,16 @@ public class Shooter extends SubsystemBase {
 		return armed;	
 	}
 
-	/**
-	 * 
-	 * @return the target power for the shooter
-	 */
-	public double getPowerSetpoint() {
-		return shooterPower;
-	}
-
-	/**
-	 * sets the dashboard commands for the shooter
-	 */
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
-		displayShooterPower.setDouble(getPowerSetpoint());
+		displayShooterPower.setDouble(getShooterPower());
+	}
+
+	private void changePIDGains(double kP, double kI, double kD, double kV) {
+		flywheelMotor.config_kP(0, kP);
+		flywheelMotor.config_kI(0, kI);
+		flywheelMotor.config_kD(0, kD);
+		flywheelMotor.config_kF(0, kV);
 	}
 
 	/**
@@ -198,8 +188,8 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		setRPM(getRPMFromDashboard());
 		setSmartDashboardCommands();
-		setArmed(); // Checks to see the shooter is at desired RPM
 	}
 
 }
