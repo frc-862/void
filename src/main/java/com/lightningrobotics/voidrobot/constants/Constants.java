@@ -22,6 +22,7 @@ public final class Constants {
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 135d;
     public static final double MIN_TURRET_ANGLE = -135d;
+    public static final double TURRET_ANGLE_TOLERANCE = 3; // degrees
 
     // Indexer Constants
     public static final double DEFAULT_INDEXER_POWER = 0.5;
