@@ -20,14 +20,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
 	
-	// Creating turret motor, encoder, and PID controller
 	private boolean isUsingNavX = false;
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
-	//variables I need to run the tests
+	
 	private double realX = 0d;
 	private double realY = 0d;
 

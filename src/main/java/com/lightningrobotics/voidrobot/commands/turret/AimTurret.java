@@ -57,43 +57,46 @@ public class AimTurret extends CommandBase {
     public void execute() {
         if((stickX.getAsDouble() > 0.15 || stickY.getAsDouble() > 0.15) && manualControl){
             targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
-        } else if(vision.hasVision()){
-            targetingState = TargetingState.AUTO_VISION;
         } else if (testing) {
             //put testing stuff here
+        } else if(vision.hasVision()){
+            targetingState = TargetingState.AUTO_VISION;
         } else{
             targetingState = TargetingState.AUTO_NO_VISION;
         }
         
         switch (targetingState) {
             case MANUAL: 
-                //only work if its not in the controller stick deadzone
+                //just sets the target to wherever the stick on the controller is pointed
                 turret.setTarget(Math.toDegrees(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
             break;
 
-            case AUTO_NO_VISION: 
-                if (isUsingVision){
-                    // As soon as we lose vision, we reset drivetrain pose/axis and get current angle degree
-                    drivetrain.resetPose();
-                    isUsingVision = false;
-                    realHeadingTowardsTarget = turret.getTurretAngle().getDegrees();// + lastVisionOffset;
-                } 
-
-                // get (x,y) relative to the robot. the X and Y axis is created when we reset the drivetrain odometer
-                double relativeX = drivetrain.getPose().getX();
-                double relativeY = drivetrain.getPose().getY();
-
-                // Get data from right before vision loss
-                double lastVisionDistance = lastVisionOffset;
-                double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
-
-                turret.setOffsetNoVision(relativeX, relativeY, realHeadingTowardsTarget, lastVisionDistance, changeInRotation);
+            case TESTING:
+                //put test code here
             break;
 
             case AUTO_VISION: 
                 lastVisionOffset = vision.getOffsetAngle();
                 turret.setVisionOffset(lastVisionOffset); // setting the target angle of the turret
                 isUsingVision = true;
+            break;
+
+            case AUTO_NO_VISION: 
+                if (isUsingVision){ //runs once on vision loss
+                    // As soon as we lose vision, we reset drivetrain pose/axis and get current angle degree
+                    drivetrain.resetPose();
+                    realHeadingTowardsTarget = turret.getTurretAngle().getDegrees();// + lastVisionOffset;
+                    isUsingVision = false;
+                } 
+
+                // get (x,y) relative to the robot. the X and Y axis is created when we reset the drivetrain odometer
+                double relativeX = drivetrain.getPose().getX();
+                double relativeY = drivetrain.getPose().getY();
+
+                // update rotation data 
+                double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+
+                turret.setOffsetNoVision(relativeX, relativeY, realHeadingTowardsTarget, lastVisionOffset, changeInRotation);
             break;
         }
     }
