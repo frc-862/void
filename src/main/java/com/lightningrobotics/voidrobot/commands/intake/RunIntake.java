@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands;
+package com.lightningrobotics.voidrobot.commands.intake;
 
 import java.util.function.DoubleSupplier;
 

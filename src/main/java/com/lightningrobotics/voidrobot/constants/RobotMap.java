@@ -23,7 +23,11 @@ public final class RobotMap {
     public static final int INTAKE_WINCH_ID = 14;
 
     // Turret
-    public static final int TURRET_MOTOR_ID = 2;
+    public static final int TURRET_MOTOR_ID = 12;
+    public static final int LIMIT_SWITCH_NEGATIVE_ID = 2; 
+    public static final int LIMIT_SWITCH_POSITIVE_ID = 3; 
+    public static final int CENTER_SENSOR_ID = 69420;
+
 
     // Indexer 
     public static final int INDEXER_MOTOR_ID = 16;

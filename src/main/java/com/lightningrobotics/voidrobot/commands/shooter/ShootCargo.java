@@ -14,7 +14,7 @@ public class ShootCargo extends CommandBase {
 	private Indexer indexer;
 	private Turret turret;
 
-	public ShootCargo(Shooter shooter, Indexer indexer, Vision vision, Turret turret) {
+	public ShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
 
 		this.shooter = shooter;
 		this.indexer = indexer;

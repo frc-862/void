@@ -46,12 +46,15 @@ public final class Constants {
     public static FeedForwardController FEEDFORWARD = new FeedForwardController(Constants.KS, Constants.KV, Constants.KA); 
 
     // Turret
-    public static final double TURN_TURRET_GEAR_RATIO = 77;
-    public static final int TURRET_GEAR_RATIO = 11;
-    public static final double TURRET_kP = 0.0035; //TODO: tune this
+    public static final double TURN_TURRET_GEAR_RATIO = 14;
+    public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.3d;
+    public static final double TURRET_REDUCED_MAX_MOTOR_OUTPUT = 0.2d;
+    public static final double TURRET_kP = 0.02; 
+    public static final double TURRET_kI = 0.005; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 135d;
-    public static final double MIN_TURRET_ANGLE = -135d;
+    public static final double MAX_TURRET_ANGLE = 90d;
+    public static final double MIN_TURRET_ANGLE = -90d;
+    public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
@@ -88,7 +91,5 @@ public final class Constants {
             put(1.0, 1.0);
         }
     };
-
-
 
 }

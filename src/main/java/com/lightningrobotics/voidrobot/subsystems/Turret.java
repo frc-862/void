@@ -1,48 +1,41 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
-
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
+	
 	// Creating turret motor, encoder, and PID controller
 	private boolean isUsingNavX = false;
-	private boolean hasVision = true;
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
 	// Creating turret motor, encoder, and PID controller
-	// private final CANSparkMax turretMotor;
-	// private final RelativeEncoder turretEncoder;
-
-	private final CANSparkMax turretMotor;
+	private final TalonSRX turretMotor;
 	//variables I need to run the tests
-	private boolean testOneHasInit = false;
-	private boolean testTwoHasInit = false;
-	private boolean testThreeHasInit = false;
-	private boolean testFourHasInit = false;
-	private double navXOrigin = 0d;
-	private double navXCurrent = 0d;
 	private double realX = 0d;
 	private double realY = 0d;
-	private double knownDistanceFromTarget = 6.5d;
-	private double realHeadingTowardsTarget = 0;
 
-	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, 0, 0);
+	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_NEGATIVE_ID);
+	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
+	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
+
+	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
@@ -52,45 +45,74 @@ public class Turret extends SubsystemBase {
 	private static double motorOutput;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+	private NetworkTableEntry setTargetAngleEntry;
+	private NetworkTableEntry centerSensorEntry;
+	private NetworkTableEntry leftLimitSwitchEntry;
+	private NetworkTableEntry rightLimitSwitchEntry;
 	
-	// TODO add java docs
+	/**
+	 * The turret subsystem has functions for aiming the turret based on three modes - vision,
+	 *  no vision, and manual control (manual should only be used in emergencies or testing)
+	 */ 
 	public Turret() {
-		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless); // TODO: change CAN ids for both motors
+		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
 		// turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		// turretMotor.setClosedLoopRampRate(0); // too low?
 		// turretEncoder = turretMotor.getEncoder();
 
-		turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
-
-		//turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-
 		navX = LightningIMU.navX();
+
+		// Motor config
+		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
+		turretMotor.setNeutralMode(NeutralMode.Brake);
+		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+
+		// Dashboard info
+		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
+		centerSensorEntry = turretTab.add("Hit Center Censor", "false").getEntry();
+		leftLimitSwitchEntry = turretTab.add("Hit Left Limit Switch", false).getEntry();
+		rightLimitSwitchEntry = turretTab.add("Hit Right Limit Switch", false).getEntry();
+
+		// Reset values
+	    resetEncoder();
+		target = 0;
 	}
 	
 	@Override
 	public void periodic() {
+		// Check if ready to shoot
+		armed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
+		SmartDashboard.putBoolean("Turret Armed", armed);
 
 		// To make the dgress in terms of -180 to 180
+		target = setTargetAngleEntry.getDouble(0); // TODO: temporary for testing
 		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 	
 		// Constraining our angle to compensate for our deadzone
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
+		double currentAngle = getTurretAngle().getDegrees();
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
-		SmartDashboard.putNumber("target angle", target);
+		SmartDashboard.putNumber("current angle", currentAngle);
+		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
 
-		// uses pid to set the turret power
+		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
+		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
+		//centerSensorEntry.setBoolean(centorCensor.get());
+		//if(centorSensor.get()) {
+		//	resetEncoder();
+		//}
+
+		// Get and constrain motor output
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		turretMotor.set(motorOutput);
-		SmartDashboard.putNumber("turret angle with navX added", getTurretAngleNoLimit().getDegrees());
+		double maxMotorOutput = Math.abs(Constants.MAX_TURRET_ANGLE - currentAngle) < 10 ?
+		    Constants.TURRET_REDUCED_MAX_MOTOR_OUTPUT : Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
+		motorOutput = LightningMath.constrain(motorOutput, -maxMotorOutput, motorOutput);
+
+		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
-
-	}
-
-	public void setTarget(double target) {
-		this.target = target;
+		SmartDashboard.putData("Gyro", navX); 
 	}
 		
 	/**
@@ -102,7 +124,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void stopTurret() {
-		turretMotor.set(0);
+		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 	}
 
 	/**
@@ -110,8 +132,7 @@ public class Turret extends SubsystemBase {
 	 * @return An angle limited by min and max turret angle
 	 */
 	public Rotation2d getTurretAngle(){
-		//return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
-		return  Rotation2d.fromDegrees(getEncoderValue() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
+		return  Rotation2d.fromDegrees(getEncoderRotation() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 	}
 
 	/**
@@ -143,12 +164,10 @@ public class Turret extends SubsystemBase {
 
 	/**
 	 * gets the encoder in rotations
-	 * @return the encoder value in rotations
+	 * @return the value of encoder in rotations
 	 */
-	public double getEncoderValue() {
-		// return turretEncoder.getPosition();
-		//return turretMotor.getEncoder().getPosition() * 360 / 4096;
-		return turretMotor.getEncoder().getPosition();
+	public double getEncoderRotation() {
+		return turretMotor.getSelectedSensorPosition() / 4096;
 }
 
 
@@ -157,33 +176,51 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		this.armed = Math.abs(offsetAngle) < 5; // Checks to see if our turret is within our vision threashold
-		hasVision = true;
+		this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
 	/**
 	 * Sets an offset based on tracking with no vision
+	 * @param relativeX the x of the odometer reading (relative to the robot)
+	 * @param relativeY the y of the odometer reading (relative to the robot)
+	 * @param realTargetHeading the angle of where the target is relative to the robot at the loss of data
+	 * @param lastVisionDistance the distance that was last recorded before vision stopped giving data
+	 * @param changeInRotation the change in rotation from the second the robot lost vision
 	 */
-	public void setOffsetNoVision(double relativeX, double relativeY, double lastOffset, double lastVisionDistance){
-		if (hasVision){
-			//currentX = 0;
-			//currentY = 0;
-			navXOrigin = navX.getHeading().getDegrees();
-			realHeadingTowardsTarget = getTurretAngle().getDegrees() + lastOffset;
-			knownDistanceFromTarget = lastVisionDistance;
-			hasVision = false;
-		}
+	public void setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+		
+		realX = rotateX(relativeX, relativeY, realTargetHeading);
+		realY = rotateY(relativeX, relativeY, realTargetHeading);
 
-		realX = rotateX(relativeX, 0);
-		realY = rotateY(relativeY, 0);
-
-		navXCurrent = navX.getHeading().getDegrees();
-
-		this.target = Math.toDegrees(Math.atan2(realX,(knownDistanceFromTarget-realY)))+(navXOrigin-navXCurrent);
+		this.target = realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
 	}
 
-	public double rotateX (double xValue, double angleInDegrees){return xValue;} // <--- TODO actually program this function
-	public double rotateY (double yValue, double angleInDegrees){return yValue;} // <--- TODO actually program this function
+	/**
+	 * Directly set the angle to turn to
+	 * @param targetAngle the angle of the turret (degrees)
+	 */
+	public void setTarget(double targetAngle) {
+		this.target = targetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+	}
+
+	/**
+	 * Rotates a point in the x y plane by an angle in degrees
+	 * @return x value of rotated point
+	 */
+	public double rotateX (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
+	}	
+
+	/**
+	 * Rotates a point in the x y plane by an angle in degrees
+	 * @return y value of rotated point
+	 */
+	public double rotateY (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
+	}
+
+	public void resetEncoder() {
+		turretMotor.setSelectedSensorPosition(0);
+	}
 
 }

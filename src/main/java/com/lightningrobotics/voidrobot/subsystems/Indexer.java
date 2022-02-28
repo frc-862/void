@@ -2,9 +2,9 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
-import com.lightningrobotics.voidrobot.commands.QueueBalls;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -87,7 +87,7 @@ public class Indexer extends SubsystemBase {
 
         // automatically suck in balls when we first see them
         if (collect1){ 
-            var cmd = new QueueBalls(this);
+            var cmd = new AutoIndexCargo(this);
             cmd.schedule(true);
         }
 
