@@ -25,7 +25,7 @@ public final class RobotMap {
     public static final int TURRET_MOTOR_ID = 12;
     public static final int LIMIT_SWITCH_NEGATIVE_ID = 2; 
     public static final int LIMIT_SWITCH_POSITIVE_ID = 3; 
-    public static final int IS_CENTERED_ID = 69420;
+    public static final int CENTER_SENSOR_ID = 69420;
 
 
     // Indexer 

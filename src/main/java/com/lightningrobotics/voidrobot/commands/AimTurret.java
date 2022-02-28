@@ -22,17 +22,13 @@ public class AimTurret extends CommandBase {
     // Creates our turret and vision subsystems
     private Turret turret;
     private Vision vision;
-    private double lastVisionOffset;
     private Drivetrain drivetrain;
+
     private boolean isUsingVision = true;
-    private boolean manualCoDriverControl = false;
+
 	private double realHeadingTowardsTarget = 0d;
+    private double lastVisionOffset;
 
-    private static double targetAngle = 0; // this is the angle that we are setting to the turret
-
-
-    private static double offsetAngle = 0d; // The offset that vision gives us
-    private static double currentAngle; // The current angle of the turret
     DoubleSupplier stickX;
     DoubleSupplier stickY;
 
@@ -62,8 +58,8 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void execute() {
-        if(manualCoDriverControl){
-            targetingState = TargetingState.MANUAL;
+        if(stickX.getAsDouble() > 0.15 || stickY.getAsDouble() > 0.15){
+            targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
         } else if(vision.hasVision()){
             targetingState = TargetingState.AUTO_VISION;
         } else{
@@ -73,15 +69,12 @@ public class AimTurret extends CommandBase {
         switch (targetingState) {
             case MANUAL: 
                 //only work if its not in the controller stick deadzone
-                if (!(stickX.getAsDouble() < 0.15 || stickY.getAsDouble() < 0.15)){
-                    turret.setTarget(Math.toDegrees(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
-                }
+                turret.setTarget(Math.toDegrees(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
             break;
 
             case AUTO_NO_VISION: 
                 if (isUsingVision){
                     // As soon as we lose vision, we reset drivetrain pose/axis and get current angle degree
-                    //navXOrigin = navX.getHeading().getDegrees();
                     drivetrain.resetPose();
                     isUsingVision = false;
                     realHeadingTowardsTarget = turret.getTurretAngle().getDegrees();// + lastVisionOffset;
@@ -98,8 +91,7 @@ public class AimTurret extends CommandBase {
                 turret.setOffsetNoVision(relativeX, relativeY, realHeadingTowardsTarget, lastVisionDistance, changeInRotation);
             break;
 
-            case AUTO_VISION:
-                //offsetAngle  = vision.getOffsetAngle(); // gets the vision offset angle 
+            case AUTO_VISION: 
                 lastVisionOffset = vision.getOffsetAngle();
                 turret.setVisionOffset(lastVisionOffset); // setting the target angle of the turret
                 isUsingVision = true;

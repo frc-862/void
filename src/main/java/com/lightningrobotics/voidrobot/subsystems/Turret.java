@@ -20,6 +20,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -41,8 +42,7 @@ public class Turret extends SubsystemBase {
 
 	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_NEGATIVE_ID);
 	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
-
-	// private final DigitalInput isCentered = new DigitalInput(RobotMap.IS_CENTERED_ID);
+	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
@@ -55,10 +55,9 @@ public class Turret extends SubsystemBase {
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry setTargetAngleEntry;
-	private NetworkTableEntry isOnLimitSwitchEntry;
-	private NetworkTableEntry isCenteredEntry;
-	private NetworkTableEntry leftSensor;
-	private NetworkTableEntry rightSensor;
+	private NetworkTableEntry centerSensorEntry;
+	private NetworkTableEntry leftLimitSwitchEntry;
+	private NetworkTableEntry rightLimitSwitchEntry;
 	
 	/**
 	 * The turret subsystem has functions for aiming the turret based on three modes - vision,
@@ -79,10 +78,9 @@ public class Turret extends SubsystemBase {
 
 		// Dashboard info
 		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
-		isOnLimitSwitchEntry = turretTab.add("Hit Limit Switch", "false").getEntry();
-		isCenteredEntry = turretTab.add("Hit Center Censor", "false").getEntry();
-		leftSensor = turretTab.add("left sensor", false).getEntry();
-		rightSensor = turretTab.add("right sensor", false).getEntry();
+		centerSensorEntry = turretTab.add("Hit Center Censor", "false").getEntry();
+		leftLimitSwitchEntry = turretTab.add("Hit Left Limit Switch", false).getEntry();
+		rightLimitSwitchEntry = turretTab.add("Hit Right Limit Switch", false).getEntry();
 
 		// Reset values
 	    resetEncoder();
@@ -91,6 +89,9 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
+		// Check if ready to shoot
+		armed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
+		SmartDashboard.putBoolean("Turret Armed", armed);
 
 		// To make the dgress in terms of -180 to 180
 		target = setTargetAngleEntry.getDouble(0); // TODO: temporary for testing
@@ -99,26 +100,25 @@ public class Turret extends SubsystemBase {
 	
 		// Constraining our angle to compensate for our deadzone
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
+		double currentAngle = getTurretAngle().getDegrees();
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", getTurretAngle().getDegrees());
-		// SmartDashboard.putNumberl("target angle", target);
+		SmartDashboard.putNumber("current angle", currentAngle);
+		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
 
-		leftSensor.setBoolean(!limitSwitchLeft.get());
-		rightSensor.setBoolean(!limitSwitchRight.get());
+		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
+		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
+		//centerSensorEntry.setBoolean(centorCensor.get());
+		//if(centorSensor.get()) {
+		//	resetEncoder();
+		//}
 
+		// Get and constrain motor output
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		motorOutput = motorOutput > Constants.TURRET_MAX_MOTOR_OUTPUT ? Constants.TURRET_MAX_MOTOR_OUTPUT : motorOutput;
-/*
-		if(isCentered.get()) {
-			isCenteredEntry.setString("true");
-			resetEncoder();
-		}
-		else{
-			isCenteredEntry.setString("false");
-		}*/
+		double maxMotorOutput = Math.abs(Constants.MAX_TURRET_ANGLE - currentAngle) < 10 ?
+		    Constants.TURRET_REDUCED_MAX_MOTOR_OUTPUT : Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
+		motorOutput = LightningMath.constrain(motorOutput, -maxMotorOutput, motorOutput);
 
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
-		SmartDashboard.putNumber("turret angle no limit", getTurretAngleNoLimit().getDegrees());
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
 		SmartDashboard.putData("Gyro", navX); 
@@ -185,8 +185,7 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		//this.target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		//this.armed = Math.abs(offsetAngle) < Constants.TURRET_ANGLE_TOLERANCE; // Checks to see if our turret is within our vision threashold
+		this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
 	/**
@@ -206,11 +205,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * Don't use this. I only have this for emergency manual control. Use "setOffset" instead.
+	 * Directly set the angle to turn to
+	 * @param targetAngle the angle of the turret (degrees)
 	 */
 	public void setTarget(double targetAngle) {
 		this.target = targetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-		//this.armed = true; // Checks to see if our turret is within our vision threashold
 	}
 
 	/**
