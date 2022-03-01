@@ -34,6 +34,8 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry displayRPM;
     private NetworkTableEntry setRPM;
     private NetworkTableEntry displayShooterPower;
+	private NetworkTableEntry targetHoodAngle;
+	private NetworkTableEntry currentHoodAngle;
 
 	// Creates a PID and FeedForward controller for our shooter
 	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
@@ -68,6 +70,12 @@ public class Shooter extends SubsystemBase {
 		displayRPM  = shooterTab
 			.add("RPM-From encoder", 0)
 			.getEntry();
+		targetHoodAngle = shooterTab
+			.add("set hood angle", 0)
+			.getEntry();
+		currentHoodAngle = shooterTab
+			.add("current hood angle", 0)
+			.getEntry();
 
 	}
 
@@ -89,12 +97,10 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setPower(double power) {
-		//TODO: use falcon built-in functions
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, power); 
 	}
 
 	public void setVelocity(double shooterVelocity) {
-		//TODO: use falcon built-in functions
 		flywheelMotor.set(TalonFXControlMode.Velocity, shooterVelocity); 
 	}
 
@@ -143,6 +149,7 @@ public class Shooter extends SubsystemBase {
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
+		currentHoodAngle.setDouble(getHoodAngle());
 	}
 
 	private void changePIDGains(double kP, double kI, double kD, double kV) {
@@ -189,6 +196,9 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {
 		setRPM(getRPMFromDashboard());
+
+		setHoodAngle(targetHoodAngle.getDouble(0));
+
 		setSmartDashboardCommands();
 	}
 
