@@ -1,26 +1,16 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -29,14 +19,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
-	// Creating turret motor, encoder, and PID controller
+	
 	private boolean isUsingNavX = false;
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
-	//variables I need to run the tests
+	
 	private double realX = 0d;
 	private double realY = 0d;
 
@@ -44,12 +34,12 @@ public class Turret extends SubsystemBase {
 	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
 	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
-	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, Constants.TURRET_kD);
+	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
 
-	private boolean armed = false;
+	private boolean isArmed = false;
 	private double target;
 	private static double motorOutput;
 
@@ -90,28 +80,17 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// Check if ready to shoot
-		armed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
-		SmartDashboard.putBoolean("Turret Armed", armed);
+		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
+		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
-		// To make the dgress in terms of -180 to 180
-		target = setTargetAngleEntry.getDouble(0); // TODO: temporary for testing
+		//target = setTargetAngleEntry.getDouble(0); //uncomment this to set it to the network table values
+	
+		// Constraining our angle to -180 to 180 and then to our turret limit
 		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
-	
-		// Constraining our angle to compensate for our deadzone
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
 		double currentAngle = getTurretAngle().getDegrees();
-		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", currentAngle);
-		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
-		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
-		SmartDashboard.putNumber("motor output", motorOutput);
-		
-		// if(limitSwitchLeft.get() || limitSwitchRight.get()){
-		// 	return;
-		// }
-		// leftLimitSwitchEntry.setBoolean(limitSwitchLeft.get());
-		// rightLimitSwitchEntry.setBoolean(limitSwitchRight.get());
+
 		//centerSensorEntry.setBoolean(centorCensor.get());
 		//if(centorSensor.get()) {
 		//	resetEncoder();
@@ -123,15 +102,25 @@ public class Turret extends SubsystemBase {
 		    Constants.TURRET_REDUCED_MAX_MOTOR_OUTPUT : Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
 		motorOutput = LightningMath.constrain(motorOutput, -maxMotorOutput, motorOutput);
 
+		
+		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
+		SmartDashboard.putNumber("motor output", motorOutput);
+		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
+		SmartDashboard.putNumber("current angle", currentAngle);
+		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
+		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
+		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
+		//SmartDashboard.putData("Gyro", navX); 
+		
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 	}
-
+		
 	/**
 	 * 
 	 * @return If the turret is turned to the correct degree and ready to shoot
 	 */
 	public boolean getArmed() {
-		return armed;
+		return isArmed;
 	}
 
 	public void stopTurret() {
@@ -211,7 +200,8 @@ public class Turret extends SubsystemBase {
 	 * @param targetAngle the angle of the turret (degrees)
 	 */
 	public void setTarget(double targetAngle) {
-		this.target = targetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		this.target = targetAngle;
+		SmartDashboard.putNumber("reading from controller", targetAngle);
 	}
 
 	/**

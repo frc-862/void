@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
     
+    private boolean manualControl = true;
+    private boolean testing = false;
+
     // Creates our turret and vision subsystems
     private Turret turret;
     private Vision vision;
@@ -34,6 +37,7 @@ public class AimTurret extends CommandBase {
 
     enum TargetingState{
         MANUAL,
+        TESTING,
         AUTO_NO_VISION,
         AUTO_VISION
     }
@@ -58,8 +62,10 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void execute() {
-        if(stickX.getAsDouble() > 0.15 || stickY.getAsDouble() > 0.15){
+        if((stickX.getAsDouble() > 0.5 || stickY.getAsDouble() > 0.5) && manualControl){
             targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
+        } else if (testing) {
+            targetingState = TargetingState.TESTING;
         } else if(vision.hasVision()){
             targetingState = TargetingState.AUTO_VISION;
         } else{
