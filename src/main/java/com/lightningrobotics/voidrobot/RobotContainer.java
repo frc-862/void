@@ -58,11 +58,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    private static Turret turret = new Turret();
+    // private static Turret turret = new Turret();
     private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
-	// private static SimpleClimber climb = new SimpleClimber();
+	private static SimpleClimber climb = new SimpleClimber();
 
 	// private static final Turret turret = new Turret();
 	// private static final Indexer indexer = new Indexer();
@@ -180,7 +180,7 @@ public class RobotContainer extends LightningContainer{
 
 		// indexer.setDefaultCommand(new RunIndexer(indexer, ()-> driver.getLeftY()));
 
-        turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> CO_PILOT.getRightX(), () -> CO_PILOT.getRightY())); 
+        // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> CO_PILOT.getRightX(), () -> CO_PILOT.getRightY())); 
 		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
 	}
 

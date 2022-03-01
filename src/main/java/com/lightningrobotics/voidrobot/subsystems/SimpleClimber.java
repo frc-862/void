@@ -30,7 +30,9 @@ public class SimpleClimber extends SubsystemBase {
 	  }
 
 	@Override
-	public void periodic() {}
+	public void periodic() {
+		runServo();
+	}
 
 	public void climb(double motorPower) {
 		winch1Motor.set(TalonFXControlMode.PercentOutput, motorPower);
@@ -42,7 +44,7 @@ public class SimpleClimber extends SubsystemBase {
 		winch2Motor.set(TalonFXControlMode.PercentOutput, 0); 
 	}
 	public void runServo() {
-		exampleServo.setAngle(SmartDashboard.getNumber("target angle for the servo thingy", 0));
+		exampleServo.setAngle(SmartDashboard.getNumber("target angle for the servo thingy", 90));
 	}
 
 }

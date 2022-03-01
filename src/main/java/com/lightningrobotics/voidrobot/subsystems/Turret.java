@@ -44,7 +44,7 @@ public class Turret extends SubsystemBase {
 	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
 	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
-	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
+	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, Constants.TURRET_kD);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
@@ -107,11 +107,11 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
 		SmartDashboard.putNumber("motor output", motorOutput);
 		
-		if(!limitSwitchLeft.get() || !limitSwitchRight.get()){
-			return;
-		}
-		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
-		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
+		// if(limitSwitchLeft.get() || limitSwitchRight.get()){
+		// 	return;
+		// }
+		// leftLimitSwitchEntry.setBoolean(limitSwitchLeft.get());
+		// rightLimitSwitchEntry.setBoolean(limitSwitchRight.get());
 		//centerSensorEntry.setBoolean(centorCensor.get());
 		//if(centorSensor.get()) {
 		//	resetEncoder();
