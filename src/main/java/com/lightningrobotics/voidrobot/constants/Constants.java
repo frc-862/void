@@ -47,13 +47,14 @@ public final class Constants {
 
     // Turret
     public static final double TURN_TURRET_GEAR_RATIO = 14;
-    public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.3d;
+    public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.6d;
     public static final double TURRET_REDUCED_MAX_MOTOR_OUTPUT = 0.2d;
-    public static final double TURRET_kP = 0.02; 
-    public static final double TURRET_kI = 0.005; 
+    public static final double TURRET_kP = 0.03; 
+    public static final double TURRET_kI = 0.00; 
+    public static final double TURRET_kD = 0.0009; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 90d;
-    public static final double MIN_TURRET_ANGLE = -90d;
+    public static final double MAX_TURRET_ANGLE = 80d;
+    public static final double MIN_TURRET_ANGLE = -80d;
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
 
     // Indexer

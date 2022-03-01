@@ -9,6 +9,7 @@ import com.lightningrobotics.common.util.operator.trigger.TwoButtonTrigger;
 import com.lightningrobotics.voidrobot.commands.auto.*;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
+
 import com.lightningrobotics.voidrobot.commands.shooter.*;
 import com.lightningrobotics.voidrobot.commands.turret.*;
 import com.lightningrobotics.voidrobot.constants.*;
@@ -59,25 +60,25 @@ public class RobotContainer extends LightningContainer{
         (new TwoButtonTrigger((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
         
         // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(copilot.getRightTriggerAxis()), intake)); //intake 
-        (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
-        (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
-        (new JoystickButton(copilot, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
-        (new JoystickButton(copilot, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-copilot.getLeftTriggerAxis()), indexer)); //indexer out
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-copilot.getLeftTriggerAxis()), intake)); //intake out
-        (new Trigger(() -> Math.abs((copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis())) > 0.03)).whenActive(    
-        	new ParallelCommandGroup(   
-				new RunIndexer(indexer, () -> (copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis())), 
-				new RunIntake(intake, () -> (copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis()))
-        ));
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
+        // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(copilot.getRightTriggerAxis()), intake)); //intake 
+        // (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        // (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        // (new JoystickButton(copilot, 5)).whenActive(new InstantCommand(() -> indexer.setPower(Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake up
+        // (new JoystickButton(copilot, 6)).whenActive(new InstantCommand(() -> indexer.setPower(-Constants.DEFAULT_INDEXER_POWER), intake)); //Manual intake down
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> indexer.setPower(-copilot.getLeftTriggerAxis()), indexer)); //indexer out
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new InstantCommand(() -> intake.setPower(-copilot.getLeftTriggerAxis()), intake)); //intake out
+        // (new Trigger(() -> Math.abs((copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis())) > 0.03)).whenActive(    
+        // 	new ParallelCommandGroup(   
+		// 		new RunIndexer(indexer, () -> (copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis())), 
+		// 		new RunIntake(intake, () -> (copilot.getRightTriggerAxis() - copilot.getLeftTriggerAxis()))
+        // ));
+        // (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 		// TODO: add bias stuff
         
 		// CLIMB
 		// TODO: add climber stuff
-		(new POVButton(climb, 0)).whenPressed(new InstantCommand()); 
-        (new POVButton(climb, 180)).whenPressed(new InstantCommand()); 
+		// (new POVButton(climb, 0)).whenPressed(new InstantCommand()); 
+        // (new POVButton(climb, 180)).whenPressed(new InstantCommand()); 
 		
     }
 

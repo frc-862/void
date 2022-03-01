@@ -8,11 +8,13 @@ import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
     
-    private boolean manualControl = false;
+    private boolean manualControl = true;
     private boolean testing = false;
 
     // Creates our turret and vision subsystems
@@ -25,14 +27,16 @@ public class AimTurret extends CommandBase {
 	private double realHeadingTowardsTarget = 0d;
     private double lastVisionOffset;
 
+	private NetworkTableEntry turretAngleEntry;
+
     DoubleSupplier stickX;
     DoubleSupplier stickY;
 
     enum TargetingState{
         MANUAL,
+        TESTING,
         AUTO_NO_VISION,
-        AUTO_VISION,
-        TESTING
+        AUTO_VISION
     }
     TargetingState targetingState;
 
@@ -47,6 +51,8 @@ public class AimTurret extends CommandBase {
         this.stickY = stickY;
         // Not adding vision since its use is read-only
         addRequirements(turret, drivetrain);
+		turretAngleEntry = NetworkTableInstance.getDefault().getTable("Turret").getEntry("Turret Angle");
+		turretAngleEntry.setDouble(0d);
     }
 
     @Override
@@ -55,10 +61,11 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void execute() {
-        if((stickX.getAsDouble() > 0.15 || stickY.getAsDouble() > 0.15) && manualControl){
+        //if((stickX.getAsDouble() > 0.5 || stickY.getAsDouble() > 0.5) && manualControl){
+		if(manualControl) {
             targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
         } else if (testing) {
-            //put testing stuff here
+            targetingState = TargetingState.TESTING;
         } else if(vision.hasVision()){
             targetingState = TargetingState.AUTO_VISION;
         } else{
@@ -68,7 +75,7 @@ public class AimTurret extends CommandBase {
         switch (targetingState) {
             case MANUAL: 
                 //just sets the target to wherever the stick on the controller is pointed
-                turret.setTarget(Math.toDegrees(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
+                turret.setTarget(Math.toDegrees(turretAngleEntry.getDouble(0d))); //(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
             break;
 
             case TESTING:
