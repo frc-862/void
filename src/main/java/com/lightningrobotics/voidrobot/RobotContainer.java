@@ -18,6 +18,7 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -103,7 +104,11 @@ public class RobotContainer extends LightningContainer{
     }
 
     @Override
-    protected void initializeDashboardCommands() { }
+    protected void initializeDashboardCommands() {
+		var tab = Shuffleboard.getTab("Vision");
+		// tab.add(new InstantCommand(() -> vision.turnOnVisionLight(), vision));
+		// tab.add(new InstantCommand(() -> vision.turnOffVisionLight(), vision));
+	}
 	
     @Override
     protected void releaseDefaultCommands() { }

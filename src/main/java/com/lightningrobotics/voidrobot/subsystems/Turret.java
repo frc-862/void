@@ -30,8 +30,6 @@ public class Turret extends SubsystemBase {
 	private double realX = 0d;
 	private double realY = 0d;
 
-	private final DigitalInput limitSwitchLeft = new DigitalInput(RobotMap.LIMIT_SWITCH_NEGATIVE_ID);
-	private final DigitalInput limitSwitchRight = new DigitalInput(RobotMap.LIMIT_SWITCH_POSITIVE_ID);
 	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
@@ -106,8 +104,8 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", currentAngle);
 		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
-		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
-		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
+		leftLimitSwitchEntry.setBoolean(turretMotor.isFwdLimitSwitchClosed() == 1);
+		rightLimitSwitchEntry.setBoolean(turretMotor.isRevLimitSwitchClosed() == 1);
 		//SmartDashboard.putData("Gyro", navX); 
 		
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
