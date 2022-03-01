@@ -44,7 +44,6 @@ public class Turret extends SubsystemBase {
 	private static double motorOutput;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry centerSensorEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
@@ -67,7 +66,6 @@ public class Turret extends SubsystemBase {
 		turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
 
 		// Dashboard info
-		setTargetAngleEntry = turretTab.add("Set Target Angle", 0).getEntry();
 		centerSensorEntry = turretTab.add("Hit Center Censor", "false").getEntry();
 		leftLimitSwitchEntry = turretTab.add("Hit Left Limit Switch", false).getEntry();
 		rightLimitSwitchEntry = turretTab.add("Hit Right Limit Switch", false).getEntry();
