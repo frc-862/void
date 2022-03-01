@@ -23,6 +23,7 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.LEDs;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.SimpleClimber;
 import com.lightningrobotics.voidrobot.subsystems.TriggerAndThumb;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
@@ -57,25 +58,26 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer extends LightningContainer{
 
     // Subsystems
-    // private static Turret turret = new Turret();
+    private static Turret turret = new Turret();
     private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
+	// private static SimpleClimber climb = new SimpleClimber();
 
-	private static final Turret turret = new Turret();
+	// private static final Turret turret = new Turret();
 	// private static final Indexer indexer = new Indexer();
 	// private static final Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
-	private static LightningIMU IMU;
-	private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
-	private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
+	// private static LightningIMU IMU;
+	// private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
+	// private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
 	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.CO_PILOT_PORT);
 
 	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.CUBED);
 
     public RobotContainer() {
         super();
-		IMU = LightningIMU.navX();
+		// IMU = LightningIMU.navX();
     }
 
     @Override
@@ -160,6 +162,9 @@ public class RobotContainer extends LightningContainer{
 
         // (new JoystickButton(CO_PILOT, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 		//(new JoystickButton(CO_PILOT, 3)).whenPressed(new AimTurretNoVision(turret));
+
+		// (new JoystickButton(CO_PILOT, 5)).whenPressed(new InstantCommand(() -> climb.runServo())); // start button to reset
+
     }
 
     @Override

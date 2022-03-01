@@ -104,7 +104,12 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", currentAngle);
 		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
-
+		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
+		SmartDashboard.putNumber("motor output", motorOutput);
+		
+		if(!limitSwitchLeft.get() || !limitSwitchRight.get()){
+			return;
+		}
 		leftLimitSwitchEntry.setBoolean(!limitSwitchLeft.get());
 		rightLimitSwitchEntry.setBoolean(!limitSwitchRight.get());
 		//centerSensorEntry.setBoolean(centorCensor.get());
@@ -119,9 +124,6 @@ public class Turret extends SubsystemBase {
 		motorOutput = LightningMath.constrain(motorOutput, -maxMotorOutput, motorOutput);
 
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
-		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
-		SmartDashboard.putNumber("motor output", motorOutput);
-		SmartDashboard.putData("Gyro", navX); 
 	}
 
 	/**
