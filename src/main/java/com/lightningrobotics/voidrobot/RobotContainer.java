@@ -62,7 +62,7 @@ public class RobotContainer extends LightningContainer{
     private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	// private static Shooter shooter = new Shooter();
-	private static SimpleClimber climb = new SimpleClimber();
+	// private static SimpleClimber climb = new SimpleClimber();
 
 	// private static final Turret turret = new Turret();
 	// private static final Indexer indexer = new Indexer();
@@ -165,6 +165,8 @@ public class RobotContainer extends LightningContainer{
 
 		// (new JoystickButton(CO_PILOT, 5)).whenPressed(new InstantCommand(() -> climb.runServo())); // start button to reset
 
+		(new JoystickButton(CO_PILOT, 5)).whenPressed(new InstantCommand(() -> vision.turnOnVisionLight())); // start button to reset
+		(new JoystickButton(CO_PILOT, 6)).whenPressed(new InstantCommand(() -> vision.turnOffVisionLight()));
     }
 
     @Override
