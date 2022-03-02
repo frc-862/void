@@ -77,6 +77,7 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
+		/*
 		// Check if ready to shoot
 		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
@@ -110,7 +111,7 @@ public class Turret extends SubsystemBase {
 		rightLimitSwitchEntry.setBoolean(turretMotor.isRevLimitSwitchClosed() == 1);
 		//SmartDashboard.putData("Gyro", navX); 
 		
-		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
+		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);*/
 	}
 		
 	/**

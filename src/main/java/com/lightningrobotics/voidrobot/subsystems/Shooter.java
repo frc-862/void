@@ -26,6 +26,7 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry displayRPM;
     private NetworkTableEntry setRPM;
     private NetworkTableEntry displayShooterPower;
+	private NetworkTableEntry currentHoodAngle;
 
 	// PID tuner for the shooter gains
 	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", Constants.HOOD_PID);
@@ -58,6 +59,9 @@ public class Shooter extends SubsystemBase {
 		displayRPM  = shooterTab
 			.add("RPM-From encoder", 0)
 			.getEntry();
+		currentHoodAngle  = shooterTab
+			.add("hood angle", 0)
+			.getEntry();
 
 	}
 
@@ -69,6 +73,10 @@ public class Shooter extends SubsystemBase {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
 		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
 		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
+	}
+
+	public void setHoodPower(double power) {
+		hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
 	}
 
 	public void setPower(double power) {
@@ -117,6 +125,8 @@ public class Shooter extends SubsystemBase {
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
+
+		currentHoodAngle.setDouble(getHoodAngle());
 	}
 
 	private void configPIDGains(double kP, double kI, double kD, double kV) {
