@@ -62,8 +62,8 @@ public class RobotContainer extends LightningContainer{
     // private static Vision vision = new Vision();
 	// private static LEDs leds = new LEDs();
 	private static Shooter shooter = new Shooter();
-	// private static final Indexer indexer = new Indexer();
-	// private static final Intake intake = new Intake();
+	private static final Indexer indexer = new Indexer();
+	private static final Intake intake = new Intake();
 	private static final Drivetrain drivetrain = new Drivetrain();
 	// private static LightningIMU IMU;
 	// private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -176,6 +176,19 @@ public class RobotContainer extends LightningContainer{
 
         //turret.setDefaultCommand(new AimTurret(turret, vision)); // this should return degrees
 		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -DRIVER_LEFT.getY() , () -> -DRIVER_RIGHT.getY(), FILTER));
+
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //intake 
+        (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
+        (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
+        (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //Manual intake up
+        (new JoystickButton(copilot, 6)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual intake down
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
+            new ParallelCommandGroup(
+                new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
+                new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
+            ));
+        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
+
 	}
 
     @Override
