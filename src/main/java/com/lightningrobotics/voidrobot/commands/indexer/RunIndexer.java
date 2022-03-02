@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands;
+package com.lightningrobotics.voidrobot.commands.indexer;
 
 import java.util.function.DoubleSupplier;
 
@@ -38,4 +38,5 @@ public class RunIndexer extends CommandBase {
     public boolean isFinished() {
         return false;
     }
+	
 }
