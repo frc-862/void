@@ -31,14 +31,16 @@ public final class Constants {
     public static final double DEFAULT_INDEXER_POWER = 0.5;
 
 	// Shooter Constants
-    	// Shooter Constants
-        public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
-        public static final double SHOOTER_KI = 0;
-        public static final double SHOOTER_KD = 0;
-    
-        public static final double SHOOTER_KS = 0; //0.58093;//-.81807;
-        public static final double SHOOTER_KF = 0.0455;//2.1597;
-        public static final double SHOOTER_KA = 0; //0.02415;//2.3746;
+    public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
+    public static final double SHOOTER_KI = 0;
+    public static final double SHOOTER_KD = 0;
+
+    public static final double SHOOTER_KS = 0; //0.58093;//-.81807;
+    public static final double SHOOTER_KF = 0.0455;//2.1597;
+    public static final double SHOOTER_KA = 0; //0.02415;//2.3746;
+
+    public static final double SHOOTER_COOLDOWN = 0.25;
+
 
     public static final double HOOD_KP = 0d; // TODO Change these
     public static final double HOOD_KI = 0d;

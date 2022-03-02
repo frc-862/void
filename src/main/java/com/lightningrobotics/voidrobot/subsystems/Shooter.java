@@ -20,6 +20,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -51,8 +52,8 @@ public class Shooter extends SubsystemBase {
 	private static boolean armed;
 	private double prevTarget;
 	private double currentTarget;
-	private boolean isTargetReached = false;
-	private boolean targetChanged = true;
+	private double timeWhenChanged = 0;
+	private boolean hasShot = false;
 	
 	public Shooter() {
 		// Sets the IDs of the hood and shooter
@@ -206,28 +207,18 @@ public class Shooter extends SubsystemBase {
 		setHoodAngle(targetHoodAngle.getDouble(0));
 
 		setSmartDashboardCommands();
-
-		if(currentTarget != prevTarget) {
-			targetChanged = true;
-		} else {
-			targetChanged = false;
-		} //TODO: make ternary operator
 		
-		if(!targetChanged) {
-			isTargetReached = getArmed();
+		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
+			hasShot = false;
 		} else {
-			isTargetReached = true;
+			hasShot = getArmed();
 		}
-
-		if(isTargetReached) {
-			if(getArmed()) {
-				//we have shot
-			}
-		}
-
-		//TODO: think through this logic a bit more; this is not done yet, please dont bully me because of how shit it is
-
+		
 		prevTarget = currentTarget;
+
+		if(prevTarget != currentTarget) {
+			timeWhenChanged = Timer.getFPGATimestamp();
+		}
 
 	}
 
