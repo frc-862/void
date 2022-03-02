@@ -47,6 +47,7 @@ public class RobotContainer extends LightningContainer{
 	private static final XboxController copilot = new XboxController(JoystickConstants.COPILOT_PORT);
 	private static final XboxController climb = new XboxController(JoystickConstants.CLIMB_PORT);
 	private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
+    private static final JoystickFilter copilotFilter = new JoystickFilter(0.05, 0.1, 1, Mode.LINEAR);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -87,7 +88,8 @@ public class RobotContainer extends LightningContainer{
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
 
-        shooter.setDefaultCommand(new MoveHood(shooter, () -> copilot.getRightY()));
+        shooter.setDefaultCommand(new MoveHood(shooter, () -> -copilot.getRightY()));
+        intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
 	}
 
     @Override
