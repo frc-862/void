@@ -27,4 +27,9 @@ public class RunIntake extends CommandBase {
         super.end(interrupted);
         intake.stop();
     }
+
+    @Override
+    public boolean isFinished(){
+        return false;
+    }
 }

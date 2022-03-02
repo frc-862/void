@@ -24,9 +24,11 @@ public class Turret extends SubsystemBase {
 
 	private Rotation2d navXHeading;
 	LightningIMU navX;
+
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
-	
+
+	//variables needed to run the tests
 	private double realX = 0d;
 	private double realY = 0d;
 
@@ -172,7 +174,7 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		//this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
 	/**

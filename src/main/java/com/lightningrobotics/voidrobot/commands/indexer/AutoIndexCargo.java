@@ -38,11 +38,12 @@ public class AutoIndexCargo extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if(indexer.getBallCount() == 0) {
+        if(indexer.getBallCount() == 1) {
             return Timer.getFPGATimestamp() - startIndexTime > indexTimeBall1;
         }
-         else if(indexer.getBallCount() == 1) {
-            return /*indexer.getBeamBreakExitStatus();*/Timer.getFPGATimestamp() - startIndexTime > indexTimeBall2; // Checks to see if we have reached the amount of time we want to index, then stops
+        /*indexer.getBeamBreakExitStatus();*/
+        else if(indexer.getBallCount() == 2) {
+            return Timer.getFPGATimestamp() - startIndexTime > indexTimeBall2; // Checks to see if we have reached the amount of time we want to index, then stops
         } 
         else {
             return true;

@@ -60,6 +60,10 @@ public final class Constants {
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
 
+    // Intake
+    public static final double INTAKE_DEPLOY_TIME = 1;
+    public static final double DEFAULT_INTAKE_POWER = 1;
+
 	// Shooter
     public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
     public static final double SHOOTER_KI = 0;

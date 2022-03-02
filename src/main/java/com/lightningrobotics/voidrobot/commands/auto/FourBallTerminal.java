@@ -20,7 +20,7 @@ public class FourBallTerminal extends CommandBase {
     private final Intake intake;
     private final Shooter shooter;
 
-    Path start4BallPath = new Path("Start4Ball.path", false);
+    Path start4BallPath = new Path("1-2Ball.path", false);
     Path middle4BallPath = new Path("Middle4Ball.path", false);
     Path end4BallPath = new Path("End6Ball.path", false);   
 
@@ -38,10 +38,14 @@ public class FourBallTerminal extends CommandBase {
     public void initialize() {
         try {
             new SequentialCommandGroup(
-                start4BallPath.getCommand(drivetrain),
-                middle4BallPath.getCommand(drivetrain), 
-                end4BallPath.getCommand(drivetrain))
-                .schedule();
+                new ParallelCommandGroup(
+                    start4BallPath.getCommand(drivetrain),  
+                    new InstantCommand(() -> intake.setPower(0.75))), 
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> indexer.setPower(0.75)),  
+                    new InstantCommand(() -> shooter.setRPM(3000)))
+            ).schedule();
+            
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
         }

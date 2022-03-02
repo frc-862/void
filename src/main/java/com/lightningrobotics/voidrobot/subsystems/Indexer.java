@@ -86,10 +86,6 @@ public class Indexer extends SubsystemBase {
         }
 
         // automatically suck in balls when we first see them
-        if (collect1){ 
-            var cmd = new AutoIndexCargo(this);
-            cmd.schedule(true);
-        }
 
         // Checks if we are in not in buffer time, but if we are skip this section
         if (!buffer){ 
@@ -98,6 +94,7 @@ public class Indexer extends SubsystemBase {
                 case 0:
                     if (collect1) {
                         ballCount = 1;
+                        new AutoIndexCargo(this).schedule();
                         startTime = Timer.getFPGATimestamp();
                     } 
                 break;
@@ -105,6 +102,7 @@ public class Indexer extends SubsystemBase {
                 case 1:
                     if (collect1) {
                         ballCount = 2;
+                        new AutoIndexCargo(this).schedule();
                         startTime = Timer.getFPGATimestamp();
                     }
                     if (eject1) {
@@ -121,6 +119,9 @@ public class Indexer extends SubsystemBase {
                     }
                 break;
             }
+
+            lowerPrev = lower;
+            upperPrev = upper;
         }
 
         // Sets the possible color cases of the ball
@@ -153,8 +154,8 @@ public class Indexer extends SubsystemBase {
 
         //TODO: delay saving previous values in order to avoid weird behavior
         //save current sensor values in order to catch rising and falling edges
-        lowerPrev = lower;
-        upperPrev = upper;
+        // lowerPrev = lower;
+        // upperPrev = upper;
  
         // Puts the ball count to the dashboard
         SmartDashboard.putNumber("Ball Count", getBallCount());

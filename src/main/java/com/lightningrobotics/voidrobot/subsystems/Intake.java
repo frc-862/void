@@ -30,6 +30,11 @@ public class Intake extends SubsystemBase {
 		intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
 	}
 
+
+	public void stopDeploy() {
+		winch.set(ControlMode.PercentOutput, 0);
+	}
+
 	public void actuateIntake(double pwr) {
 		winch.set(ControlMode.PercentOutput, pwr);
 	}
