@@ -68,7 +68,7 @@ public class RobotContainer extends LightningContainer{
 	// private static LightningIMU IMU;
 	// private static final Joystick DRIVER_LEFT = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	// private static final Joystick DRIVER_RIGHT = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
-	private static final XboxController CO_PILOT = new XboxController(JoystickConstants.CO_PILOT_PORT);
+	private static final XboxController copilot = new XboxController(JoystickConstants.CO_PILOT_PORT);
 
 	private static final JoystickFilter FILTER = new JoystickFilter(0.15, 0.1, 1, Mode.CUBED);
 
