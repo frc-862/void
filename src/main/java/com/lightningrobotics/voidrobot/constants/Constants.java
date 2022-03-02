@@ -53,8 +53,8 @@ public final class Constants {
     public static final double TURRET_kI = 0.00; 
     public static final double TURRET_kD = 0.0009; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 80d;
-    public static final double MIN_TURRET_ANGLE = -80d;
+    public static final double MAX_TURRET_ANGLE = 40d;
+    public static final double MIN_TURRET_ANGLE = -40d;
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
 
     // Indexer

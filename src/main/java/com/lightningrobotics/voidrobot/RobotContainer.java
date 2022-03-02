@@ -34,7 +34,7 @@ public class RobotContainer extends LightningContainer{
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
-    //private static final Turret turret = new Turret();
+    private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
@@ -84,10 +84,10 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureDefaultCommands() {
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
+		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+         turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
 
-        shooter.setDefaultCommand(new MoveHood(shooter, () -> copilot.getRightY()));
+        //shooter.setDefaultCommand(new MoveHood(shooter, () -> copilot.getRightY()));
 	}
 
     @Override

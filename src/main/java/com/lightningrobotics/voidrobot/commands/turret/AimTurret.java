@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
     
-    private boolean manualControl = true;
+    private boolean manualControl = false;
     private boolean testing = false;
 
     // Creates our turret and vision subsystems

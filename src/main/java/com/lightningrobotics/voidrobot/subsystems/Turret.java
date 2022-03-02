@@ -45,6 +45,7 @@ public class Turret extends SubsystemBase {
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry centerSensorEntry;
+	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
 	
@@ -69,6 +70,7 @@ public class Turret extends SubsystemBase {
 		centerSensorEntry = turretTab.add("Hit Center Censor", "false").getEntry();
 		leftLimitSwitchEntry = turretTab.add("Hit Left Limit Switch", false).getEntry();
 		rightLimitSwitchEntry = turretTab.add("Hit Right Limit Switch", false).getEntry();
+		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
 
 		// Reset values
 	    resetEncoder();
@@ -77,12 +79,11 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
-		/*
 		// Check if ready to shoot
 		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
-		//target = setTargetAngleEntry.getDouble(0); //uncomment this to set it to the network table values
+		target = setTargetAngleEntry.getDouble(0); //uncomment this to set it to the network table values
 	
 		// Constraining our angle to -180 to 180 and then to our turret limit
 		double sign = Math.signum(target);
@@ -111,7 +112,7 @@ public class Turret extends SubsystemBase {
 		rightLimitSwitchEntry.setBoolean(turretMotor.isRevLimitSwitchClosed() == 1);
 		//SmartDashboard.putData("Gyro", navX); 
 		
-		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);*/
+		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 	}
 		
 	/**
@@ -143,6 +144,7 @@ public class Turret extends SubsystemBase {
 		boolean isOverLimit = turretAngle.getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) || turretAngle.getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
 
 
+		target = setTargetAngleEntry.getDouble(0);
 		// If target angle is over the limit and we are not using the navx to calculate, then use the navx to calculate
 		if (isOverLimit && !isUsingNavX) {
 			isUsingNavX = true;
@@ -175,7 +177,7 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		//this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
 	/**
