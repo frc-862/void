@@ -83,9 +83,8 @@ public class Turret extends SubsystemBase {
 		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
-		target = setTargetAngleEntry.getDouble(0); //uncomment this to set it to the network table values
-	
-		// Constraining our angle to -180 to 180 and then to our turret limit
+		//double offsetAngle = setTargetAngleEntry.getDouble(0) / 10d; //uncomment this to set it to the network table values
+
 		double sign = Math.signum(target);
         target = sign * (((Math.abs(target) + 180) % 360) - 180);
 		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
@@ -98,16 +97,13 @@ public class Turret extends SubsystemBase {
 
 		// Get and constrain motor output
 		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		double maxMotorOutput = Math.abs(Constants.MAX_TURRET_ANGLE - currentAngle) < 10 ?
-		    Constants.TURRET_REDUCED_MAX_MOTOR_OUTPUT : Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
-		motorOutput = LightningMath.constrain(motorOutput, -maxMotorOutput, motorOutput);
+		//motorOutput *= Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
+		motorOutput = LightningMath.constrain(motorOutput, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT,Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT);
 
 		
 		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
-		SmartDashboard.putNumber("motor output", motorOutput);
 		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
 		SmartDashboard.putNumber("current angle", currentAngle);
-		SmartDashboard.putNumber("current angle no limit", getTurretAngleNoLimit().getDegrees());
 		leftLimitSwitchEntry.setBoolean(turretMotor.isFwdLimitSwitchClosed() == 1);
 		rightLimitSwitchEntry.setBoolean(turretMotor.isRevLimitSwitchClosed() == 1);
 		//SmartDashboard.putData("Gyro", navX); 
@@ -115,6 +111,11 @@ public class Turret extends SubsystemBase {
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 	}
 		
+	public boolean isOverLimit(){
+		final double tolerance = 5d;
+		return getTurretAngle().getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) 
+		|| getTurretAngle().getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
+	}
 	/**
 	 * 
 	 * @return If the turret is turned to the correct degree and ready to shoot
@@ -136,34 +137,6 @@ public class Turret extends SubsystemBase {
 	}
 
 	/**
-	 * Gets the turret angle as if it has no limit
-	 */
-	public Rotation2d getTurretAngleNoLimit() {
-		Rotation2d turretAngle = getTurretAngle();
-		final double tolerance = 5d;
-		boolean isOverLimit = turretAngle.getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) || turretAngle.getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
-
-
-		target = setTargetAngleEntry.getDouble(0);
-		// If target angle is over the limit and we are not using the navx to calculate, then use the navx to calculate
-		if (isOverLimit && !isUsingNavX) {
-			isUsingNavX = true;
-			navXHeading = navX.getHeading(); // what the navx was at the second it hit the limit
-		} 
-		// If target angle is within the limit and we are using the navx, don't
-		else if (!isOverLimit && isUsingNavX){
-			isUsingNavX = false;
-		}
-
-		// If we are using the navx to calculate, add the change in navx reading from the moment we hit the limit
-		if(isUsingNavX){
-			turretAngle = Rotation2d.fromDegrees(turretAngle.getDegrees() + (navX.getHeading().getDegrees() - navXHeading.getDegrees()));
-		} 
-		
-		return turretAngle;
-	}
-
-	/**
 	 * gets the encoder in rotations
 	 * @return the value of encoder in rotations
 	 */
@@ -177,7 +150,7 @@ public class Turret extends SubsystemBase {
 	 * @param offsetAngle relative angle to turn
 	 */
 	public void setVisionOffset(double offsetAngle) {
-		this.target = getTurretAngleNoLimit().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+		target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
 	/**

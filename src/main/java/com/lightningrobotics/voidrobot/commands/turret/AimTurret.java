@@ -66,7 +66,7 @@ public class AimTurret extends CommandBase {
             targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
         } else if (testing) {
             targetingState = TargetingState.TESTING;
-        } else if(vision.hasVision()){
+        } else if(vision.hasVision() && !turret.isOverLimit()){
             targetingState = TargetingState.AUTO_VISION;
         } else{
             targetingState = TargetingState.AUTO_NO_VISION;
@@ -75,7 +75,7 @@ public class AimTurret extends CommandBase {
         switch (targetingState) {
             case MANUAL: 
                 //just sets the target to wherever the stick on the controller is pointed
-                turret.setTarget(Math.toDegrees(turretAngleEntry.getDouble(0d))); //(Math.tan(stickX.getAsDouble()/stickY.getAsDouble())) + 90);
+                turret.setTarget(Math.toDegrees(Math.atan2(stickX.getAsDouble(),stickY.getAsDouble()))+  90); //(Math.toDegrees(turretAngleEntry.getDouble(0d))); 
             break;
 
             case TESTING:
@@ -84,7 +84,8 @@ public class AimTurret extends CommandBase {
 
             case AUTO_VISION: 
                 lastVisionOffset = vision.getOffsetAngle();
-                turret.setVisionOffset(lastVisionOffset); // setting the target angle of the turret
+                //turret.setVisionOffset(lastVisionOffset); // setting the target angle of the turret
+                turret.setVisionOffset(stickX.getAsDouble());
                 isUsingVision = true;
             break;
 
