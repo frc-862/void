@@ -75,7 +75,12 @@ public class AimTurret extends CommandBase {
         switch (targetingState) {
             case MANUAL: 
                 //just sets the target to wherever the stick on the controller is pointed
-                turret.setTarget(Math.toDegrees(Math.atan2(stickX.getAsDouble(),stickY.getAsDouble()))+  90); //(Math.toDegrees(turretAngleEntry.getDouble(0d))); 
+                if (stickY.getAsDouble() >= 0){
+                    turret.setTarget(-1 * (Math.toDegrees(Math.atan(stickX.getAsDouble()/stickY.getAsDouble()))));
+                } else {
+                    turret.setTarget(-180 - Math.toDegrees(Math.atan(stickX.getAsDouble()/stickY.getAsDouble())));
+                }
+                //turret.setTarget(Math.toDegrees(Math.atan2(stickX.getAsDouble(),stickY.getAsDouble()))+  90); //(Math.toDegrees(turretAngleEntry.getDouble(0d))); 
             break;
 
             case TESTING:
