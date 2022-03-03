@@ -32,7 +32,7 @@ public class Turret extends SubsystemBase {
 	private double realX = 0d;
 	private double realY = 0d;
 
-	//private final DigitalInput centerCensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
+	// private final DigitalInput centerSensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
 	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
 
@@ -42,6 +42,7 @@ public class Turret extends SubsystemBase {
 	private boolean isArmed = false;
 	private double target;
 	private static double motorOutput;
+	private boolean turretZeroed = false;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry centerSensorEntry;
@@ -79,6 +80,21 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
+
+
+		// //TODO: put this somewhere better, and implement it with some kind of break maybe. 
+		// while(findZero() && !turretZeroed) {
+		// 	if(!centerSensor.get()) {
+		// 		resetEncoder();
+		// 	}
+		// }
+
+		// turretZeroed = true;
+
+		// if(!centerSensor.get()) {
+		// 	resetEncoder();
+		// }
+
 		// Check if ready to shoot
 		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
@@ -110,6 +126,31 @@ public class Turret extends SubsystemBase {
 		
 		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 	}
+
+	// public boolean findZero() {
+	// 	//if the limit switch isn't triggered, move right
+	// 	if(turretMotor.isFwdLimitSwitchClosed() == 0) {
+	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0.2);
+	// 		return true;
+	// 	} 
+	// 	//Once the limit is triggered, move until the center sensor is triggered
+	// 	else if(centerSensor.get()) { //TODO: double check if inverted
+	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, -0.2);
+
+	// 		if(turretMotor.isRevLimitSwitchClosed() == 1) { // if we pass the center switch and hit the next limit, return with a warning
+	// 			turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
+	// 			resetEncoder();
+	// 			SmartDashboard.putString("WARNING:", "TURRET NOT ZEROED");
+	// 			return false;
+	// 		} else {
+	// 			return true;
+	// 		}
+	// 	} else { //if the center switch is triggered, exit the loop
+	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
+	// 		resetEncoder();
+	// 		return false;
+	// 	}
+	// }
 		
 	public boolean isOverLimit(){
 		final double tolerance = 5d;
