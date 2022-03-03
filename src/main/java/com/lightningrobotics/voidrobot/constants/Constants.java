@@ -46,6 +46,7 @@ public final class Constants {
     public static FeedForwardController FEEDFORWARD = new FeedForwardController(Constants.KS, Constants.KV, Constants.KA); 
 
     // Turret
+	public static final PIDFController TURRET_PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
     public static final double TURN_TURRET_GEAR_RATIO = 14;
     public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.6d;
     public static final double TURRET_REDUCED_MAX_MOTOR_OUTPUT = 0.2d;

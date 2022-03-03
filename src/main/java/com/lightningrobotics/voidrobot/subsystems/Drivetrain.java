@@ -13,6 +13,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends DifferentialDrivetrain {
 
@@ -63,8 +64,4 @@ public class Drivetrain extends DifferentialDrivetrain {
         return ((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() < 0.05 && ((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() < 0.05;
     }
 
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-    }
 }

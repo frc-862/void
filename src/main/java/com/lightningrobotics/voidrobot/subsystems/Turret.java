@@ -22,9 +22,6 @@ public class Turret extends SubsystemBase {
 	
 	private boolean isUsingNavX = false;
 
-	private Rotation2d navXHeading;
-	LightningIMU navX;
-
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
 
@@ -32,12 +29,8 @@ public class Turret extends SubsystemBase {
 	private double realX = 0d;
 	private double realY = 0d;
 
-	// private final DigitalInput centerSensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
-
-	private final PIDFController PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
-
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
-	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", PID);
+	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", Constants.TURRET_PID);
 
 	private boolean isArmed = false;
 	private double target;
@@ -45,22 +38,13 @@ public class Turret extends SubsystemBase {
 	private boolean turretZeroed = false;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+	private NetworkTableEntry currentAngle;
 	private NetworkTableEntry centerSensorEntry;
 	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
 	
-	/**
-	 * The turret subsystem has functions for aiming the turret based on three modes - vision,
-	 *  no vision, and manual control (manual should only be used in emergencies or testing)
-	 */ 
 	public Turret() {
-		// turretMotor = new CANSparkMax(RobotMap.TURRET_MOTOR_ID, MotorType.kBrushless);
-		// turretMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		// turretMotor.setClosedLoopRampRate(0); // too low?
-		// turretEncoder = turretMotor.getEncoder();
-
-		navX = LightningIMU.navX();
 
 		// Motor config
 		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
@@ -72,6 +56,8 @@ public class Turret extends SubsystemBase {
 		leftLimitSwitchEntry = turretTab.add("Hit Left Limit Switch", false).getEntry();
 		rightLimitSwitchEntry = turretTab.add("Hit Right Limit Switch", false).getEntry();
 		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
+		currentAngle = turretTab.add("current angle", 0).getEntry(); 
+
 
 		// Reset values
 	    resetEncoder();
@@ -96,35 +82,12 @@ public class Turret extends SubsystemBase {
 		// }
 
 		// Check if ready to shoot
-		isArmed = Math.abs(target - getTurretAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
+		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
-		//double offsetAngle = setTargetAngleEntry.getDouble(0) / 10d; //uncomment this to set it to the network table values
+		currentAngle.setDouble(getCurrentAngle().getDegrees());
 
-		double sign = Math.signum(target);
-        target = sign * (((Math.abs(target) + 180) % 360) - 180);
-		Rotation2d constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(target, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
-		double currentAngle = getTurretAngle().getDegrees();
 
-		//centerSensorEntry.setBoolean(centorCensor.get());
-		//if(centorSensor.get()) {
-		//	resetEncoder();
-		//}
-
-		// Get and constrain motor output
-		motorOutput = PID.calculate(getTurretAngle().getDegrees(), constrainedAngle.getDegrees());
-		//motorOutput *= Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT;
-		motorOutput = LightningMath.constrain(motorOutput, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT,Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT);
-
-		
-		SmartDashboard.putNumber("navx reading", navX.getHeading().getDegrees());
-		SmartDashboard.putNumber("constrained angle", constrainedAngle.getDegrees());
-		SmartDashboard.putNumber("current angle", currentAngle);
-		leftLimitSwitchEntry.setBoolean(turretMotor.isFwdLimitSwitchClosed() == 1);
-		rightLimitSwitchEntry.setBoolean(turretMotor.isRevLimitSwitchClosed() == 1);
-		//SmartDashboard.putData("Gyro", navX); 
-		
-		turretMotor.set(TalonSRXControlMode.PercentOutput, motorOutput);
 	}
 
 	// public boolean findZero() {
@@ -154,89 +117,57 @@ public class Turret extends SubsystemBase {
 		
 	public boolean isOverLimit(){
 		final double tolerance = 5d;
-		return getTurretAngle().getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) 
-		|| getTurretAngle().getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
+		return getCurrentAngle().getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) 
+		|| getCurrentAngle().getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
 	}
-	/**
-	 * 
-	 * @return If the turret is turned to the correct degree and ready to shoot
-	 */
+
 	public boolean getArmed() {
 		return isArmed;
 	}
 
-	public void stopTurret() {
+	public void stop() {
 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 	}
 
-	/**
-	 * Gets the turret angle using turret encoder
-	 * @return An angle limited by min and max turret angle
-	 */
-	public Rotation2d getTurretAngle(){
+	public Rotation2d getCurrentAngle(){
 		return  Rotation2d.fromDegrees(getEncoderRotation() / Constants.TURN_TURRET_GEAR_RATIO * 360d);
 	}
 
-	/**
-	 * gets the encoder in rotations
-	 * @return the value of encoder in rotations
-	 */
 	public double getEncoderRotation() {
 		return turretMotor.getSelectedSensorPosition() / 4096;
-}
-
-
-	/**
-	 * Sets the offset angle and updates to see if we are within the angle threshold to shoot
-	 * @param offsetAngle relative angle to turn
-	 */
-	public void setVisionOffset(double offsetAngle) {
-		target = getTurretAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
-	/**
-	 * Sets an offset based on tracking with no vision
-	 * @param relativeX the x of the odometer reading (relative to the robot)
-	 * @param relativeY the y of the odometer reading (relative to the robot)
-	 * @param realTargetHeading the angle of where the target is relative to the robot at the loss of data
-	 * @param lastVisionDistance the distance that was last recorded before vision stopped giving data
-	 * @param changeInRotation the change in rotation from the second the robot lost vision
-	 */
-	public void setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+	public void setVisionOffset(double offsetAngle) {
+		target = getCurrentAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
+	}
+
+	public double setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
 		
 		realX = rotateX(relativeX, relativeY, realTargetHeading);
 		realY = rotateY(relativeX, relativeY, realTargetHeading);
 
-		this.target = realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
+		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
 	}
 
-	/**
-	 * Directly set the angle to turn to
-	 * @param targetAngle the angle of the turret (degrees)
-	 */
 	public void setTarget(double targetAngle) {
 		this.target = targetAngle;
 		SmartDashboard.putNumber("reading from controller", targetAngle);
 	}
 
-	/**
-	 * Rotates a point in the x y plane by an angle in degrees
-	 * @return x value of rotated point
-	 */
 	public double rotateX (double xValue, double yValue, double angleInDegrees){
 		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
 	}	
 
-	/**
-	 * Rotates a point in the x y plane by an angle in degrees
-	 * @return y value of rotated point
-	 */
 	public double rotateY (double xValue, double yValue, double angleInDegrees){
 		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
 	}
 
 	public void resetEncoder() {
 		turretMotor.setSelectedSensorPosition(0);
+	}
+
+	public void setPower(double power) {
+		turretMotor.set(TalonSRXControlMode.PercentOutput, power);
 	}
 
 }

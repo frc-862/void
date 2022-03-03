@@ -1,127 +1,144 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package com.lightningrobotics.voidrobot.commands.turret;
 
 import java.util.function.DoubleSupplier;
 
-import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
+import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.LightningMath;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
+
+  private final Vision vision;
+  private final Turret turret;
+
+  private LightningIMU imu;
+
+  private Rotation2d offsetAngle;
+  private Rotation2d targetAngle;
+  private Rotation2d constrainedAngle;
+
+	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+  private NetworkTableEntry displayOffset;
+	private NetworkTableEntry displayTargetAngle;
+	private NetworkTableEntry displayConstrainedAngle;
+	private NetworkTableEntry displayMotorOutput;
+
+  private static double motorOutput;
+  private DoubleSupplier controlerInput;
+  private final Drivetrain drivetrain;
+
+  private double testOffset;
+  private double lastKnownHeading;
+
+  enum TargetingState{
+    MANUAL,
+    VISION,
+    NO_VISION
+  }
+  TargetingState targetingState;
+
+  public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInput) {
+    this.vision = vision;
+    this.drivetrain = drivetrain;
+    this.turret = turret;
+    this.imu = imu;
+    this.controlerInput = controllerInput;
+
+   
+
+    addRequirements(vision, turret);
+
+  }
+
+  @Override
+  public void initialize() {
+
+    targetingState = TargetingState.MANUAL;
+
+    drivetrain.resetPose();
+    lastKnownHeading = turret.getCurrentAngle().getDegrees();
+
+    displayOffset = turretTab.add("test offset", 0).getEntry();
+    displayTargetAngle = turretTab.add("target angle", 0).getEntry();
+    displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
+    displayMotorOutput = turretTab.add("motor output", 0).getEntry();
+
+  }
+
+  @Override
+  public void execute() {
+
+   if (controlerInput.getAsDouble() == 0) { // vision.getDistance == -1
+      targetingState = TargetingState.NO_VISION;
+    } else {
+     targetingState = TargetingState.MANUAL;
+    }
     
-    private boolean manualControl = false;
-    private boolean testing = false;
+    switch(targetingState) {
+      case MANUAL: 
+        testOffset += controlerInput.getAsDouble();
+        break;
+      case VISION:
+        testOffset = vision.getOffsetAngle();
+        break;
+      case NO_VISION:
+     
+      // drivetrain.resetPose();
+      // lastKnownHeading = turret.getCurrentAngle().getDegrees();
 
-    // Creates our turret and vision subsystems
-    private Turret turret;
-    private Vision vision;
-    private Drivetrain drivetrain;
-
-    private boolean isUsingVision = true;
-
-	private double realHeadingTowardsTarget = 0d;
-    private double lastVisionOffset;
-
-	private NetworkTableEntry turretAngleEntry;
-
-    DoubleSupplier stickX;
-    DoubleSupplier stickY;
-
-    enum TargetingState{
-        MANUAL,
-        TESTING,
-        AUTO_NO_VISION,
-        AUTO_VISION
-    }
-    TargetingState targetingState;
-
-    /**
-	 * Command to aim the turret
-	 */ 
-    public AimTurret(Turret turret, Vision vision, Drivetrain drivetrain, DoubleSupplier stickX, DoubleSupplier stickY) {
-        this.turret = turret;
-        this.vision = vision;
-        this.drivetrain = drivetrain;
-        this.stickX = stickX;
-        this.stickY = stickY;
-        // Not adding vision since its use is read-only
-        addRequirements(turret, drivetrain);
-		turretAngleEntry = NetworkTableInstance.getDefault().getTable("Turret").getEntry("Turret Angle");
-		turretAngleEntry.setDouble(0d);
-    }
-
-    @Override
-    public void initialize() {
-    }
-
-    @Override
-    public void execute() {
-        //if((stickX.getAsDouble() > 0.5 || stickY.getAsDouble() > 0.5) && manualControl){
-		if(manualControl) {
-            targetingState = TargetingState.MANUAL; // TODO: how does copilot override auto turning?
-        } else if (testing) {
-            targetingState = TargetingState.TESTING;
-        } else if(vision.hasVision() && !turret.isOverLimit()){
-            targetingState = TargetingState.AUTO_VISION;
-        } else{
-            targetingState = TargetingState.AUTO_NO_VISION;
-        }
-        
-        switch (targetingState) {
-            case MANUAL: 
-                //just sets the target to wherever the stick on the controller is pointed
-                if (stickY.getAsDouble() >= 0){
-                    turret.setTarget(-1 * (Math.toDegrees(Math.atan(stickX.getAsDouble()/stickY.getAsDouble()))));
-                } else {
-                    turret.setTarget(-180 - Math.toDegrees(Math.atan(stickX.getAsDouble()/stickY.getAsDouble())));
-                }
-                //turret.setTarget(Math.toDegrees(Math.atan2(stickX.getAsDouble(),stickY.getAsDouble()))+  90); //(Math.toDegrees(turretAngleEntry.getDouble(0d))); 
-            break;
-
-            case TESTING:
-                //put test code here
-            break;
-
-            case AUTO_VISION: 
-                lastVisionOffset = vision.getOffsetAngle();
-                //turret.setVisionOffset(lastVisionOffset); // setting the target angle of the turret
-                turret.setVisionOffset(stickX.getAsDouble());
-                isUsingVision = true;
-            break;
-
-            case AUTO_NO_VISION: 
-                if (isUsingVision){ //runs once on vision loss
-                    // As soon as we lose vision, we reset drivetrain pose/axis and get current angle degree
-                    drivetrain.resetPose();
-                    realHeadingTowardsTarget = turret.getTurretAngle().getDegrees();// + lastVisionOffset;
-                    isUsingVision = false;
-                } 
-
-                // get (x,y) relative to the robot. the X and Y axis is created when we reset the drivetrain odometer
-                double relativeX = drivetrain.getPose().getX();
-                double relativeY = drivetrain.getPose().getY();
-
+        double relativeX = drivetrain.getPose().getX();
+        double relativeY = drivetrain.getPose().getY();
                 // update rotation data 
                 double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+                SmartDashboard.putNumber("odometer x", relativeX);
+                SmartDashboard.putNumber("odometer y", relativeY);
+                SmartDashboard.putNumber("change in rotation", changeInRotation);
 
-                turret.setOffsetNoVision(relativeX, relativeY, realHeadingTowardsTarget, lastVisionOffset, changeInRotation);
+                 testOffset = turret.setOffsetNoVision(relativeX, relativeY, lastKnownHeading, 10, changeInRotation);
             break;
-        }
+        
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        turret.stopTurret();
-    }
+    //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
+    displayOffset.setDouble(testOffset); // offsetAngle.getDegrees()
+    targetAngle = Rotation2d.fromDegrees(testOffset); // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
 
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
+    double sign = Math.signum(targetAngle.getDegrees());
+    targetAngle =  Rotation2d.fromDegrees(sign * (((Math.abs(targetAngle.getDegrees()) + 180) % 360) - 180));
+    displayTargetAngle.setDouble(targetAngle.getDegrees());
 
+		constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(targetAngle.getDegrees(), Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
+    displayConstrainedAngle.setDouble(constrainedAngle.getDegrees());
+
+    motorOutput = Constants.TURRET_PID.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+    displayMotorOutput.setDouble(motorOutput);
+    turret.setPower(motorOutput);
+
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    turret.stop();
+
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }
