@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry displayShooterPower;
 	private NetworkTableEntry targetHoodAngle;
 	private NetworkTableEntry currentHoodAngle;
+	private NetworkTableEntry hasShotShuffEntry;
 
 	// Creates a PID and FeedForward controller for our shooter
 	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
@@ -80,6 +81,9 @@ public class Shooter extends SubsystemBase {
 			.getEntry();
 		currentHoodAngle = shooterTab
 			.add("current hood angle", 0)
+			.getEntry();
+		hasShotShuffEntry = shooterTab
+			.add("has shot", false)
 			.getEntry();
 
 	}
@@ -155,6 +159,7 @@ public class Shooter extends SubsystemBase {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
 		currentHoodAngle.setDouble(getHoodAngle());
+		hasShotShuffEntry.setBoolean(hasShot);
 	}
 
 	private void changePIDGains(double kP, double kI, double kD, double kV) {
@@ -205,8 +210,6 @@ public class Shooter extends SubsystemBase {
 		setRPM(currentTarget);
 
 		setHoodAngle(targetHoodAngle.getDouble(0));
-
-		setSmartDashboardCommands();
 		
 		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
 			hasShot = false;
@@ -219,6 +222,9 @@ public class Shooter extends SubsystemBase {
 		if(prevTarget != currentTarget) {
 			timeWhenChanged = Timer.getFPGATimestamp();
 		}
+
+		
+		setSmartDashboardCommands();
 
 	}
 
