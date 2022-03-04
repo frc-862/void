@@ -63,7 +63,7 @@ public class RobotContainer extends LightningContainer{
         // (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
         // (new TwoButtonTrigger((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
         
-        // // COPILOT
+        // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //intake 
         (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
         (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
@@ -75,10 +75,10 @@ public class RobotContainer extends LightningContainer{
                 new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
             ));
         (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
-		// // TODO: add bias stuff
+		// TODO: add bias stuff
         
-		// // CLIMB
-		// // TODO: add climber stuff
+		// CLIMB
+		// TODO: add climber stuff
 		(new POVButton(climb, 0)).whenPressed(new InstantCommand()); 
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); 		
     }

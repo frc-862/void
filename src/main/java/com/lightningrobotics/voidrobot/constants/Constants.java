@@ -37,13 +37,9 @@ public final class Constants {
         Constants.TRACK_WIDTH,
         new boolean[]{Constants.LEFT_1_INVERT, Constants.LEFT_2_INVERT, Constants.LEFT_3_INVERT},
         new boolean[]{Constants.RIGHT_1_INVERT, Constants.RIGHT_2_INVERT, Constants.RIGHT_3_INVERT},
-        Constants.PID,
-        Constants.FEEDFORWARD
+        new PIDFController(Constants.KP, Constants.KI, Constants.KD),
+        new FeedForwardController(Constants.KS, Constants.KV, Constants.KA)
     );
-
-	// These are not final so we can tune on dash
-	public static PIDFController PID = new PIDFController(Constants.KP, Constants.KI, Constants.KD);
-    public static FeedForwardController FEEDFORWARD = new FeedForwardController(Constants.KS, Constants.KV, Constants.KA); 
 
     // Turret
     public static final double TURN_TURRET_GEAR_RATIO = 14;

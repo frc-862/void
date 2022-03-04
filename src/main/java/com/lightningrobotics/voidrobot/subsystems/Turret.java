@@ -23,7 +23,7 @@ public class Turret extends SubsystemBase {
 	private boolean isUsingNavX = false;
 
 	private Rotation2d navXHeading;
-	LightningIMU navX;
+	// LightningIMU navX;
 
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
@@ -58,7 +58,7 @@ public class Turret extends SubsystemBase {
 		// turretMotor.setClosedLoopRampRate(0); // too low?
 		// turretEncoder = turretMotor.getEncoder();
 
-		navX = LightningIMU.navX();
+		// navX = LightningIMU.navX();
 
 		// Motor config
 		turretMotor = new TalonSRX(RobotMap.TURRET_MOTOR_ID);
@@ -146,7 +146,7 @@ public class Turret extends SubsystemBase {
 		// If target angle is over the limit and we are not using the navx to calculate, then use the navx to calculate
 		if (isOverLimit && !isUsingNavX) {
 			isUsingNavX = true;
-			navXHeading = navX.getHeading(); // what the navx was at the second it hit the limit
+			// navXHeading = navX.getHeading(); // what the navx was at the second it hit the limit
 		} 
 		// If target angle is within the limit and we are using the navx, don't
 		else if (!isOverLimit && isUsingNavX){
@@ -155,7 +155,7 @@ public class Turret extends SubsystemBase {
 
 		// If we are using the navx to calculate, add the change in navx reading from the moment we hit the limit
 		if(isUsingNavX){
-			turretAngle = Rotation2d.fromDegrees(turretAngle.getDegrees() + (navX.getHeading().getDegrees() - navXHeading.getDegrees()));
+			// turretAngle = Rotation2d.fromDegrees(turretAngle.getDegrees() + (navX.getHeading().getDegrees() - navXHeading.getDegrees()));
 		} 
 		
 		return turretAngle;

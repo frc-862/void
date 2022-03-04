@@ -1,6 +1,9 @@
 package com.lightningrobotics.voidrobot.commands.auto;
 
 import com.lightningrobotics.common.auto.Path;
+import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
+import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
+import com.lightningrobotics.voidrobot.commands.shooter.RunShooterDashboard;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
@@ -11,6 +14,7 @@ import com.lightningrobotics.voidrobot.subsystems.Vision;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class FourBallTerminal extends CommandBase {
@@ -20,7 +24,7 @@ public class FourBallTerminal extends CommandBase {
     private final Intake intake;
     private final Shooter shooter;
 
-    Path start4BallPath = new Path("1-2Ball.path", false);
+    Path start4BallPath = new Path("Start4Ball.path", false);
     Path middle4BallPath = new Path("Middle4Ball.path", false);
     Path end4BallPath = new Path("End6Ball.path", false);   
 
@@ -40,11 +44,11 @@ public class FourBallTerminal extends CommandBase {
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
                     start4BallPath.getCommand(drivetrain),  
-                    new InstantCommand(() -> intake.setPower(0.75))), 
+                    new RunIntake(intake, () -> 1d)), 
                 new ParallelCommandGroup(
-                    new InstantCommand(() -> indexer.setPower(0.75)),  
-                    new InstantCommand(() -> shooter.setRPM(3000)))
-            ).schedule();
+                    new RunIndexer(indexer, () -> 1d),  
+                    new RunShooterDashboard(shooter, 3000))
+                ).schedule();
             
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
