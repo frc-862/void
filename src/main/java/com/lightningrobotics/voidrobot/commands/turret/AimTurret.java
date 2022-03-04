@@ -29,8 +29,8 @@ public class AimTurret extends CommandBase {
     private LightningIMU imu;
 
     private Rotation2d offsetAngle;
-    private Rotation2d targetAngle;
-    private Rotation2d constrainedAngle;
+    private double targetAngle;
+    private double constrainedAngle;
 
     private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
     private NetworkTableEntry displayOffset;
@@ -119,19 +119,19 @@ public class AimTurret extends CommandBase {
 
         //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
         displayOffset.setDouble(testOffset); // offsetAngle.getDegrees()
-        targetAngle = Rotation2d.fromDegrees(testOffset); // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
+        targetAngle = testOffset; // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
 
-        double sign = Math.signum(targetAngle.getDegrees());
-        targetAngle =  Rotation2d.fromDegrees(sign * (((Math.abs(targetAngle.getDegrees()) + 180) % 360) - 180));
-        displayTargetAngle.setDouble(targetAngle.getDegrees());
+        double sign = Math.signum(targetAngle);
+        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
+        displayTargetAngle.setDouble(targetAngle);
 
-        constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(targetAngle.getDegrees(), Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
-        displayConstrainedAngle.setDouble(constrainedAngle.getDegrees());
+        constrainedAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
+        displayConstrainedAngle.setDouble(constrainedAngle);
 
-        if(constrainedAngle.getDegrees() - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
-            motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+        if(constrainedAngle - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
+            motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
         } else {
-            motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+            motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
         }
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
