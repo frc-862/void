@@ -25,6 +25,7 @@ public class Turret extends SubsystemBase {
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
 
+	private final DigitalInput centerSensor = new DigitalInput(2);
 	//variables needed to run the tests
 	private double realX = 0d;
 	private double realY = 0d;
@@ -89,31 +90,6 @@ public class Turret extends SubsystemBase {
 
 
 	}
-
-	// public boolean findZero() {
-	// 	//if the limit switch isn't triggered, move right
-	// 	if(turretMotor.isFwdLimitSwitchClosed() == 0) {
-	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0.2);
-	// 		return true;
-	// 	} 
-	// 	//Once the limit is triggered, move until the center sensor is triggered
-	// 	else if(centerSensor.get()) { //TODO: double check if inverted
-	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, -0.2);
-
-	// 		if(turretMotor.isRevLimitSwitchClosed() == 1) { // if we pass the center switch and hit the next limit, return with a warning
-	// 			turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
-	// 			resetEncoder();
-	// 			SmartDashboard.putString("WARNING:", "TURRET NOT ZEROED");
-	// 			return false;
-	// 		} else {
-	// 			return true;
-	// 		}
-	// 	} else { //if the center switch is triggered, exit the loop
-	// 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
-	// 		resetEncoder();
-	// 		return false;
-	// 	}
-	// }
 		
 	public boolean isOverLimit(){
 		final double tolerance = 5d;
@@ -141,7 +117,7 @@ public class Turret extends SubsystemBase {
 		target = getCurrentAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
-	public double setOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+	public double getOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
 		
 		realX = rotateX(relativeX, relativeY, realTargetHeading);
 		realY = rotateY(relativeX, relativeY, realTargetHeading);
@@ -164,6 +140,18 @@ public class Turret extends SubsystemBase {
 
 	public void resetEncoder() {
 		turretMotor.setSelectedSensorPosition(0);
+	}
+
+	public boolean getLeftLimitSwitch() {
+		return turretMotor.isFwdLimitSwitchClosed() == 1;
+	}
+
+	public boolean getRightLimitSwitch() {
+		return turretMotor.isRevLimitSwitchClosed() == 1;
+	}
+
+	public boolean getCenterSensor() {
+		return !centerSensor.get(); // TODO: check if it's inverted
 	}
 
 	public void setPower(double power) {
