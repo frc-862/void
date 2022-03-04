@@ -59,7 +59,6 @@ public class Turret extends SubsystemBase {
 		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
 		currentAngle = turretTab.add("current angle", 0).getEntry(); 
 
-
 		// Reset values
 	    resetEncoder();
 		target = 0;
@@ -67,8 +66,6 @@ public class Turret extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
-
-
 		// //TODO: put this somewhere better, and implement it with some kind of break maybe. 
 		// while(findZero() && !turretZeroed) {
 		// 	if(!centerSensor.get()) {
@@ -87,8 +84,6 @@ public class Turret extends SubsystemBase {
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
-
-
 	}
 		
 	public boolean isOverLimit(){

@@ -98,24 +98,23 @@ public class AimTurret extends CommandBase {
                 lastKnownDistance = vision.getTargetDistance();
                 break;
             case NO_VISION:
-            if(isUsingVision){
-                isUsingVision = false;
-                drivetrain.resetPose();
-                lastKnownHeading = turret.getCurrentAngle().getDegrees();
-            }
+                if(isUsingVision){
+                    isUsingVision = false;
+                    drivetrain.resetPose();
+                    lastKnownHeading = turret.getCurrentAngle().getDegrees();
+                }
 
-            double relativeX = drivetrain.getPose().getX();
-            double relativeY = drivetrain.getPose().getY();
+                double relativeX = drivetrain.getPose().getX();
+                double relativeY = drivetrain.getPose().getY();
 
-            // update rotation data 
-            double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
-            SmartDashboard.putNumber("odometer x", relativeX);
-            SmartDashboard.putNumber("odometer y", relativeY);
-            SmartDashboard.putNumber("change in rotation", changeInRotation);
+                // update rotation data 
+                double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+                SmartDashboard.putNumber("odometer x", relativeX);
+                SmartDashboard.putNumber("odometer y", relativeY);
+                SmartDashboard.putNumber("change in rotation", changeInRotation);
 
-            testOffset = turret.getOffsetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
-            break;
-                
+                testOffset = turret.getOffsetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                break;   
         }
 
         //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
@@ -132,13 +131,11 @@ public class AimTurret extends CommandBase {
         motorOutput = Constants.TURRET_PID.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
-
     }
 
     @Override
     public void end(boolean interrupted) {
         turret.stop();
-
     }
 
     @Override
