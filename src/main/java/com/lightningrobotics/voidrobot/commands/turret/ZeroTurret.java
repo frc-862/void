@@ -4,6 +4,7 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -16,6 +17,9 @@ public class ZeroTurret extends CommandBase {
 
   private boolean limitSwitchPressed = false;
   private boolean stopped = false;
+
+  public double centerOffset = 0d;
+
   /** Creates a new ZeroTurret. */
   public ZeroTurret(Turret turret) {
     this.turret = turret;
@@ -36,6 +40,7 @@ public class ZeroTurret extends CommandBase {
     }
 
     if (turret.getCenterSensor() || turret.getRightLimitSwitch()) { // stop if it bypasses center sensor
+      centerOffset = turret.getCurrentAngle().getDegrees();
       turret.stop();
       stopped = true;
     }
@@ -49,5 +54,11 @@ public class ZeroTurret extends CommandBase {
   @Override
   public boolean isFinished() {
     return stopped;
+  }
+  
+  // So that you know the difference from what the robot thinks is zero vs what the center limit switch says is zero
+  // Might be useful at some point 
+  public double getCenterOffset(){ 
+    return centerOffset;
   }
 }
