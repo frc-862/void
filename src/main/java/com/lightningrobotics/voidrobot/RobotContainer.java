@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot;
 
-import java.time.Instant;
-
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
@@ -34,7 +32,7 @@ public class RobotContainer extends LightningContainer{
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
-    //private static final Turret turret = new Turret();
+    private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
@@ -49,7 +47,8 @@ public class RobotContainer extends LightningContainer{
 
 	// Joystick Filters
 	private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
-    private static final JoystickFilter copilotFilter = new JoystickFilter(0.05, 0.1, 1, Mode.LINEAR);
+    private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
+
 
     @Override
     protected void configureAutonomousCommands() {
@@ -89,8 +88,8 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
-        shooter.setDefaultCommand(new MoveHood(shooter, () -> -copilot.getRightY()));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
+        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
         intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
 	}
 
