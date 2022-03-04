@@ -49,7 +49,6 @@ public class RobotContainer extends LightningContainer{
 	private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-
     @Override
     protected void configureAutonomousCommands() {
 		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter));
