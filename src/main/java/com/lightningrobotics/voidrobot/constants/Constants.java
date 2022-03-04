@@ -109,4 +109,7 @@ public final class Constants {
         }
     };
 
+	// Intake
+	public static final double INTAKE_DEPLOY_TIME = 6d;
+
 }
