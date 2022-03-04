@@ -1,5 +1,7 @@
 package com.lightningrobotics.voidrobot.constants;
 
+// import javax.smartcardio.CardNotPresentException;
+
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
@@ -46,17 +48,22 @@ public final class Constants {
     public static FeedForwardController FEEDFORWARD = new FeedForwardController(Constants.KS, Constants.KV, Constants.KA); 
 
     // Turret
-	public static final PIDFController TURRET_PID = new PIDFController(Constants.TURRET_kP, Constants.TURRET_kI, 0);
+	public static final PIDFController TURRET_PID_SLOW = new PIDFController(Constants.TURRET_kP_SLOW, Constants.TURRET_kI_SLOW, Constants.TURRET_kD_SLOW);
+    public static final PIDFController TURRET_PID_FAST = new PIDFController(Constants.TURRET_kP_FAST, Constants.TURRET_kI_FAST, Constants.TURRET_kD_FAST);
     public static final double TURN_TURRET_GEAR_RATIO = 14;
     public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.6d;
     public static final double TURRET_REDUCED_MAX_MOTOR_OUTPUT = 0.2d;
-    public static final double TURRET_kP = 0.03; 
-    public static final double TURRET_kI = 0.00; 
-    public static final double TURRET_kD = 0.0009; 
+    public static final double TURRET_kP_SLOW = 0.03; 
+    public static final double TURRET_kI_SLOW = 0.00; 
+    public static final double TURRET_kD_SLOW = 0.0009; 
+    public static final double TURRET_kP_FAST = 0.03; 
+    public static final double TURRET_kI_FAST = 0.00; 
+    public static final double TURRET_kD_FAST = 0.0009; 
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 40d;
     public static final double MIN_TURRET_ANGLE = -40d;
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
+    public static final double SLOW_PID_THRESHOLD = 5; // degrees
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;

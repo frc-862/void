@@ -31,7 +31,9 @@ public class Turret extends SubsystemBase {
 	private double realY = 0d;
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
-	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("Turret", Constants.TURRET_PID);
+	private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
+	private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
+
 
 	private boolean isArmed = false;
 	private double target;

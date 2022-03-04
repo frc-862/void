@@ -128,7 +128,11 @@ public class AimTurret extends CommandBase {
         constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(targetAngle.getDegrees(), Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
         displayConstrainedAngle.setDouble(constrainedAngle.getDegrees());
 
-        motorOutput = Constants.TURRET_PID.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+        if(constrainedAngle.getDegrees() - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
+            motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+        } else {
+            motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
+        }
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
     }
