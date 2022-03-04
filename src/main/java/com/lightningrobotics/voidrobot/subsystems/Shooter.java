@@ -122,10 +122,10 @@ public class Shooter extends SubsystemBase {
 		return armed;	
 	}
 
+	// Update Displays on Dashboard
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
-
 		currentHoodAngle.setDouble(getHoodAngle());
 	}
 
@@ -142,7 +142,7 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		setRPM(getRPMFromDashboard());
+		// setRPM(getRPMFromDashboard());
 		setSmartDashboardCommands();
 	}
 

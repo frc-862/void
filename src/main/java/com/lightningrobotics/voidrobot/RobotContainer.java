@@ -46,6 +46,8 @@ public class RobotContainer extends LightningContainer{
 	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
 	private static final XboxController copilot = new XboxController(JoystickConstants.COPILOT_PORT);
 	private static final XboxController climb = new XboxController(JoystickConstants.CLIMB_PORT);
+
+	// Joystick Filters
 	private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     private static final JoystickFilter copilotFilter = new JoystickFilter(0.05, 0.1, 1, Mode.LINEAR);
 
@@ -62,7 +64,8 @@ public class RobotContainer extends LightningContainer{
         // DRIVER
         // (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
         // (new TwoButtonTrigger((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
-        
+		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
+
         // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //intake 
         (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
@@ -87,7 +90,6 @@ public class RobotContainer extends LightningContainer{
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
-
         shooter.setDefaultCommand(new MoveHood(shooter, () -> -copilot.getRightY()));
         intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
 	}
@@ -107,11 +109,7 @@ public class RobotContainer extends LightningContainer{
     }
 
     @Override
-    protected void initializeDashboardCommands() {
-		var tab = Shuffleboard.getTab("Vision");
-		// tab.add(new InstantCommand(() -> vision.turnOnVisionLight(), vision));
-		// tab.add(new InstantCommand(() -> vision.turnOffVisionLight(), vision));
-	}
+    protected void initializeDashboardCommands() { }
 	
     @Override
     protected void releaseDefaultCommands() { }

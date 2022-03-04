@@ -66,6 +66,5 @@ public class Drivetrain extends DifferentialDrivetrain {
     @Override
     public void periodic() {
         super.periodic();
-        // This method will be called once per scheduler run
     }
 }
