@@ -32,11 +32,11 @@ public class AimTurret extends CommandBase {
     private Rotation2d targetAngle;
     private Rotation2d constrainedAngle;
 
-    private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-    private NetworkTableEntry displayOffset;
-    private NetworkTableEntry displayTargetAngle;
-    private NetworkTableEntry displayConstrainedAngle;
-    private NetworkTableEntry displayMotorOutput;
+    private static ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+    private static NetworkTableEntry displayOffset = turretTab.add("test offset2", 0).getEntry();
+    private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
+    private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
+    private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
 
     private double motorOutput;
     private DoubleSupplier controlerInput;
@@ -56,13 +56,20 @@ public class AimTurret extends CommandBase {
 	private TargetingState targetingState;
 
     public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInput) {
-        this.vision = vision;
+        
+		this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controlerInput = controllerInput;
 
         addRequirements(vision, turret);
+
+		// displayOffset = turretTab.add("test offset", 0).getEntry();
+        // displayTargetAngle = turretTab.add("target angle", 0).getEntry();
+        // displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
+        // displayMotorOutput = turretTab.add("motor output", 0).getEntry();
+
     }
 
     @Override
@@ -72,11 +79,6 @@ public class AimTurret extends CommandBase {
 
         drivetrain.resetPose();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
-
-        displayOffset = turretTab.add("test offset", 0).getEntry();
-        displayTargetAngle = turretTab.add("target angle", 0).getEntry();
-        displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
-        displayMotorOutput = turretTab.add("motor output", 0).getEntry();
 
     }
 

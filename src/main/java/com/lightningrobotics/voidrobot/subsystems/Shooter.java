@@ -141,7 +141,9 @@ public class Shooter extends SubsystemBase {
 
 	// Checks if flywheel RPM is within a threshold
 	public void setArmed() {
-		armed = Math.abs(getEncoderRPM() - targetRPM) < 50;
+		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
+		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
+		armed = flywheel && hood;
 	}
 
 	// Whether flywheel RPM is within a threshold and ready to shoot
@@ -170,6 +172,10 @@ public class Shooter extends SubsystemBase {
 	 */
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
+	}
+
+	public double getHoodAngleFromDashboard() {
+		return targetHoodAngle.getDouble(0);
 	}
 
 	/**
@@ -201,11 +207,10 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {
 		
-		currentTarget = getRPMFromDashboard();
-
-		setRPM(currentTarget);
-
-		setHoodAngle(targetHoodAngle.getDouble(0));
+		// TODO move to manual shoot command
+		// currentTarget = getRPMFromDashboard();
+		// setRPM(currentTarget);
+		// setHoodAngle(targetHoodAngle.getDouble(0));
 		
 		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
 			hasShot = false;

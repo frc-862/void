@@ -70,11 +70,11 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
         (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //Manual intake up
         (new JoystickButton(copilot, 6)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual intake down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
-            new ParallelCommandGroup(
-                new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
-                new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
-            ));
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
+        //     new ParallelCommandGroup(
+        //         new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
+        //         new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
+        //     ));
         (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 		// TODO: add bias stuff
         
@@ -88,7 +88,8 @@ public class RobotContainer extends LightningContainer{
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
-        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
+        // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
+		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
 	}
 

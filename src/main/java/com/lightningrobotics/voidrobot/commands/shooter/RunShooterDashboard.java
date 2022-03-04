@@ -22,8 +22,8 @@ public class RunShooterDashboard extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setRPM(targetRPM);  // shooter.getRPMFromDashboard() // Gets the desired RPM from the dashboard and sets them to the motor
-        //shooter.setRPM(targetRPM);
+        shooter.setRPM(shooter.getRPMFromDashboard());  // shooter.getRPMFromDashboard() // Gets the desired RPM from the dashboard and sets them to the motor
+        shooter.setHoodAngle(shooter.getHoodAngleFromDashboard());
     }
 
     @Override
