@@ -94,7 +94,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public boolean hasVision(){
-		return true;
+		return false;
 	}
 
 }
