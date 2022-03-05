@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class MoveHoodSetpoint extends CommandBase {
 
-	private static final double DEFAULT_HOOD_ANGLE = 13d;
+	private static final double DEFAULT_HOOD_ANGLE = 0d;
 
     private static ShuffleboardTab hoodTab = Shuffleboard.getTab("Hood");
 	private static NetworkTableEntry hoodSetpoint = hoodTab.add("Hood Setpoint", DEFAULT_HOOD_ANGLE).getEntry();

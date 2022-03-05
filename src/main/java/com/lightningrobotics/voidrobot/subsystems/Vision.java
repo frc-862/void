@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Distance");
 
 	// Placeholder Vars for Angle & Distance
-	private static double targetDistance = 0d;
+	private static double targetDistance = -1d;
     private static double offsetAngle = 0d;
 	
 	// Var for if green LEDs are on
@@ -40,6 +40,7 @@ public class Vision extends SubsystemBase {
 		offsetAngle = targetAngleEntry.getDouble(offsetAngle);
 		
 		// Update Target Distance
+		targetDistance = -1;
 		targetDistance = targetDistanceEntry.getDouble(targetDistance);
 
 	}

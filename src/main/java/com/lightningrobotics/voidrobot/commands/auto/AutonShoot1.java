@@ -55,7 +55,7 @@ public class AutonShoot1 extends CommandBase {
 		shooter.setRPM(RPM);
 		shootingState = ShootingState.WATING_TO_ARM;
 		setTurretAngle(turretAngle);
-		// shooter.setHoodAngle(hoodAngle);
+		shooter.setHoodAngle(hoodAngle);
 	}
 
 	@Override

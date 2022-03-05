@@ -71,7 +71,13 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake)); //Deploy intake
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getLeftTriggerAxis())); //manual intake down
-        
+        (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER));
+        (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER));
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
+        //     new ParallelCommandGroup(
+        //         new RunIntake(intake, () -> -copilot.getLeftTriggerAxis()), //manual intake down
+        //         new RunIndexer(indexer, () -> -copilot.getLeftTriggerAxis())
+        // ));
 
         //(new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake, indexer)); //Retract intake
 

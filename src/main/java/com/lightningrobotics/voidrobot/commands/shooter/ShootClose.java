@@ -17,7 +17,6 @@ public class ShootClose extends CommandBase {
 
 	private double startTime = 0;
 	private boolean hasShot = false;
-	private final double WAIT_AFTER_SHOOT_TIME = 1.5;
 
 	public ShootClose(Shooter shooter, Indexer indexer, Turret turret) {
 
@@ -54,7 +53,7 @@ public class ShootClose extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return Timer.getFPGATimestamp() - startTime > WAIT_AFTER_SHOOT_TIME && hasShot;
+		return Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
 	}
 	
 }
