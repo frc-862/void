@@ -5,7 +5,6 @@
 package com.lightningrobotics.voidrobot.commands.intake;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -13,41 +12,34 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RetractIntake extends CommandBase {
   Intake intake;
-  Indexer indexer;
   double startTime;
 
   /** Creates a new DeployIntake. */
-  public RetractIntake(Intake intake, Indexer indexer) {
+  public RetractIntake(Intake intake) {
     this.intake = intake;
-    this.indexer = indexer;
     
     addRequirements(intake);
-    addRequirements(indexer);
   }
 
   // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    startTime = Timer.getFPGATimestamp();
-  }
+  @Override 
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.actuateIntake(-0.5);
+    intake.actuateIntake(-Constants.DEFAULT_WINCH_POWER);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.setIsDeployed(false);
     intake.stopDeploy();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return indexer.getLowerStatus() || !intake.getIsDeployed()
-      || Timer.getFPGATimestamp() - startTime >= Constants.INTAKE_RETRACT_TIME; //TODO delete this part if using void
+    return false;
   }
 }
