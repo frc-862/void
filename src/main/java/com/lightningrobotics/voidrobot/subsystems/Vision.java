@@ -22,6 +22,9 @@ public class Vision extends SubsystemBase {
 	// Placeholder Vars for Angle & Distance
 	private static double targetDistance = 0d;
     private static double offsetAngle = 0d;
+	
+	// Var for if green LEDs are on
+	private static boolean lightsOn = false;
 
 	// PDH
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
@@ -70,6 +73,7 @@ public class Vision extends SubsystemBase {
 	 */
 	public void turnOnVisionLight(){
 		pdh.setSwitchableChannel(true);
+		lightsOn = true;
 	}
 
 	/**
@@ -77,10 +81,20 @@ public class Vision extends SubsystemBase {
 	 */
 	public void turnOffVisionLight(){
 		pdh.setSwitchableChannel(false);
+		lightsOn = false;
+	}
+
+	public void toggleVisionLights() {
+		if(lightsOn) turnOffVisionLight();
+		else turnOnVisionLight();
+	}
+
+	public boolean visionLightsOn() {
+		return lightsOn;
 	}
 
 	public boolean hasVision(){
-		return false;
+		return targetDistance != -1;
 	}
 
 }

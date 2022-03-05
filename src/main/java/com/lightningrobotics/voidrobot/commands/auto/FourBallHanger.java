@@ -1,12 +1,7 @@
 package com.lightningrobotics.voidrobot.commands.auto;
 
 import com.lightningrobotics.common.auto.Path;
-import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
-import com.lightningrobotics.voidrobot.subsystems.Indexer;
-import com.lightningrobotics.voidrobot.subsystems.Intake;
-import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Turret;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
+import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;

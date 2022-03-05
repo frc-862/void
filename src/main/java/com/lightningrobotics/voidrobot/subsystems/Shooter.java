@@ -5,14 +5,18 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -26,7 +30,12 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry displayRPM;
     private NetworkTableEntry setRPM;
     private NetworkTableEntry displayShooterPower;
+	private NetworkTableEntry targetHoodAngle;
 	private NetworkTableEntry currentHoodAngle;
+	private NetworkTableEntry hasShotShuffEntry;
+
+	// Creates a PID and FeedForward controller for our shooter
+	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
 
 	// PID tuner for the shooter gains
 	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", Constants.HOOD_PID);
@@ -36,7 +45,10 @@ public class Shooter extends SubsystemBase {
 	private double hoodPowerSetPoint;
 	private double targetRPM;
 	private double hoodAngle;
-	private static boolean armed;
+	private double prevTarget;
+	private double currentTarget;
+	private double timeWhenChanged = 0;
+	private boolean hasShot = false;
 	
 	public Shooter() {
 
@@ -59,16 +71,32 @@ public class Shooter extends SubsystemBase {
 		displayRPM  = shooterTab
 			.add("RPM-From encoder", 0)
 			.getEntry();
-		currentHoodAngle  = shooterTab
-			.add("hood angle", 0)
+		targetHoodAngle = shooterTab
+			.add("set hood angle", 0)
 			.getEntry();
+		currentHoodAngle = shooterTab
+			.add("current hood angle", 0)
+			.getEntry();
+		hasShotShuffEntry = shooterTab
+			.add("has shot", false)
+			.getEntry();
+
+			// hoodMotor.setSelectedSensorPosition(0);
+			hoodMotor.setSensorPhase(true);
 
 	}
 
+	/**
+	 * gets the hood angle in degrees
+	 */
 	public double getHoodAngle() {
 		return hoodMotor.getSelectedSensorPosition() / 4096 * 360; // Should retrun the angle; maybe 4096
 	}
 
+	/**
+	 * commands the hood to move to an angle using a PID
+	 * @param hoodAngle target hood angle in degrees
+	 */
 	public void setHoodAngle(double hoodAngle) {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
 		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
@@ -87,20 +115,23 @@ public class Shooter extends SubsystemBase {
 		flywheelMotor.set(TalonFXControlMode.Velocity, shooterVelocity); 
 	}
 
+	/**
+	 * stops the shooter motor
+	 */
 	public void stop() {
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0);; 
 	}
 
-	public void hoodMove(double moveAmount) {
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, moveAmount);
-		//TODO: add logic to actually increment
-	}
-
+	/**
+	 * gets the shooter's RPMs
+	 * @return the RPM's of the shooter
+	 */
 	public double getEncoderRPM() {
 		return flywheelMotor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
 	}
 
 	public void setRPM(double targetRPMs) {
+		this.targetRPM = targetRPMs;
 		setVelocity(targetRPMs / 600 * 2048);
 	}
 
@@ -113,20 +144,19 @@ public class Shooter extends SubsystemBase {
 	}
 
 	// Checks if flywheel RPM is within a threshold
-	public void setArmed() {
-		armed = Math.abs(getEncoderRPM() - targetRPM) < 50;
-	}
-
-	// Whether flywheel RPM is within a threshold and ready to shoot
 	public boolean getArmed() {
-		return armed;	
+		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
+		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
+		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
+		return flywheel; //&& hood;
 	}
 
+	// Update Displays on Dashboard
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
-
 		currentHoodAngle.setDouble(getHoodAngle());
+		hasShotShuffEntry.setBoolean(hasShot);
 	}
 
 	private void configPIDGains(double kP, double kI, double kD, double kV) {
@@ -136,14 +166,66 @@ public class Shooter extends SubsystemBase {
 		flywheelMotor.config_kF(0, kV);
 	}
 
+	/**
+	 * 
+	 * @return the target RPMs for the shooter taken from the dashboard
+	 */
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
 	}
 
+	public double getHoodAngleFromDashboard() {
+		return targetHoodAngle.getDouble(0);
+	}
+
+	/**
+	 * gets the optimal shooter RPM from an inputted height in pixels using an interpolation map
+	 * @param height in pixels
+	 * @return motor RPMs
+	 */
+	public double getRPMsFromHeight(double height) {
+		if (height > 0) {
+            return Constants.DISTANCE_RPM_MAP.get(height);
+        } else {
+            return 0;
+        }
+	}
+
+	/**
+	 * gets the optimal hood angle from an inputted distance in X using an interpolation map
+	 * @param height in pixels
+	 * @return target angle
+	 */
+	public double getAngleFromHeight(double distance) {
+		if (distance > 0) {
+            return Constants.HOOD_ANGLE_MAP.get(distance);
+        } else {
+            return 0;
+        }
+	}
+
 	@Override
 	public void periodic() {
-		setRPM(getRPMFromDashboard());
+		
+		// TODO move to manual shoot command
+		// currentTarget = getRPMFromDashboard();
+		// setRPM(currentTarget);
+		// setHoodAngle(targetHoodAngle.getDouble(0));
+		
+		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
+			hasShot = false;
+		} else {
+			hasShot = getArmed();
+		}
+		
+		prevTarget = currentTarget;
+
+		if(prevTarget != currentTarget) {
+			timeWhenChanged = Timer.getFPGATimestamp();
+		}
+		
 		setSmartDashboardCommands();
+
 	}
 
 }

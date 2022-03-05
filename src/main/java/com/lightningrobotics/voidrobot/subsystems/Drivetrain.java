@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
-import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
@@ -17,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends DifferentialDrivetrain {
 
-    private static PIDFDashboardTuner tuner = new PIDFDashboardTuner("drivetrain", Constants.PID);
+    private LightningIMU imu;
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -52,6 +51,7 @@ public class Drivetrain extends DifferentialDrivetrain {
 			leftPositionSupplier, 
 			rightPositionSupplier
         );
+        this.imu = imu;
 
         for (int i = 0; i < RIGHT_MOTORS.length; i++){
             ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
@@ -64,4 +64,9 @@ public class Drivetrain extends DifferentialDrivetrain {
         return ((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() < 0.05 && ((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() < 0.05;
     }
 
+    @Override
+    public void periodic() {
+        super.periodic();
+        SmartDashboard.putNumber("headiong", imu.getHeading().getDegrees());
+    }
 }

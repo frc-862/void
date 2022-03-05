@@ -72,7 +72,6 @@ public class Turret extends SubsystemBase {
 		// Reset values
 	    resetEncoder();
 		target = 0;
-
 	}
 	
 	@Override

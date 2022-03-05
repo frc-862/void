@@ -41,10 +41,10 @@ public class AimTurret extends CommandBase {
     private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
     private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
     private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
+    private static NetworkTableEntry manualOverrideEntry = turretTab.add("Manual Turret", false).getEntry();
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
-    private BooleanSupplier buttonPressed;
     private DoubleSupplier POV;
     private boolean usingManual = false;
     private final Drivetrain drivetrain;
@@ -64,18 +64,24 @@ public class AimTurret extends CommandBase {
         NO_VISION,
         MANUAL_OVERRIDE
     }
-    TargetingState targetingState;
+    
+	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, BooleanSupplier buttonPressed, DoubleSupplier POV) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
-        this.buttonPressed = buttonPressed;
         this.POV = POV;
 
         addRequirements(vision, turret);
+
+		// displayOffset = turretTab.add("test offset", 0).getEntry();
+        // displayTargetAngle = turretTab.add("target angle", 0).getEntry();
+        // displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
+        // displayMotorOutput = turretTab.add("motor output", 0).getEntry();
+
     }
 
     @Override
@@ -94,7 +100,7 @@ public class AimTurret extends CommandBase {
         if (turret.getManualOverride()){
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
-            if (buttonPressed.getAsBoolean()){
+            if (manualOverrideEntry.getBoolean(false)){
                 if (usingManual){
                     usingManual = false;
                     targetingState = TargetingState.VISION;
@@ -163,6 +169,7 @@ public class AimTurret extends CommandBase {
 
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
+
     }
 
     @Override
