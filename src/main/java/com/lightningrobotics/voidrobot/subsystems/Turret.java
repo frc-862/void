@@ -49,8 +49,8 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
 
-    private static NetworkTableEntry displayTestAngle;
-    private static NetworkTableEntry displayTestBoolean;
+    //private static NetworkTableEntry displayTestAngle;
+    //private static NetworkTableEntry displayTestBoolean;
 	
 	public Turret() {
 
@@ -66,8 +66,8 @@ public class Turret extends SubsystemBase {
 		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
 		currentAngle = turretTab.add("current angle", 0).getEntry(); 
 
-		displayTestAngle = turretTab.add("MU Target Angle", 0).getEntry();
-		displayTestBoolean = turretTab.add("MU Boolean", false).getEntry();
+		// displayTestAngle = turretTab.add("MU Target Angle", 0).getEntry();
+		// displayTestBoolean = turretTab.add("MU Boolean", false).getEntry();
 
 		// Reset values
 	    resetEncoder();
@@ -80,8 +80,8 @@ public class Turret extends SubsystemBase {
 		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
-		target = displayTestAngle.getDouble(0d);
-		manualOverride = displayTestBoolean.getBoolean(false);
+		// target = displayTestAngle.getDouble(0d);
+		// manualOverride = displayTestBoolean.getBoolean(false);
 
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
 	}
