@@ -88,6 +88,7 @@ public class RobotContainer extends LightningContainer{
         // // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
 		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         // intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 	}
 
     @Override
