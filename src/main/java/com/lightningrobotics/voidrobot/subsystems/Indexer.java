@@ -93,14 +93,14 @@ public class Indexer extends SubsystemBase {
                 case 0:
                     if (collect1) {
                         ballCount = 1;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     } 
                 break;
 
                 case 1:
                     if (collect1) {
                         ballCount = 2;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     }
                     if (eject1) {
                         ballCount = 0;
