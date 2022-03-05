@@ -4,8 +4,12 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import javax.security.sasl.RealmCallback;
+
+import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
@@ -28,24 +32,28 @@ public class AimTurret extends CommandBase {
 
     private LightningIMU imu;
 
-    private Rotation2d offsetAngle;
-    private Rotation2d targetAngle;
-    private Rotation2d constrainedAngle;
+    private double targetAngle;
+    private double constrainedAngle;
+    private double initialIMUHeading; 
 
     private static ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-    private static NetworkTableEntry displayOffset = turretTab.add("test offset2", 0).getEntry();
+    private static NetworkTableEntry displayOffset  = turretTab.add("vision offset", 0).getEntry();
     private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
     private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
     private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
 
-    private double motorOutput;
-    private DoubleSupplier controlerInput;
+    private static double motorOutput;
+    private DoubleSupplier controllerInputX;
+    private BooleanSupplier button;
     private final Drivetrain drivetrain;
 
-    private double testOffset;
-    private double lastKnownHeading;
-    private double lastKnownDistance;
-    private boolean isUsingVision = true;
+    private double targetOffset;
+    private double lastKnownHeading = 0;
+    private double lastKnownDistance = 6.4008;
+    private boolean isUsingOdometer = true;
+    private double initialOdometerGyroReading = 0d;
+    private double initialX = 0d;
+    private double initialY = 0d;
 
     enum TargetingState{
         MANUAL,
@@ -55,13 +63,12 @@ public class AimTurret extends CommandBase {
     
 	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInput) {
-        
-		this.vision = vision;
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, BooleanSupplier buttonPressed) {
+        this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
-        this.controlerInput = controllerInput;
+        this.controllerInputX = controllerInputX;
 
         addRequirements(vision, turret);
 
@@ -79,13 +86,14 @@ public class AimTurret extends CommandBase {
 
         drivetrain.resetPose();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
+        initialIMUHeading = imu.getHeading().getDegrees();
 
     }
 
     @Override
     public void execute() {
 
-        if (controlerInput.getAsDouble() == 0) { // vision.getDistance == -1
+        if (controllerInputX.getAsDouble() == 0) { // vision.getDistance == -1
             targetingState = TargetingState.NO_VISION;
         } else {
             targetingState = TargetingState.MANUAL;
@@ -93,51 +101,46 @@ public class AimTurret extends CommandBase {
             
         switch(targetingState) {
             case MANUAL: 
-                testOffset += controlerInput.getAsDouble();
+                motorOutput = controllerInputX.getAsDouble() / 4;
                 break;
             case VISION:
-                isUsingVision = true;
-                testOffset = vision.getOffsetAngle();
+                isUsingOdometer = true;
+                targetOffset = vision.getOffsetAngle();
                 lastKnownDistance = vision.getTargetDistance();
+                targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
+
+                targetAngle = turret.getConstrainedAngle(targetAngle);
+                motorOutput = turret.getMotorOutput(targetAngle);
                 break;
             case NO_VISION:
-                if(isUsingVision){
-                    isUsingVision = false;
-                    drivetrain.resetPose(); // TODO instead of resetting the pose, we dhould just measure a delta. dont want to accidentally reset in auto...
-                    lastKnownHeading = turret.getCurrentAngle().getDegrees();
+                if(isUsingOdometer){
+                    isUsingOdometer = false;
+                    resetPose();
                 }
 
-                double relativeX = drivetrain.getPose().getX();
-                double relativeY = drivetrain.getPose().getY();
+                double relativeX = drivetrain.getPose().getX() - initialX;
+                double relativeY = drivetrain.getPose().getY() - initialY;
+
+                // rotate from odometer-center to robot-center
+                relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
+                relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
                 // update rotation data 
-                double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+                double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
                 SmartDashboard.putNumber("odometer x", relativeX);
                 SmartDashboard.putNumber("odometer y", relativeY);
                 SmartDashboard.putNumber("change in rotation", changeInRotation);
 
-                testOffset = turret.getOffsetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                
+                targetAngle = turret.getConstrainedAngle(targetAngle);
+                motorOutput = turret.getMotorOutput(targetAngle);
                 break;   
         }
 
-        //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
-        displayOffset.setDouble(testOffset); // offsetAngle.getDegrees()
-        targetAngle = Rotation2d.fromDegrees(testOffset); // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
+        displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
+        displayTargetAngle.setDouble(targetAngle);
 
-        double sign = Math.signum(targetAngle.getDegrees());
-        targetAngle =  Rotation2d.fromDegrees(sign * (((Math.abs(targetAngle.getDegrees()) + 180) % 360) - 180));
-        displayTargetAngle.setDouble(targetAngle.getDegrees());
-
-        constrainedAngle = Rotation2d.fromDegrees(LightningMath.constrain(targetAngle.getDegrees(), Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE));
-        displayConstrainedAngle.setDouble(constrainedAngle.getDegrees());
-
-        if(constrainedAngle.getDegrees() - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
-            motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
-        } else {
-            motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle.getDegrees());
-        }
-
-		// Set Motor Output
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
 
@@ -153,4 +156,10 @@ public class AimTurret extends CommandBase {
         return false;
     }
 
+    public void resetPose(){
+        initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
+        initialX = drivetrain.getPose().getX();
+        initialY = drivetrain.getPose().getY();
+        lastKnownHeading = turret.getCurrentAngle().getDegrees();
+    }
 }

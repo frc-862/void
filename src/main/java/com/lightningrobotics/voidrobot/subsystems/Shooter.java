@@ -45,7 +45,6 @@ public class Shooter extends SubsystemBase {
 	private double hoodPowerSetPoint;
 	private double targetRPM;
 	private double hoodAngle;
-	private static boolean armed;
 	private double prevTarget;
 	private double currentTarget;
 	private double timeWhenChanged = 0;
@@ -145,16 +144,11 @@ public class Shooter extends SubsystemBase {
 	}
 
 	// Checks if flywheel RPM is within a threshold
-	public void setArmed() {
+	public boolean getArmed() {
 		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
 		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
 		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
-		armed = flywheel && hood;
-	}
-
-	// Whether flywheel RPM is within a threshold and ready to shoot
-	public boolean getArmed() {
-		return armed;	
+		return flywheel; //&& hood;
 	}
 
 	// Update Displays on Dashboard
@@ -229,7 +223,6 @@ public class Shooter extends SubsystemBase {
 		if(prevTarget != currentTarget) {
 			timeWhenChanged = Timer.getFPGATimestamp();
 		}
-		setArmed();
 		
 		setSmartDashboardCommands();
 
