@@ -93,14 +93,16 @@ public class AimTurret extends CommandBase {
             
         switch(targetingState) {
             case MANUAL: 
-                targetOffset += controllerInputX.getAsDouble();
-                targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
+                motorOutput = controllerInputX.getAsDouble() / 4;
                 break;
             case VISION:
                 isUsingOdometer = true;
                 targetOffset = vision.getOffsetAngle();
                 lastKnownDistance = vision.getTargetDistance();
                 targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
+
+                targetAngle = turret.getConstrainedAngle(targetAngle);
+                motorOutput = turret.getMotorOutput(targetAngle);
                 break;
             case NO_VISION:
                 if(isUsingOdometer){
@@ -119,25 +121,29 @@ public class AimTurret extends CommandBase {
                 SmartDashboard.putNumber("change in rotation", changeInRotation);
 
                 targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                
+                targetAngle = turret.getConstrainedAngle(targetAngle);
+                motorOutput = turret.getMotorOutput(targetAngle);
                 break;   
         }
 
-        //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
         displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
-        //targetAngle = testOffset; // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
-
-        double sign = Math.signum(targetAngle);
-        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
         displayTargetAngle.setDouble(targetAngle);
 
+        /*
+        double sign = Math.signum(targetAngle);
+        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
+
         constrainedAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
-        displayConstrainedAngle.setDouble(constrainedAngle);
+        //displayConstrainedAngle.setDouble(constrainedAngle);
 
         if(constrainedAngle - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
             motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
         } else {
             motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
         }
+        */
+
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
     }
