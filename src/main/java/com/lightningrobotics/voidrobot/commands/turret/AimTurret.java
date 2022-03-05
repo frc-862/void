@@ -45,10 +45,12 @@ public class AimTurret extends CommandBase {
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
     private BooleanSupplier buttonPressed;
+    private DoubleSupplier POV;
     private boolean usingManual;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
+    private double turretTrim = 0d; 
     private double lastKnownHeading = 0;
     private double lastKnownDistance = 7.62;
     private boolean isUsingOdometer = true;
@@ -59,17 +61,19 @@ public class AimTurret extends CommandBase {
     enum TargetingState{
         MANUAL,
         VISION,
-        NO_VISION
+        NO_VISION,
+        MANUAL_OVERRIDE
     }
     TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, BooleanSupplier buttonPressed) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, BooleanSupplier buttonPressed, DoubleSupplier POV) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
         this.buttonPressed = buttonPressed;
+        this.POV = POV;
 
         addRequirements(vision, turret);
     }
@@ -88,8 +92,14 @@ public class AimTurret extends CommandBase {
     public void execute() {
 
         if (buttonPressed.getAsBoolean()){
-            if (usingManual){
-                targetingState = TargetingState.NO_VISION;
+            if (turret.getManualOverride()){
+                targetingState = TargetingState.MANUAL_OVERRIDE;
+            } else if (usingManual){
+                if (vision.hasVision()){
+                    targetingState = TargetingState.VISION;
+                } else {
+                    targetingState = TargetingState.NO_VISION;
+                }
                 usingManual = false;
             } else {
                 targetingState = TargetingState.MANUAL;
@@ -99,7 +109,7 @@ public class AimTurret extends CommandBase {
             
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = controllerInputX.getAsDouble() / 4;
+                motorOutput = -1 * (controllerInputX.getAsDouble() / 4);
                 break;
             case VISION:
                 isUsingOdometer = true;
@@ -125,15 +135,20 @@ public class AimTurret extends CommandBase {
 
                 // update rotation data 
                 double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
-                SmartDashboard.putNumber("odometer x", relativeX);
-                SmartDashboard.putNumber("odometer y", relativeY);
-                SmartDashboard.putNumber("change in rotation", changeInRotation);
+                // SmartDashboard.putNumber("odometer x", relativeX);
+                // SmartDashboard.putNumber("odometer y", relativeY);
+                // SmartDashboard.putNumber("change in rotation", changeInRotation);
 
                 targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
                 
                 targetAngle = turret.getConstrainedAngle(targetAngle);
                 motorOutput = turret.getMotorOutput(targetAngle);
                 break;   
+            case MANUAL_OVERRIDE:
+                targetAngle = turret.getTarget();
+                targetAngle = turret.getConstrainedAngle(targetAngle);
+                motorOutput = turret.getMotorOutput(targetAngle);
+                break;
         }
 
         displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
@@ -159,4 +174,5 @@ public class AimTurret extends CommandBase {
         initialY = drivetrain.getPose().getY();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
     }
+
 }

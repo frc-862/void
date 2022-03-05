@@ -39,6 +39,8 @@ public class Turret extends SubsystemBase {
 	private double target;
 	private static double motorOutput;
 	private boolean turretZeroed = false;
+	private boolean manualOverride;
+	private double manualOverridePosition;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry currentAngle;
@@ -46,6 +48,9 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
+
+    private static NetworkTableEntry displayTestAngle;
+    private static NetworkTableEntry displayTestBoolean;
 	
 	public Turret() {
 
@@ -61,37 +66,24 @@ public class Turret extends SubsystemBase {
 		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
 		currentAngle = turretTab.add("current angle", 0).getEntry(); 
 
+		displayTestAngle = turretTab.add("MU Target Angle", 0).getEntry();
+		displayTestBoolean = turretTab.add("MU Boolean", false).getEntry();
+
 		// Reset values
 	    resetEncoder();
 		target = 0;
+
 	}
 	
 	@Override
 	public void periodic() {
-		// //TODO: put this somewhere better, and implement it with some kind of break maybe. 
-		// while(findZero() && !turretZeroed) {
-		// 	if(!centerSensor.get()) {
-		// 		resetEncoder();
-		// 	}
-		// }
-
-		// turretZeroed = true;
-
-		// if(!centerSensor.get()) {
-		// 	resetEncoder();
-		// }
-
-		// Check if ready to shoot
 		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 
+		target = displayTestAngle.getDouble(0d);
+		manualOverride = displayTestBoolean.getBoolean(false);
+
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
-	}
-		
-	public boolean isOverLimit(){
-		final double tolerance = 5d;
-		return getCurrentAngle().getDegrees() >= (Constants.MAX_TURRET_ANGLE - tolerance) 
-		|| getCurrentAngle().getDegrees() <= (Constants.MIN_TURRET_ANGLE + tolerance);
 	}
 
 	public boolean getArmed() {
@@ -110,10 +102,6 @@ public class Turret extends SubsystemBase {
 		return turretMotor.getSelectedSensorPosition() / 4096;
 	}
 
-	public void setVisionOffset(double offsetAngle) {
-		target = getCurrentAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
-	}
-
 	public double getTargetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
 		
 		realX = rotateX(relativeX, relativeY, realTargetHeading);
@@ -124,7 +112,6 @@ public class Turret extends SubsystemBase {
 
 	public void setTarget(double targetAngle) {
 		this.target = targetAngle;
-		SmartDashboard.putNumber("reading from controller", targetAngle);
 	}
 
 	public double rotateX (double xValue, double yValue, double angleInDegrees){
@@ -171,5 +158,17 @@ public class Turret extends SubsystemBase {
             motorOutput = Constants.TURRET_PID_FAST.calculate(getCurrentAngle().getDegrees(), constrainedAngle);
         }
 		return motorOutput;
+	}
+
+	public void setManualOverride(boolean manualOverride){
+		this.manualOverride = manualOverride;
+	}
+
+	public boolean getManualOverride(){
+		return manualOverride;
+	}
+
+	public double getTarget(){
+		return target;
 	}
 }
