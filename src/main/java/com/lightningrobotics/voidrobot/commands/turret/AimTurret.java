@@ -55,13 +55,13 @@ public class AimTurret extends CommandBase {
     
 	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu/*, DoubleSupplier... controllerInput*/) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInput) {
         
 		this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
-        // this.controlerInput = controllerInput;
+        this.controlerInput = controllerInput;
 
         addRequirements(vision, turret);
 
