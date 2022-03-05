@@ -19,7 +19,6 @@ public class Intake extends SubsystemBase {
 		intakeMotor = new VictorSPX(RobotMap.INTAKE_MOTOR_ID);
 		winch = new TalonSRX(RobotMap.INTAKE_WINCH_ID);
 		winch.setNeutralMode(NeutralMode.Brake);
-		// TODO set inverts on winch/other
 	}
 
 	public void setPower(double intakePower) {

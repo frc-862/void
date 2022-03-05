@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot;
 
-import java.time.Instant;
-
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
@@ -34,7 +32,7 @@ public class RobotContainer extends LightningContainer{
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
-    //private static final Turret turret = new Turret();
+    private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
@@ -46,7 +44,10 @@ public class RobotContainer extends LightningContainer{
 	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
 	private static final XboxController copilot = new XboxController(JoystickConstants.COPILOT_PORT);
 	private static final XboxController climb = new XboxController(JoystickConstants.CLIMB_PORT);
+
+	// Joystick Filters
 	private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
+    private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -61,23 +62,24 @@ public class RobotContainer extends LightningContainer{
         // DRIVER
         // (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
         // (new TwoButtonTrigger((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
-        
-        // // COPILOT
+		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
+
+        // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //intake 
         (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
         (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
         (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //Manual intake up
         (new JoystickButton(copilot, 6)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual intake down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
-            new ParallelCommandGroup(
-                new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
-                new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
-            ));
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
+        //     new ParallelCommandGroup(
+        //         new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
+        //         new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
+        //     ));
         (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
-		// // TODO: add bias stuff
+		// TODO: add bias stuff
         
-		// // CLIMB
-		// // TODO: add climber stuff
+		// CLIMB
+		// TODO: add climber stuff
 		(new POVButton(climb, 0)).whenPressed(new InstantCommand()); 
         (new POVButton(climb, 180)).whenPressed(new InstantCommand()); 		
     }
@@ -85,9 +87,10 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(turret, vision, drivetrain, () -> copilot.getRightX(), () -> copilot.getRightY()));
-
-        shooter.setDefaultCommand(new MoveHood(shooter, () -> copilot.getRightY()));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
+        // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
+		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
+        intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
 	}
 
     @Override
@@ -105,11 +108,7 @@ public class RobotContainer extends LightningContainer{
     }
 
     @Override
-    protected void initializeDashboardCommands() {
-		var tab = Shuffleboard.getTab("Vision");
-		// tab.add(new InstantCommand(() -> vision.turnOnVisionLight(), vision));
-		// tab.add(new InstantCommand(() -> vision.turnOffVisionLight(), vision));
-	}
+    protected void initializeDashboardCommands() { }
 	
     @Override
     protected void releaseDefaultCommands() { }

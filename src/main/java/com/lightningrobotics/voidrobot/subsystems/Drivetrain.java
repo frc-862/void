@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
-import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
@@ -15,8 +14,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class Drivetrain extends DifferentialDrivetrain {
-
-    private static PIDFDashboardTuner tuner = new PIDFDashboardTuner("drivetrain", Constants.PID);
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -65,6 +62,6 @@ public class Drivetrain extends DifferentialDrivetrain {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        super.periodic();
     }
 }
