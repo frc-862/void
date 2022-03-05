@@ -60,8 +60,8 @@ public final class Constants {
     public static final double TURRET_kI_FAST = 0.00; 
     public static final double TURRET_kD_FAST = 0.0009; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 40d;
-    public static final double MIN_TURRET_ANGLE = -40d;
+    public static final double MAX_TURRET_ANGLE = 90d;
+    public static final double MIN_TURRET_ANGLE = -90d;
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 5; // degrees
 

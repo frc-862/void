@@ -6,6 +6,8 @@ package com.lightningrobotics.voidrobot.commands.turret;
 
 import java.util.function.DoubleSupplier;
 
+import javax.security.sasl.RealmCallback;
+
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
@@ -32,11 +34,11 @@ public class AimTurret extends CommandBase {
     private double constrainedAngle;
     private double initialIMUHeading; 
 
-    private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
-    private NetworkTableEntry displayOffset;
-    private NetworkTableEntry displayTargetAngle;
-    private NetworkTableEntry displayConstrainedAngle;
-    private NetworkTableEntry displayMotorOutput;
+    private static ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+    private static NetworkTableEntry displayOffset  = turretTab.add("vision offset", 0).getEntry();
+    private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
+    private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
+    private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
@@ -44,9 +46,12 @@ public class AimTurret extends CommandBase {
     private final Drivetrain drivetrain;
 
     private double targetOffset;
-    private double lastKnownHeading;
-    private double lastKnownDistance;
+    private double lastKnownHeading = 0;
+    private double lastKnownDistance = 6.4008;
     private boolean isUsingOdometer = true;
+    private double initialOdometerGyroReading = 0d;
+    private double initialX = 0d;
+    private double initialY = 0d;
 
     enum TargetingState{
         MANUAL,
@@ -75,11 +80,6 @@ public class AimTurret extends CommandBase {
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
         initialIMUHeading = imu.getHeading().getDegrees();
 
-        displayOffset = turretTab.add("vision offset", 0).getEntry();
-        displayTargetAngle = turretTab.add("target angle", 0).getEntry();
-        displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
-        displayMotorOutput = turretTab.add("motor output", 0).getEntry();
-
     }
 
     @Override
@@ -107,15 +107,22 @@ public class AimTurret extends CommandBase {
             case NO_VISION:
                 if(isUsingOdometer){
                     isUsingOdometer = false;
-                    drivetrain.resetPose();
+                    //drivetrain.resetPose();
+                    initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
+                    initialX = drivetrain.getPose().getX();
+                    initialY = drivetrain.getPose().getY();
                     lastKnownHeading = turret.getCurrentAngle().getDegrees();
                 }
 
-                double relativeX = drivetrain.getPose().getX();
-                double relativeY = drivetrain.getPose().getY();
+                double relativeX = drivetrain.getPose().getX() - initialX;
+                double relativeY = drivetrain.getPose().getY() - initialY;
+
+                // rotate from odometer-center to robot-center
+                relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
+                relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
                 // update rotation data 
-                double changeInRotation = drivetrain.getPose().getRotation().getDegrees();
+                double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
                 SmartDashboard.putNumber("odometer x", relativeX);
                 SmartDashboard.putNumber("odometer y", relativeY);
                 SmartDashboard.putNumber("change in rotation", changeInRotation);
