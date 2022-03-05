@@ -61,7 +61,7 @@ public class AimTurret extends CommandBase {
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
-        this.controlerInput = controllerInput;
+        this.controlerInput = controllerInput; // supplied offset for now
 
         addRequirements(vision, turret);
 
@@ -85,15 +85,15 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
 
-        if (controlerInput.getAsDouble() == 0) { // vision.getDistance == -1
-            targetingState = TargetingState.NO_VISION;
-        } else {
-            targetingState = TargetingState.MANUAL;
-        }
+        // if (controlerInput.getAsDouble() == 0) { // vision.getDistance == -1
+        //     targetingState = TargetingState.NO_VISION;
+        // } else {
+        //     targetingState = TargetingState.MANUAL;
+        // }
             
         switch(targetingState) {
             case MANUAL: 
-                testOffset += controlerInput.getAsDouble();
+                testOffset = controlerInput.getAsDouble(); // target angle for testing 
                 break;
             case VISION:
                 isUsingVision = true;

@@ -11,28 +11,32 @@ public class AutonIntake extends CommandBase {
     private final Intake intake;
     private double power;
     private Indexer indexer;
+    private double ballsWanted;
 
-    public AutonIntake(Intake intake, Indexer indexer, double power) {
+    public AutonIntake(Intake intake, Indexer indexer, double power, double ballsWanted) {
         this.intake = intake;
         this.indexer = indexer;
         this.power = power;
+        this.ballsWanted = ballsWanted;
 
-        addRequirements(intake);
+        addRequirements(intake, indexer);
     }    
 
     @Override
     public void execute() {
         intake.setPower(power);
+        indexer.setPower(power);
     }
 
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
         intake.stop();
+        indexer.stop();
     }
 
     @Override
     public boolean isFinished(){
-        return indexer.getCollectedBall();
+        return indexer.getBallCount() == ballsWanted;
     }
 }

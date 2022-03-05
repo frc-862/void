@@ -49,21 +49,15 @@ public class FourBallTerminal extends CommandBase {
 
                             new SequentialCommandGroup(
                                 
-                                new AutonShoot(indexer, shooter, turret, 4100d, 0d, 22.5),
-
-                                new ParallelCommandGroup(
-
-                                	new RunIndexer(indexer, () -> 1d),
-                                	new RunIntake(intake, () -> 1d),
-                                	new RunShooter(shooter, 4100d) // TODO use vision shoot function instead
-
-                                )
+                                new AutonShoot1(indexer, shooter, turret, 0.3d, 4100d, 0d, 22.5),
+                                new AutonIntake(intake, indexer, 1d, 2d),
+                                new AutonShoot2(indexer, shooter, turret, 0, 4100d, 0d, 43.1)
                             )
                         )
 
                     ), 
 
-                        start4BallPath.getDuration(drivetrain)
+                        start4BallPath.getDuration(drivetrain) + 3
 
                 ), 
 
