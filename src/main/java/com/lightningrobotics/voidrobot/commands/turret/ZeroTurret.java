@@ -4,7 +4,6 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -15,7 +14,6 @@ public class ZeroTurret extends CommandBase {
 
   DigitalInput limitSwitch;
 
-  private boolean limitSwitchPressed = false;
   private boolean stopped = false;
 
   /** Creates a new ZeroTurret. */

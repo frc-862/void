@@ -13,7 +13,7 @@ public class AutoIndexCargo extends CommandBase {
     private static double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
     private static double startIndexTime = 0d; // Setting a default start time of 0
 
-    private static double power = 0.75; // the power we want the indexer to run at
+    private static double power = 1; // the power we want the indexer to run at
 
     public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
@@ -32,10 +32,10 @@ public class AutoIndexCargo extends CommandBase {
         }
 
         if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
-            indexer.setPower(1d);
+            indexer.setPower(power);
         } 
         else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2) {; // Checks to see if we have reached the amount of time we want to index, then stops
-            indexer.setPower(1d);
+            indexer.setPower(power);
         } else {
             indexer.setPower(0);
         } 

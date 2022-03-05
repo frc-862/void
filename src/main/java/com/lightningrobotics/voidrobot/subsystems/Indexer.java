@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
@@ -60,7 +61,7 @@ public class Indexer extends SubsystemBase {
     public Indexer() {
         // Sets Motor and color ID/ports
         indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
-        intakeSensor = new ColorSensorV3(RobotMap.i2cPort);
+        intakeSensor = new ColorSensorV3(RobotMap.I2C_PORT);
 
         bufferStartTime = Timer.getFPGATimestamp(); // Sets an initial start time 
     }
@@ -74,7 +75,7 @@ public class Indexer extends SubsystemBase {
         lower = getLowerStatus();
         upper = getUpperStatus();
 
-        collect1 = !lowerPrev && lower; //Rising edge // TODO maybe change 
+        collect1 = !lowerPrev && lower; //Rising edge 
         eject1 = !upper && upperPrev; //Falling edge
 
         // Swaps the collect and eject when we are reversing the indexer
@@ -147,13 +148,7 @@ public class Indexer extends SubsystemBase {
                     ball2Color = Color.blue;
                 }
             break;
-        }
-
-        //TODO: delay saving previous values in order to avoid weird behavior
-        //save current sensor values in order to catch rising and falling edges
-        // lowerPrev = lower;
-        // upperPrev = upper;
- 
+        } 
         // Puts the ball count to the dashboard
         SmartDashboard.putNumber("Ball Count", getBallCount());
 	}
@@ -194,10 +189,10 @@ public class Indexer extends SubsystemBase {
     }
 
     public int getColorSensorOutputs() {
-        if(intakeSensor.getColor().red >= 0.295) {
+        if(intakeSensor.getColor().red >= Constants.RED_THRESHOLD) {
             // SmartDashboard.putString("Color", "red");
             return 1;
-        } else if(intakeSensor.getColor().blue >= 0.25) {
+        } else if(intakeSensor.getColor().blue >= Constants.BLUE_THRESHOLD) {
             // SmartDashboard.putString("Color", "blue");
             return 2;
         }        
@@ -205,11 +200,7 @@ public class Indexer extends SubsystemBase {
     }
     
     private boolean isMotorReversing() {
-        if(indexer.getMotorOutputPercent() < 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return indexer.getMotorOutputPercent() < 0;
     }
 
     public void stop() {
