@@ -27,23 +27,27 @@ public class RetractIntake extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    startTime = Timer.getFPGATimestamp();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.actuateIntake(-0.2);
+    intake.actuateIntake(-0.5);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    intake.setIsDeployed(false);
     intake.stopDeploy();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return indexer.getLowerStatus();
+    return indexer.getLowerStatus() || !intake.getIsDeployed()
+      || Timer.getFPGATimestamp() - startTime >= Constants.INTAKE_RETRACT_TIME; //TODO delete this part if using void
   }
 }

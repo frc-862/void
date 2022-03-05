@@ -6,6 +6,9 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -15,11 +18,13 @@ public class Intake extends SubsystemBase {
 	private final TalonSRX winch;
 	private boolean isDeployed = false;
 
+
 	public Intake() {
 		// Sets the ID of the intake motor
 		intakeMotor = new VictorSPX(RobotMap.INTAKE_MOTOR_ID);
 		winch = new TalonSRX(RobotMap.INTAKE_WINCH_ID);
 		winch.setNeutralMode(NeutralMode.Brake);
+		winch.setInverted(true);
 	}
 
 	public void setPower(double intakePower) {
@@ -45,5 +50,4 @@ public class Intake extends SubsystemBase {
 	public void actuateIntake(double pwr) {
 		winch.set(ControlMode.PercentOutput, pwr);
 	}
-
 }
