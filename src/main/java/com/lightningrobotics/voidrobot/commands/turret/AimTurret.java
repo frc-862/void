@@ -4,10 +4,12 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import javax.security.sasl.RealmCallback;
 
+import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
@@ -42,7 +44,7 @@ public class AimTurret extends CommandBase {
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
-    private DoubleSupplier controllerInputY;
+    private BooleanSupplier button;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
@@ -60,13 +62,12 @@ public class AimTurret extends CommandBase {
     }
     TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier controllerInputY) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, BooleanSupplier buttonPressed) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
-        this.controllerInputY = controllerInputY;
 
         addRequirements(vision, turret);
     }
@@ -107,11 +108,7 @@ public class AimTurret extends CommandBase {
             case NO_VISION:
                 if(isUsingOdometer){
                     isUsingOdometer = false;
-                    //drivetrain.resetPose();
-                    initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
-                    initialX = drivetrain.getPose().getX();
-                    initialY = drivetrain.getPose().getY();
-                    lastKnownHeading = turret.getCurrentAngle().getDegrees();
+                    resetPose();
                 }
 
                 double relativeX = drivetrain.getPose().getX() - initialX;
@@ -137,20 +134,6 @@ public class AimTurret extends CommandBase {
         displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
         displayTargetAngle.setDouble(targetAngle);
 
-        /*
-        double sign = Math.signum(targetAngle);
-        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
-
-        constrainedAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
-        //displayConstrainedAngle.setDouble(constrainedAngle);
-
-        if(constrainedAngle - turret.getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
-            motorOutput = Constants.TURRET_PID_SLOW.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
-        } else {
-            motorOutput = Constants.TURRET_PID_FAST.calculate(turret.getCurrentAngle().getDegrees(), constrainedAngle);
-        }
-        */
-
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
     }
@@ -163,5 +146,12 @@ public class AimTurret extends CommandBase {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    public void resetPose(){
+        initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
+        initialX = drivetrain.getPose().getX();
+        initialY = drivetrain.getPose().getY();
+        lastKnownHeading = turret.getCurrentAngle().getDegrees();
     }
 }
