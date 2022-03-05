@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands;
+package com.lightningrobotics.voidrobot.commands.intake;
 
 import java.util.function.DoubleSupplier;
 
@@ -19,6 +19,7 @@ public class RunIntake extends CommandBase {
 
     @Override
     public void execute() {
+        System.out.println("Running Intake...");
         intake.setPower(power.getAsDouble());
     }
 
@@ -26,5 +27,10 @@ public class RunIntake extends CommandBase {
     public void end(boolean interrupted) {
         super.end(interrupted);
         intake.stop();
+    }
+
+    @Override
+    public boolean isFinished(){
+        return false;
     }
 }

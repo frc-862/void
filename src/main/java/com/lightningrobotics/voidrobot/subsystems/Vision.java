@@ -1,10 +1,13 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
@@ -15,59 +18,83 @@ public class Vision extends SubsystemBase {
 	// Entries for Angle & Distance	
 	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Angle");
 	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Distance");
-	// private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Angle");
-	// private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Distance");
-
-	private final ShuffleboardTab vision = Shuffleboard.getTab("vision");
-	private final NetworkTableEntry setTurretAngle;
-	private final NetworkTableEntry setTargetHeight;
-	private final double deltaAngle = 0.001;
 
 	// Placeholder Vars for Angle & Distance
-	private static double targetAngle = 0d;
 	private static double targetDistance = 0d;
-	private static double targetHeight = 0d;
     private static double offsetAngle = 0d;
+	
+	// Var for if green LEDs are on
+	private static boolean lightsOn = false;
+
+	// PDH
+	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
 	public Vision() {
-		setTurretAngle = vision
-			.add("set turrent angle", 0)
-			.getEntry();
-		setTargetHeight = vision
-			.add("set target height", 0)
-			.getEntry();
+		turnOffVisionLight();
 	}
 
 	@Override
 	public void periodic() {
 		
 		// Update Target Angle
-		offsetAngle = targetAngleEntry.getDouble(targetAngle);
-		targetAngle = setTurretAngle.getDouble(0);
-
-		targetHeight = setTargetHeight.getDouble(0);
-
-		// targetAngleEntry.getDouble(targetAngle);
-
+		offsetAngle = targetAngleEntry.getDouble(offsetAngle);
+		
 		// Update Target Distance
 		targetDistance = targetDistanceEntry.getDouble(targetDistance);
 
 	}
 
+	/**
+	 * Check if turret angle is within tolerance
+	 * @return If turret is ready for shooting
+	 */
+	public boolean isOnTarget() {
+		return Math.abs(getOffsetAngle()) < Constants.TURRET_ANGLE_TOLERANCE;
+	}
+
+	/**
+	 * Retreives offset angle from current turret angle
+	 * @return Number from NetworkTable outputted by vision pipeline [0, 360]
+	 */
 	public double getOffsetAngle() {
-		// TODO: implement math for error to get target angle
 		return offsetAngle; 
 	}
 
+	/**
+	 * Retrieves distance from camera to detected contour
+	 * @return Number from NetworkTable outputted by vision pipeline
+	 */
 	public double getTargetDistance() {
-		return targetDistance;
+		return targetDistanceEntry.getDouble(0); // TODO: units??
 	}
 
-	public double getTargetHeight() {
-		return targetHeight;
+	/**
+	 * Set the switchable port on the REV PDH to true
+	 */
+	public void turnOnVisionLight(){
+		pdh.setSwitchableChannel(true);
+		lightsOn = true;
+	}
+
+	/**
+	 * Set the switchable port on the REV PDH to false
+	 */
+	public void turnOffVisionLight(){
+		pdh.setSwitchableChannel(false);
+		lightsOn = false;
+	}
+
+	public void toggleVisionLights() {
+		if(lightsOn) turnOffVisionLight();
+		else turnOnVisionLight();
+	}
+
+	public boolean visionLightsOn() {
+		return lightsOn;
 	}
 
 	public boolean hasVision(){
 		return true;
 	}
+
 }

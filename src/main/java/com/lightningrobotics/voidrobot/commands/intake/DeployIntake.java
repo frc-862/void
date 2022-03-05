@@ -2,50 +2,46 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package com.lightningrobotics.voidrobot.commands;
+package com.lightningrobotics.voidrobot.commands.intake;
 
-import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
+import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootWithVision extends CommandBase {
-  /** Creates a new shootWithVision. */
+public class DeployIntake extends CommandBase {
+  Intake intake;
+  double startTime;
 
-  Shooter shooter;
-  Vision vision;
-
-  double time;
-
-  public ShootWithVision(Shooter shooter, Vision vision) {
-    this.shooter = shooter;
-    this.vision = vision;
-
-    addRequirements(shooter, vision);
+  /** Creates a new DeployIntake. */
+  public DeployIntake(Intake intake) {
+    this.intake = intake;
+    
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
-  @Override
+  @Override 
   public void initialize() {
-    time = Timer.getFPGATimestamp();
+    startTime = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.setRPM(shooter.getRPMsFromHeight(vision.getTargetHeight()));
+    intake.actuateIntake(0.2);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.stop();
+    intake.stopDeploy();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((Timer.getFPGATimestamp() - time) > 360);
+    return Timer.getFPGATimestamp() - startTime > Constants.INTAKE_DEPLOY_TIME;
   }
 }

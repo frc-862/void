@@ -1,28 +1,24 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
-import com.lightningrobotics.voidrobot.constants.Constants;
-
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
 
 	// Creates our intake motor
 	private final VictorSPX intakeMotor;
+	private final TalonSRX winch;
 
 	public Intake() {
 		// Sets the ID of the intake motor
 		intakeMotor = new VictorSPX(RobotMap.INTAKE_MOTOR_ID);
-		// TODO correctly set inverts for motors
-	}
-
-	@Override
-	public void periodic() {
+		winch = new TalonSRX(RobotMap.INTAKE_WINCH_ID);
+		winch.setNeutralMode(NeutralMode.Brake);
 	}
 
 	public void setPower(double intakePower) {
@@ -33,12 +29,13 @@ public class Intake extends SubsystemBase {
 		intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
 	}
 
-	public void deployIntake() {
-		// TODO figure out how to deploy intake
+
+	public void stopDeploy() {
+		winch.set(ControlMode.PercentOutput, 0);
 	}
 
-	public void retractIntake() {
-		// TODO figure out how to retract intake
+	public void actuateIntake(double pwr) {
+		winch.set(ControlMode.PercentOutput, pwr);
 	}
 
 }

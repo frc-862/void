@@ -1,20 +1,13 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.lang.invoke.ConstantBootstraps;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
-import com.lightningrobotics.util.InterpolatedMap;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
@@ -26,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
+
 	// Creates the flywheel motor and hood motors
 	private TalonFX flywheelMotor;
 	private TalonSRX hoodMotor;
@@ -43,7 +37,7 @@ public class Shooter extends SubsystemBase {
 	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
 
 	// PID tuner for the shooter gains
-	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", hoodPID);
+	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", Constants.HOOD_PID);
 
 	// The power point we want the shooter to be at
 	private double shooterPower;
@@ -57,6 +51,7 @@ public class Shooter extends SubsystemBase {
 	private boolean hasShot = false;
 	
 	public Shooter() {
+
 		// Sets the IDs of the hood and shooter
 		flywheelMotor = new TalonFX(RobotMap.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
@@ -64,7 +59,7 @@ public class Shooter extends SubsystemBase {
 
 		flywheelMotor.setInverted(true); // Inverts the flywheel motor
 
-		changePIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
+		configPIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
 
 		// Creates the tables to see important values
 		displayShooterPower = shooterTab
@@ -101,8 +96,12 @@ public class Shooter extends SubsystemBase {
 	 */
 	public void setHoodAngle(double hoodAngle) {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
-		hoodPowerSetPoint = hoodPID.calculate(getHoodAngle(), this.hoodAngle);
+		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
 		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
+	}
+
+	public void setHoodPower(double power) {
+		hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
 	}
 
 	public void setPower(double power) {
@@ -140,21 +139,19 @@ public class Shooter extends SubsystemBase {
 		return flywheelMotor.getSelectedSensorPosition();
 	}
 
-	/**
-	 * Checks if flywheel RPM is within a threshold
-	 */
+	// Checks if flywheel RPM is within a threshold
 	public void setArmed() {
-		armed = Math.abs(getEncoderRPM() - targetRPM) < 50;
+		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
+		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
+		armed = flywheel && hood;
 	}
 
-	/**
-	 * 
-	 * @return Whether flywheel RPM is within a threshold and ready to shoot
-	 */
+	// Whether flywheel RPM is within a threshold and ready to shoot
 	public boolean getArmed() {
 		return armed;	
 	}
 
+	// Update Displays on Dashboard
 	public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
 		displayShooterPower.setDouble(getShooterPower());
@@ -162,7 +159,7 @@ public class Shooter extends SubsystemBase {
 		hasShotShuffEntry.setBoolean(hasShot);
 	}
 
-	private void changePIDGains(double kP, double kI, double kD, double kV) {
+	private void configPIDGains(double kP, double kI, double kD, double kV) {
 		flywheelMotor.config_kP(0, kP);
 		flywheelMotor.config_kI(0, kI);
 		flywheelMotor.config_kD(0, kD);
@@ -175,6 +172,10 @@ public class Shooter extends SubsystemBase {
 	 */
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
+	}
+
+	public double getHoodAngleFromDashboard() {
+		return targetHoodAngle.getDouble(0);
 	}
 
 	/**
@@ -205,11 +206,11 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		currentTarget = getRPMFromDashboard();
-
-		setRPM(currentTarget);
-
-		setHoodAngle(targetHoodAngle.getDouble(0));
+		
+		// TODO move to manual shoot command
+		// currentTarget = getRPMFromDashboard();
+		// setRPM(currentTarget);
+		// setHoodAngle(targetHoodAngle.getDouble(0));
 		
 		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
 			hasShot = false;
