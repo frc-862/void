@@ -12,8 +12,11 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends DifferentialDrivetrain {
+
+    private LightningIMU imu;
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -48,6 +51,7 @@ public class Drivetrain extends DifferentialDrivetrain {
 			leftPositionSupplier, 
 			rightPositionSupplier
         );
+        this.imu = imu;
 
         for (int i = 0; i < RIGHT_MOTORS.length; i++){
             ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
@@ -63,5 +67,6 @@ public class Drivetrain extends DifferentialDrivetrain {
     @Override
     public void periodic() {
         super.periodic();
+        SmartDashboard.putNumber("headiong", imu.getHeading().getDegrees());
     }
 }

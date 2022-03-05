@@ -7,6 +7,10 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
+import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
+import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
+import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,6 +20,7 @@ public class AutonShoot extends CommandBase {
 	private Indexer indexer;
 	private Shooter shooter;
 	private Turret turret;
+	private Intake intake;
 
 	private double RPM;
 	private double hoodAngle;
