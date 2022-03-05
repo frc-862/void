@@ -22,7 +22,6 @@ public class ShootCargo extends CommandBase {
 	private final double WAIT_AFTER_SHOOT_TIME = 1.5;
 
 	public ShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
-
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.vision = vision;
@@ -35,16 +34,20 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 
-		var distance = vision.getTargetDistance();
-		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+		if(vision.hasVision()) {
+			var distance = vision.getTargetDistance();
+			var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+			var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-		shooter.setRPM(rpm);
-		shooter.setHoodAngle(hoodAngle);
+			shooter.setRPM(rpm);
+			shooter.setHoodAngle(hoodAngle);
+		} else { //if no vision
+			shooter.setRPM(4100);
+			shooter.setHoodAngle(0); 
+		}
 
-		// shooter.setRPM(2500);
-		// shooter.setHoodAngle(2);
 		hasShot = false;
+
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
