@@ -223,7 +223,6 @@ public class Shooter extends SubsystemBase {
 		if(prevTarget != currentTarget) {
 			timeWhenChanged = Timer.getFPGATimestamp();
 		}
-		setArmed();
 		
 		setSmartDashboardCommands();
 
