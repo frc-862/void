@@ -2,7 +2,6 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
@@ -94,16 +93,14 @@ public class Indexer extends SubsystemBase {
                 case 0:
                     if (collect1) {
                         ballCount = 1;
-                        // new AutoIndexCargo(this).schedule();
-                        bufferStartTime = Timer.getFPGATimestamp();
+                        startTime = Timer.getFPGATimestamp();
                     } 
                 break;
 
                 case 1:
                     if (collect1) {
                         ballCount = 2;
-                        // new AutoIndexCargo(this).schedule();
-                        bufferStartTime = Timer.getFPGATimestamp();
+                        startTime = Timer.getFPGATimestamp();
                     }
                     if (eject1) {
                         ballCount = 0;
