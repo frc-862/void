@@ -26,6 +26,8 @@ public class ShootClose extends CommandBase {
 
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
 
+		// turret.setManualOverride(true);
+		// turret.setTarget(0d);
 	}
 
 	@Override
@@ -49,6 +51,7 @@ public class ShootClose extends CommandBase {
 	public void end(boolean interrupted) {
 		shooter.stop();
 		indexer.stop();
+		// turret.setManualOverride(false);
 	}
 
 	@Override

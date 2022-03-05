@@ -57,8 +57,8 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureButtonBindings() {
         // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
-        (new JoystickButton(driverRight, 2)).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
+        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision), false); // Auto shoot
+        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
         
         // COPILOT

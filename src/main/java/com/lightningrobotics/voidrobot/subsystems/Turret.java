@@ -65,10 +65,6 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
-
-		// target = displayTestAngle.getDouble(0d);
-		// manualOverride = displayTestBoolean.getBoolean(false);
-
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
 	}
 
