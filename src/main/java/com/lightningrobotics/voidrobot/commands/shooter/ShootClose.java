@@ -5,52 +5,56 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootClose extends CommandBase {
 
-    private final double CLOSE_DISTANCE = 2d;
-    private final double TURRET_ANGLE = 0d;
+	private Shooter shooter;
+	private Indexer indexer;
+	private Turret turret;
 
-    private Shooter shooter;
-    private Indexer indexer;
-    private Turret turret;
+	private double startTime = 0;
+	private boolean hasShot = false;
+	private final double WAIT_AFTER_SHOOT_TIME = 1.5;
 
-    public ShootClose(Shooter shooter, Indexer indexer, Turret turret) {
+	public ShootClose(Shooter shooter, Indexer indexer, Turret turret) {
 
-        this.shooter = shooter;
-        this.indexer = indexer;
-        this.turret = turret;
+		this.shooter = shooter;
+		this.indexer = indexer;
+		this.turret = turret;
 
-        addRequirements(shooter, indexer, turret); // not adding vision or turret as it is read only
+		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
 
-    }
+	}
 
-    @Override
-    public void execute() {
+	@Override
+	public void execute() {
+		shooter.setRPM(Constants.SHOOT_CLOSE_RPM);
+		shooter.setHoodAngle(Constants.SHOOT_CLOSE_ANGLE);
 
-        var rpm = Constants.DISTANCE_RPM_MAP.get(CLOSE_DISTANCE);
-        var hoodAngle = Constants.HOOD_ANGLE_MAP.get(CLOSE_DISTANCE);
+		SmartDashboard.putBoolean("Shooter Armed", shooter.getArmed());
+		SmartDashboard.putBoolean("Turret Armed", turret.getArmed());
+		hasShot = false;
+		if(shooter.getArmed() && turret.getArmed()) {
+			indexer.toShooter();
+		}
+		if(indexer.getUpperStatus()){
+			startTime = Timer.getFPGATimestamp();
+			hasShot = true;
+		}
+	}
 
-        shooter.setRPM(rpm);
-        shooter.setHoodAngle(hoodAngle);
-        turret.setTarget(TURRET_ANGLE);
+	@Override
+	public void end(boolean interrupted) {
+		shooter.stop();
+		indexer.stop();
+	}
 
-        if(shooter.getArmed() && turret.getArmed()) {
-        	indexer.toShooter();
-        }
-
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        shooter.stop();
-        indexer.stop();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return indexer.getBallCount() == 0;
-    }
-
+	@Override
+	public boolean isFinished() {
+		return Timer.getFPGATimestamp() - startTime > WAIT_AFTER_SHOOT_TIME && hasShot;
+	}
+	
 }

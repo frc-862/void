@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -60,23 +61,19 @@ public class RobotContainer extends LightningContainer{
     protected void configureButtonBindings() {
 		
         // DRIVER
-        // (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
-        // (new TwoButtonTrigger((new JoystickButton(driverRight, 1)), (new JoystickButton(driverRight, 2)))).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
+        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
+        (new JoystickButton(driverRight, 2)).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
-
+        
         // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //intake 
-        (new JoystickButton(copilot, 1)).whenPressed(new DeployIntake(intake)); //Deploy intake
-        (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
-        (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //Manual intake up
-        (new JoystickButton(copilot, 6)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual intake down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
-            new ParallelCommandGroup(
-                new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
-                new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
-            ));
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
-		// TODO: add bias stuff
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
+        (new JoystickButton(copilot, 6)).whenPressed(new RetractIntake(intake, indexer)); //Retract intake
+
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //manual indexer up
+        (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual indexer down
+        (new JoystickButton(copilot, 2)).whileHeld(new ParallelCommandGroup(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER), new RunIntake(intake, () -> -Constants.DEFAULT_INTAKE_POWER))); //Manual indexer and collector out (spit)
+        
+        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
         
 		// CLIMB
 		// TODO: add climber stuff

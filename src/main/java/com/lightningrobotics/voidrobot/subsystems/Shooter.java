@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -80,6 +81,9 @@ public class Shooter extends SubsystemBase {
 			.add("has shot", false)
 			.getEntry();
 
+			// hoodMotor.setSelectedSensorPosition(0);
+			hoodMotor.setSensorPhase(true);
+
 	}
 
 	/**
@@ -142,6 +146,7 @@ public class Shooter extends SubsystemBase {
 	// Checks if flywheel RPM is within a threshold
 	public boolean getArmed() {
 		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
+		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
 		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
 		return flywheel; //&& hood;
 	}
@@ -218,7 +223,7 @@ public class Shooter extends SubsystemBase {
 		if(prevTarget != currentTarget) {
 			timeWhenChanged = Timer.getFPGATimestamp();
 		}
-
+		setArmed();
 		
 		setSmartDashboardCommands();
 
