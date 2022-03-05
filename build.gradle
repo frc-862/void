@@ -63,7 +63,7 @@ def includeDesktopSupport = false
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-     implementation 'com.lightningrobotics:common:0.0.4'
+    implementation 'com.lightningrobotics:common:0.0.4'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -106,6 +106,14 @@ tasks.register('paths', Copy) {
     include "*.path"
     into "src/main/deploy/paths"
 }
+tasks.register('prune', Delete) {
+	delete(files("src/main/deploy/paths/"))
+}
+tasks.register('makedirs') {
+	mkdir "src/main/deploy/paths"
+}
 
 // Automatically copy paths over on build
+makedirs.dependsOn('prune')
+paths.dependsOn('makedirs')
 build.dependsOn('paths')

@@ -35,7 +35,7 @@ public class Indexer extends SubsystemBase {
     private static boolean eject1;
 
     // Creating a start time and setting a buffer timer variable
-    private static double startTime;
+    private static double bufferStartTime;
     private static double bufferTime = 0.5;
     private static boolean buffer = false;
 
@@ -62,13 +62,13 @@ public class Indexer extends SubsystemBase {
         indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
         intakeSensor = new ColorSensorV3(RobotMap.i2cPort);
 
-        startTime = Timer.getFPGATimestamp(); // Sets an initial start time 
+        bufferStartTime = Timer.getFPGATimestamp(); // Sets an initial start time 
     }
 
     @Override
     public void periodic() {
 
-        buffer = !(Timer.getFPGATimestamp() - startTime > bufferTime); // Tells us when were in our buffer time
+        buffer = !(Timer.getFPGATimestamp() - bufferStartTime > bufferTime); // Tells us when were in our buffer time
         
         // Setting our current beam break status
         lower = getLowerStatus();
@@ -93,18 +93,18 @@ public class Indexer extends SubsystemBase {
                 case 0:
                     if (collect1) {
                         ballCount = 1;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     } 
                 break;
 
                 case 1:
                     if (collect1) {
                         ballCount = 2;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     }
                     if (eject1) {
                         ballCount = 0;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     }
                 break;
 
@@ -112,7 +112,7 @@ public class Indexer extends SubsystemBase {
                     if (eject1) {
                         ballCount = 1;
                         ball1Color = ball2Color;
-                        startTime = Timer.getFPGATimestamp();
+                        bufferStartTime = Timer.getFPGATimestamp();
                     }
                 break;
             }
@@ -163,8 +163,12 @@ public class Indexer extends SubsystemBase {
         ballCount = 0;
     } 
  
-    public boolean startCommandSeq() {
+    public boolean getCollectedBall() {
         return collect1; // checks to see of the beam break has seen a ball
+    }
+
+    public boolean getEjectedBall() {
+        return eject1;
     }
 
     public void setPower(double power) {
