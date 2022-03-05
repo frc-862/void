@@ -78,7 +78,7 @@ public final class Constants {
 	public static final double SHOOTER_TOLERANCE = 25d;
 	public static final double HOOD_TOLERANCE = 5d; // TODO tune these
 
-	public static final double HOOD_KP = 0d; // TODO tune these
+	public static final double HOOD_KP = 0.9d; // TODO tune these
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
