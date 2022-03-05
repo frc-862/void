@@ -114,7 +114,7 @@ public class Turret extends SubsystemBase {
 		target = getCurrentAngle().getDegrees() + offsetAngle;// this is getting us the angle that we need to go to using the current angle and the needed rotation 
 	}
 
-	public double getOffsetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+	public double getTargetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
 		
 		realX = rotateX(relativeX, relativeY, realTargetHeading);
 		realY = rotateY(relativeX, relativeY, realTargetHeading);

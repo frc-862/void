@@ -28,7 +28,6 @@ public class AimTurret extends CommandBase {
 
     private LightningIMU imu;
 
-    private Rotation2d offsetAngle;
     private double targetAngle;
     private double constrainedAngle;
 
@@ -39,13 +38,14 @@ public class AimTurret extends CommandBase {
     private NetworkTableEntry displayMotorOutput;
 
     private static double motorOutput;
-    private DoubleSupplier controlerInput;
+    private DoubleSupplier controllerInputX;
+    private DoubleSupplier controllerInputY;
     private final Drivetrain drivetrain;
 
-    private double testOffset;
+    private double targetOffset;
     private double lastKnownHeading;
     private double lastKnownDistance;
-    private boolean isUsingVision = true;
+    private boolean isUsingOdometer = true;
 
     enum TargetingState{
         MANUAL,
@@ -54,12 +54,13 @@ public class AimTurret extends CommandBase {
     }
     TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInput) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier controllerInputY) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
-        this.controlerInput = controllerInput;
+        this.controllerInputX = controllerInputX;
+        this.controllerInputY = controllerInputY;
 
         addRequirements(vision, turret);
     }
@@ -72,7 +73,7 @@ public class AimTurret extends CommandBase {
         drivetrain.resetPose();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
 
-        displayOffset = turretTab.add("test offset", 0).getEntry();
+        displayOffset = turretTab.add("vision offset", 0).getEntry();
         displayTargetAngle = turretTab.add("target angle", 0).getEntry();
         displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
         displayMotorOutput = turretTab.add("motor output", 0).getEntry();
@@ -82,7 +83,7 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
 
-        if (controlerInput.getAsDouble() == 0) { // vision.getDistance == -1
+        if (controllerInputX.getAsDouble() == 0) { // vision.getDistance == -1
             targetingState = TargetingState.NO_VISION;
         } else {
             targetingState = TargetingState.MANUAL;
@@ -90,16 +91,23 @@ public class AimTurret extends CommandBase {
             
         switch(targetingState) {
             case MANUAL: 
-                testOffset += controlerInput.getAsDouble();
+                //testOffset += controllerInput.getAsDouble();
+                isUsingOdometer = true;
+                if (controllerInputY.getAsDouble() >= 0){
+                    targetAngle = (-1 * (Math.toDegrees(Math.atan(controllerInputX.getAsDouble()/controllerInputY.getAsDouble()))));
+                } else {
+                    targetAngle = (-180 - Math.toDegrees(Math.atan(controllerInputX.getAsDouble()/controllerInputY.getAsDouble())));
+                }
                 break;
             case VISION:
-                isUsingVision = true;
-                testOffset = vision.getOffsetAngle();
+                isUsingOdometer = true;
+                targetOffset = vision.getOffsetAngle();
                 lastKnownDistance = vision.getTargetDistance();
+                targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
                 break;
             case NO_VISION:
-                if(isUsingVision){
-                    isUsingVision = false;
+                if(isUsingOdometer){
+                    isUsingOdometer = false;
                     drivetrain.resetPose();
                     lastKnownHeading = turret.getCurrentAngle().getDegrees();
                 }
@@ -113,13 +121,13 @@ public class AimTurret extends CommandBase {
                 SmartDashboard.putNumber("odometer y", relativeY);
                 SmartDashboard.putNumber("change in rotation", changeInRotation);
 
-                testOffset = turret.getOffsetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
                 break;   
         }
 
         //offsetAngle = Rotation2d.fromDegrees(vision.getOffsetAngle());
-        displayOffset.setDouble(testOffset); // offsetAngle.getDegrees()
-        targetAngle = testOffset; // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
+        displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
+        //targetAngle = testOffset; // turret.getCurrentAngle().getDegrees() + offsetAngle.getDegrees()
 
         double sign = Math.signum(targetAngle);
         targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
