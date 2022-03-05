@@ -152,7 +152,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setPower(double power) {
-		turretMotor.set(TalonSRXControlMode.PercentOutput, power);
+		turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
 	}
 
 	public double getConstrainedAngle(double targetAngle){
