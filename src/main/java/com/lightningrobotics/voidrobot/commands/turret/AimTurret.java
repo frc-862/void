@@ -44,12 +44,13 @@ public class AimTurret extends CommandBase {
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
-    private BooleanSupplier button;
+    private BooleanSupplier buttonPressed;
+    private boolean usingManual;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
     private double lastKnownHeading = 0;
-    private double lastKnownDistance = 6.4008;
+    private double lastKnownDistance = 7.62;
     private boolean isUsingOdometer = true;
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
@@ -68,6 +69,7 @@ public class AimTurret extends CommandBase {
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
+        this.buttonPressed = buttonPressed;
 
         addRequirements(vision, turret);
     }
@@ -75,9 +77,8 @@ public class AimTurret extends CommandBase {
     @Override
     public void initialize() {
 
-        targetingState = TargetingState.MANUAL;
+        targetingState = TargetingState.NO_VISION;
 
-        drivetrain.resetPose();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
         initialIMUHeading = imu.getHeading().getDegrees();
 
@@ -86,10 +87,14 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
 
-        if (controllerInputX.getAsDouble() == 0) { // vision.getDistance == -1
-            targetingState = TargetingState.NO_VISION;
-        } else {
-            targetingState = TargetingState.MANUAL;
+        if (buttonPressed.getAsBoolean()){
+            if (usingManual){
+                targetingState = TargetingState.NO_VISION;
+                usingManual = false;
+            } else {
+                targetingState = TargetingState.MANUAL;
+                usingManual = true;
+            }
         }
             
         switch(targetingState) {
