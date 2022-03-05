@@ -5,6 +5,9 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootCargo extends CommandBase {
@@ -13,6 +16,10 @@ public class ShootCargo extends CommandBase {
 	private Vision vision;
 	private Indexer indexer;
 	private Turret turret;
+
+	private double startTime = 0;
+	private boolean hasShot = false;
+	private final double WAIT_AFTER_SHOOT_TIME = 1.5;
 
 	public ShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
 
@@ -35,10 +42,16 @@ public class ShootCargo extends CommandBase {
 		shooter.setRPM(rpm);
 		shooter.setHoodAngle(hoodAngle);
 
+		// shooter.setRPM(2500);
+		// shooter.setHoodAngle(2);
+		hasShot = false;
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
-		
+		if(indexer.getUpperStatus()){
+			startTime = Timer.getFPGATimestamp();
+			hasShot = true;
+		}
 	}
 
 	@Override
@@ -49,7 +62,7 @@ public class ShootCargo extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return indexer.getBallCount() == 0;
+		return Timer.getFPGATimestamp() - startTime > WAIT_AFTER_SHOOT_TIME && hasShot;
 	}
 	
 }

@@ -75,20 +75,25 @@ public final class Constants {
 
     public static final double SHOOTER_COOLDOWN = 0.25;
 
-	public static final double SHOOTER_TOLERANCE = 25d;
-	public static final double HOOD_TOLERANCE = 5d; // TODO tune these
+	public static final double SHOOTER_TOLERANCE = 5d;
+	public static final double HOOD_TOLERANCE = .2d;
 
-	public static final double HOOD_KP = 0d; // TODO tune these
+	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
 
-    public static final double MAX_HOOD_ANGLE = 70; // TODO get these soft limit values that we want
-    public static final double MIN_HOOD_ANGLE = 0;
+    public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
+    public static final double MIN_HOOD_ANGLE = 0.3;
+
+    public static final double SHOOT_CLOSE_RPM = 2000;  // TODO tune these
+    public static final double SHOOT_CLOSE_ANGLE = 0;
 
     //distance in feet, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
+            
+            put(0d, 0d);
             put(10d, 3900d);
             put(11d, 4000d);
             put(12d, 4200d);
@@ -102,6 +107,7 @@ public final class Constants {
     //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
     public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
         {
+            put(0d, 0d);
             put(10d, 65.2d);
             put(11d, 64.9d);
             put(12d, 64.7d);
@@ -113,6 +119,8 @@ public final class Constants {
     };
 
 	// Intake
-	public static final double INTAKE_DEPLOY_TIME = 6d;
+	public static final double INTAKE_DEPLOY_TIME = 2d;
+    public static final double INTAKE_RETRACT_TIME = 2.3d;
+    public static final double DEFAULT_INTAKE_POWER = 0.5;
 
 }
