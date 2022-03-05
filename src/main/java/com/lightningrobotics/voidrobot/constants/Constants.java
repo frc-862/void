@@ -53,7 +53,7 @@ public final class Constants {
     public static final double TURN_TURRET_GEAR_RATIO = 14;
     public static final double TURRET_NORMAL_MAX_MOTOR_OUTPUT = 0.6d;
     public static final double TURRET_REDUCED_MAX_MOTOR_OUTPUT = 0.2d;
-    public static final double TURRET_kP_SLOW = 0.03; 
+    public static final double TURRET_kP_SLOW = 0.05; 
     public static final double TURRET_kI_SLOW = 0.00; 
     public static final double TURRET_kD_SLOW = 0.0009; 
     public static final double TURRET_kP_FAST = 0.03; 
