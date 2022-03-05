@@ -44,8 +44,7 @@ public class RunAutoShoot extends CommandBase {
   @Override
   public void execute() {
     if(indexer.getBallCount() > 0 && shooter.getArmed() && turret.getArmed()) {
-      // TODO add the commands that we want here
-      indexer.setPower(0.5); // Temporary
+      (new BallsToShooter(indexer)).schedule();
     }
 
     if(indexer.getBeamBreakExitStatus()){
