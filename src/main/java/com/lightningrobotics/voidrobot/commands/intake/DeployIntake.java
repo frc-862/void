@@ -36,12 +36,13 @@ public class DeployIntake extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    intake.setIsDeployed(true); 
     intake.stopDeploy();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Timer.getFPGATimestamp() - startTime > Constants.INTAKE_DEPLOY_TIME;
+    return intake.getIsDeployed() || Timer.getFPGATimestamp() - startTime > Constants.INTAKE_DEPLOY_TIME; //if the intake is already deployed, auto exit
   }
 }

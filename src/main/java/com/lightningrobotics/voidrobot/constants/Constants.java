@@ -114,5 +114,6 @@ public final class Constants {
 
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 6d;
+    public static final double DEFAULT_INTAKE_POWER = 0.5;
 
 }

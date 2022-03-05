@@ -13,6 +13,7 @@ public class Intake extends SubsystemBase {
 	// Creates our intake motor
 	private final VictorSPX intakeMotor;
 	private final TalonSRX winch;
+	private boolean isDeployed = false;
 
 	public Intake() {
 		// Sets the ID of the intake motor
@@ -29,6 +30,13 @@ public class Intake extends SubsystemBase {
 		intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
 	}
 
+	public void setIsDeployed(boolean isDeployed) {
+		this.isDeployed = isDeployed;
+	}
+
+	public boolean getIsDeployed() {
+		return isDeployed;
+	}
 
 	public void stopDeploy() {
 		winch.set(ControlMode.PercentOutput, 0);
