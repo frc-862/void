@@ -93,18 +93,8 @@ public class AimTurret extends CommandBase {
             
         switch(targetingState) {
             case MANUAL: 
-                //testOffset += controllerInput.getAsDouble(); <-- old manual control
-
-                // Just sets the target to the aim of the stick
-                if (controllerInputY.getAsDouble() >= 0){
-                    targetAngle = (-1 * (Math.toDegrees(Math.atan(controllerInputX.getAsDouble()/controllerInputY.getAsDouble()))));
-                } else {
-                    targetAngle = (-180 - Math.toDegrees(Math.atan(controllerInputX.getAsDouble()/controllerInputY.getAsDouble())));
-                }
-
-                //makes it field centric based on the imu
-                targetAngle = (imu.getHeading().getDegrees() - initialIMUHeading) + targetAngle;
-                
+                targetOffset += controllerInputX.getAsDouble();
+                targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
                 break;
             case VISION:
                 isUsingOdometer = true;
