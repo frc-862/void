@@ -75,16 +75,19 @@ public final class Constants {
 
     public static final double SHOOTER_COOLDOWN = 0.25;
 
-	public static final double SHOOTER_TOLERANCE = 25d;
-	public static final double HOOD_TOLERANCE = 5d; // TODO tune these
+	public static final double SHOOTER_TOLERANCE = 5d;
+	public static final double HOOD_TOLERANCE = .2d;
 
 	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
 
-    public static final double MAX_HOOD_ANGLE = 5; // TODO get these soft limit values that we want
-    public static final double MIN_HOOD_ANGLE = 1;
+    public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
+    public static final double MIN_HOOD_ANGLE = 0.3;
+
+    public static final double SHOOT_CLOSE_RPM = 2000;  // TODO tune these
+    public static final double SHOOT_CLOSE_ANGLE = 0;
 
     //distance in feet, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {

@@ -39,14 +39,11 @@ public class ShootCargo extends CommandBase {
 		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
 		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-		// shooter.setRPM(rpm);
-		// shooter.setHoodAngle(hoodAngle);
-		//TODO: uncomment the above if you want to use the interpolated map
-		shooter.setRPM(2500);
-		shooter.setHoodAngle(2);
+		shooter.setRPM(rpm);
+		shooter.setHoodAngle(hoodAngle);
 
-		SmartDashboard.putBoolean("Shooter Armed", shooter.getArmed());
-		SmartDashboard.putBoolean("TUrret Armed", turret.getArmed());
+		// shooter.setRPM(2500);
+		// shooter.setHoodAngle(2);
 		hasShot = false;
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();

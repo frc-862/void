@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase {
 	public void setArmed() {
 		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
 		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
-		boolean hood = true;//Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
+		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
 		armed = flywheel && hood;
 	}
 
