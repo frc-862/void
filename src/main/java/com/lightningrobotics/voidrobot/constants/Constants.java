@@ -75,7 +75,7 @@ public final class Constants {
 
     public static final double SHOOTER_COOLDOWN = 0.25;
 
-	public static final double SHOOTER_TOLERANCE = 25d;
+	public static final double SHOOTER_TOLERANCE = 100d;
 	public static final double HOOD_TOLERANCE = 5d; // TODO tune these
 
 	public static final double HOOD_KP = 0d; // TODO tune these

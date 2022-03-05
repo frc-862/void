@@ -51,7 +51,7 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureAutonomousCommands() {
-		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter));
+		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret));
 		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter));
         if(TESTING) registerTestPaths();        
     }
@@ -70,11 +70,11 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, 4)).whenPressed(new RetractIntake(intake)); //Retract intake
         (new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //Manual intake up
         (new JoystickButton(copilot, 6)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual intake down
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
-        //     new ParallelCommandGroup(
-        //         new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
-        //         new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
-        //     ));
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
+            new ParallelCommandGroup(
+                new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()),
+                new RunIntake(intake, () -> copilot.getLeftTriggerAxis())
+            ));
         (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); // start button to reset
 		// TODO: add bias stuff
         
@@ -87,10 +87,12 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
+        // turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
         // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
-		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
+		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
+        shooter.setDefaultCommand(new RunShooterDashboard(shooter, 0d));
         intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 	}
 
     @Override

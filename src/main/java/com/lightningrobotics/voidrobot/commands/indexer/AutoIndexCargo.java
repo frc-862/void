@@ -22,13 +22,23 @@ public class AutoIndexCargo extends CommandBase {
 	}
 
     @Override
-    public void initialize() {
-        startIndexTime = Timer.getFPGATimestamp(); // Gets the current run time of the robot
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
-        indexer.setPower(power);
+
+        if (indexer.getCollectedBall()) {
+            startIndexTime = Timer.getFPGATimestamp();
+        }
+
+        if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
+            indexer.setPower(1d);
+        } 
+        else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2) {; // Checks to see if we have reached the amount of time we want to index, then stops
+            indexer.setPower(1d);
+        } else {
+            indexer.setPower(0);
+        } 
     }
 
     @Override
@@ -38,15 +48,6 @@ public class AutoIndexCargo extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if(indexer.getBallCount() == 1) {
-            return Timer.getFPGATimestamp() - startIndexTime > indexTimeBall1;
-        }
-        /*indexer.getBeamBreakExitStatus();*/
-        else if(indexer.getBallCount() == 2) {
-            return Timer.getFPGATimestamp() - startIndexTime > indexTimeBall2; // Checks to see if we have reached the amount of time we want to index, then stops
-        } 
-        else {
-            return true;
-        }
+        return false;
     }
 }
