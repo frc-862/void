@@ -84,7 +84,7 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
         // // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
 		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         // intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
