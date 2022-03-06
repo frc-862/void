@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 public class VoltageTestContinuous extends CommandBase {

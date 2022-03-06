@@ -63,6 +63,8 @@ public final class Constants {
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
+    public static final double RED_THRESHOLD = 0.295;
+    public static final double BLUE_THRESHOLD = 0.25;
 
 	// Shooter Constants
     public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune

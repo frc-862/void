@@ -4,25 +4,17 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import javax.security.sasl.RealmCallback;
 
-import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
-import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
-import com.lightningrobotics.common.util.LightningMath;
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {

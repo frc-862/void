@@ -7,7 +7,6 @@ package com.lightningrobotics.voidrobot.commands.intake;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RetractIntake extends CommandBase {

@@ -36,7 +36,7 @@ public final class RobotMap {
     public static final int INDEXER_MOTOR_ID = 16;
     public static final int ENTER_BEAM_BREAK = 1;
     public static final int EXIT_BEAM_BREAK = 0;
-    public static final I2C.Port i2cPort = I2C.Port.kMXP;
+    public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
     
     // Shooter
     public static final int FLYWHEEL_MOTOR_ID = 11;

@@ -6,10 +6,8 @@ package com.lightningrobotics.voidrobot.commands.intake;
 
 import java.util.function.DoubleSupplier;
 
-import com.fasterxml.jackson.databind.ser.std.NumberSerializers.DoubleSerializer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class MoveIntake extends CommandBase {

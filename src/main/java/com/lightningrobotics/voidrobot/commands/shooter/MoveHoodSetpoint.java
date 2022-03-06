@@ -4,8 +4,6 @@
 
 package com.lightningrobotics.voidrobot.commands.shooter;
 
-import java.util.function.DoubleSupplier;
-
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
