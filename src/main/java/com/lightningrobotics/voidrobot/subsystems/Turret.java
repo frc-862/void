@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.lightningrobotics.common.controller.PIDFController;
-import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
@@ -19,9 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
-	
-	private boolean isUsingNavX = false;
-
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
 
@@ -38,9 +33,7 @@ public class Turret extends SubsystemBase {
 	private boolean isArmed = false;
 	private double target;
 	private static double motorOutput;
-	private boolean turretZeroed = false;
 	private boolean manualOverride;
-	private double manualOverridePosition;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry currentAngle;
@@ -48,9 +41,6 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
-
-    //private static NetworkTableEntry displayTestAngle;
-    //private static NetworkTableEntry displayTestBoolean;
 	
 	public Turret() {
 
@@ -66,11 +56,8 @@ public class Turret extends SubsystemBase {
 		setTargetAngleEntry = turretTab.add("Set Turret Angle", 0).getEntry();
 		currentAngle = turretTab.add("current angle", 0).getEntry(); 
 
-		// displayTestAngle = turretTab.add("MU Target Angle", 0).getEntry();
-		// displayTestBoolean = turretTab.add("MU Boolean", false).getEntry();
-
 		// Reset values
-	    resetEncoder();
+	    // resetEncoder();
 		target = 0;
 	}
 	
@@ -78,10 +65,6 @@ public class Turret extends SubsystemBase {
 	public void periodic() {
 		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
-
-		// target = displayTestAngle.getDouble(0d);
-		// manualOverride = displayTestBoolean.getBoolean(false);
-
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
 	}
 

@@ -1,18 +1,16 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.lightningrobotics.common.controller.PIDFController;
-import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -34,12 +32,6 @@ public class Shooter extends SubsystemBase {
 	private NetworkTableEntry currentHoodAngle;
 	private NetworkTableEntry hasShotShuffEntry;
 
-	// Creates a PID and FeedForward controller for our shooter
-	private PIDFController hoodPID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
-
-	// PID tuner for the shooter gains
-	private PIDFDashboardTuner hoodTuner = new PIDFDashboardTuner("hood test", Constants.HOOD_PID);
-
 	// The power point we want the shooter to be at
 	private double shooterPower;
 	private double hoodPowerSetPoint;
@@ -57,7 +49,10 @@ public class Shooter extends SubsystemBase {
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
 		hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog);
 
+		hoodMotor.setNeutralMode(NeutralMode.Brake);
+
 		flywheelMotor.setInverted(true); // Inverts the flywheel motor
+		flywheelMotor.setNeutralMode(NeutralMode.Coast);
 
 		configPIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
 
@@ -81,8 +76,9 @@ public class Shooter extends SubsystemBase {
 			.add("has shot", false)
 			.getEntry();
 
-			// hoodMotor.setSelectedSensorPosition(0);
-			hoodMotor.setSensorPhase(true);
+			//TODO: find a prooper solution for this
+		// hoodMotor.setSelectedSensorPosition(0);
+		hoodMotor.setSensorPhase(true);
 
 	}
 
@@ -95,7 +91,7 @@ public class Shooter extends SubsystemBase {
 
 	/**
 	 * commands the hood to move to an angle using a PID
-	 * @param hoodAngle target hood angle in degrees
+	 * @param hoodAngle target hood angle in units
 	 */
 	public void setHoodAngle(double hoodAngle) {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
@@ -119,7 +115,7 @@ public class Shooter extends SubsystemBase {
 	 * stops the shooter motor
 	 */
 	public void stop() {
-		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0);; 
+		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0); 
 	}
 
 	/**
@@ -148,7 +144,7 @@ public class Shooter extends SubsystemBase {
 		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
 		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
 		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
-		return flywheel; //&& hood;
+		return flywheel && hood;
 	}
 
 	// Update Displays on Dashboard
@@ -178,40 +174,8 @@ public class Shooter extends SubsystemBase {
 		return targetHoodAngle.getDouble(0);
 	}
 
-	/**
-	 * gets the optimal shooter RPM from an inputted height in pixels using an interpolation map
-	 * @param height in pixels
-	 * @return motor RPMs
-	 */
-	public double getRPMsFromHeight(double height) {
-		if (height > 0) {
-            return Constants.DISTANCE_RPM_MAP.get(height);
-        } else {
-            return 0;
-        }
-	}
-
-	/**
-	 * gets the optimal hood angle from an inputted distance in X using an interpolation map
-	 * @param height in pixels
-	 * @return target angle
-	 */
-	public double getAngleFromHeight(double distance) {
-		if (distance > 0) {
-            return Constants.HOOD_ANGLE_MAP.get(distance);
-        } else {
-            return 0;
-        }
-	}
-
 	@Override
-	public void periodic() {
-		
-		// TODO move to manual shoot command
-		// currentTarget = getRPMFromDashboard();
-		// setRPM(currentTarget);
-		// setHoodAngle(targetHoodAngle.getDouble(0));
-		
+	public void periodic() {		
 		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
 			hasShot = false;
 		} else {

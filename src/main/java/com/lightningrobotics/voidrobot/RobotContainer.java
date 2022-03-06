@@ -5,7 +5,6 @@ import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-import com.lightningrobotics.common.util.operator.trigger.TwoButtonTrigger;
 import com.lightningrobotics.voidrobot.commands.auto.*;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
@@ -19,9 +18,7 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -61,10 +58,9 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
-		
         // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision)); // Auto shoot
-        (new JoystickButton(driverRight, 2)).whenActive(new ShootClose(shooter, indexer, turret)); // Shoot close no vision
+        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision), false); // Auto shoot
+        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
         
         // COPILOT
@@ -73,16 +69,12 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake)); //Deploy intake
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getLeftTriggerAxis())); //manual intake down
-        (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER));
-        (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER));
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(
-        //     new ParallelCommandGroup(
-        //         new RunIntake(intake, () -> -copilot.getLeftTriggerAxis()), //manual intake down
-        //         new RunIndexer(indexer, () -> -copilot.getLeftTriggerAxis())
-        // ));
+        (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //manual indexer down
+        (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //manual indexer up
+        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
 
+        //Fritz's button bindings
         //(new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake, indexer)); //Retract intake
-
         // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //manual indexer up
         //(new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual indexer down
         // (new JoystickButton(copilot, 2)).whileHeld(new ParallelCommandGroup(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER), new RunIntake(intake, () -> -Constants.DEFAULT_INTAKE_POWER))); //Manual indexer and collector out (spit)
@@ -94,9 +86,7 @@ public class RobotContainer extends LightningContainer{
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
-        // // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> -copilot.getRightY()));
 		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        // intake.setDefaultCommand(new MoveIntake(intake, () -> copilotFilter.filter(copilot.getLeftY())));
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 
         climber.setDefaultCommand(

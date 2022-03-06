@@ -9,12 +9,8 @@ public class RunShooterDashboard extends CommandBase {
     // Creates the shooter subsystem
     private Shooter shooter;
 
-    private double targetRPM;
-
-    public RunShooterDashboard(Shooter shooter, double targetRPM) {
+    public RunShooterDashboard(Shooter shooter) {
         this.shooter = shooter;
-
-        this.targetRPM = targetRPM;
         addRequirements(shooter);
     }
 
