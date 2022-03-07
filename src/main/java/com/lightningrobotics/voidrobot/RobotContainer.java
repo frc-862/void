@@ -6,6 +6,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.auto.*;
+import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
 
@@ -29,6 +30,7 @@ public class RobotContainer extends LightningContainer{
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
+    private static final Climber climber = new Climber();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
@@ -77,10 +79,7 @@ public class RobotContainer extends LightningContainer{
         //(new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual indexer down
         // (new JoystickButton(copilot, 2)).whileHeld(new ParallelCommandGroup(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER), new RunIntake(intake, () -> -Constants.DEFAULT_INTAKE_POWER))); //Manual indexer and collector out (spit)
         
-		// CLIMB
-		// TODO: add climber stuff
-		(new POVButton(climb, 0)).whenPressed(new InstantCommand()); 
-        (new POVButton(climb, 180)).whenPressed(new InstantCommand()); 		
+        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
     }
 
     @Override
@@ -89,6 +88,27 @@ public class RobotContainer extends LightningContainer{
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
 		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+
+        climber.setDefaultCommand(
+            new runClimb(
+                climber,
+                () -> (
+                    climb.getLeftY() +
+                    // I know some people don't like these so I'll document it
+                    // If the d-pad up is pressed, add 1 to total power
+                    climb.getPOV() == 0 ? 1 : 0 +
+                    // If the d-pad down is pressed, add -1 to total power
+                    climb.getPOV() == 180 ? -1 : 0
+                ),
+                () -> (
+                    climb.getRightY() +
+                    // same thing as above, if it's up add 1
+                    climb.getPOV() == 0 ? 1 : 0 +
+                    // if it's down add -1
+                    climb.getPOV() == 180 ? -1 : 0
+                )
+            )
+        );
 	}
 
     @Override
