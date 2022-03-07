@@ -33,7 +33,7 @@ public class Turret extends SubsystemBase {
 	private boolean isArmed = false;
 	private double target;
 	private static double motorOutput;
-	private boolean manualOverride;
+	private boolean manualOverride = false;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry currentAngle;
@@ -57,7 +57,7 @@ public class Turret extends SubsystemBase {
 		currentAngle = turretTab.add("current angle", 0).getEntry(); 
 
 		// Reset values
-	    // resetEncoder();
+	    resetEncoder();
 		target = 0;
 	}
 	

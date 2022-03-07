@@ -52,9 +52,9 @@ public final class Constants {
     public static final double TURRET_kP_SLOW = 0.05; 
     public static final double TURRET_kI_SLOW = 0.00; 
     public static final double TURRET_kD_SLOW = 0.0009; 
-    public static final double TURRET_kP_FAST = 0.03; 
+    public static final double TURRET_kP_FAST = 0.02; 
     public static final double TURRET_kI_FAST = 0.00; 
-    public static final double TURRET_kD_FAST = 0.0002; 
+    public static final double TURRET_kD_FAST = 0.001; 
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 70d;
     public static final double MIN_TURRET_ANGLE = -70d;
@@ -88,7 +88,7 @@ public final class Constants {
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
 
-    public static final double SHOOT_CLOSE_RPM = 4100;  // TODO tune these
+    public static final double SHOOT_CLOSE_RPM = 1000;  // 4100 TODO tune these
     public static final double SHOOT_CLOSE_ANGLE = 3;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 

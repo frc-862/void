@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
 	private double hoodAngle;
 	private double prevTarget;
 	private double currentTarget;
-	private double timeWhenChanged = 0;
+	private double startTime = 0;
 	private boolean hasShot = false;
 	
 	public Shooter() {
@@ -77,7 +77,7 @@ public class Shooter extends SubsystemBase {
 			.getEntry();
 
 			//TODO: find a prooper solution for this
-		// hoodMotor.setSelectedSensorPosition(0);
+		hoodMotor.setSelectedSensorPosition(0);
 		hoodMotor.setSensorPhase(true);
 
 	}
@@ -86,7 +86,7 @@ public class Shooter extends SubsystemBase {
 	 * gets the hood angle in degrees
 	 */
 	public double getHoodAngle() {
-		return hoodMotor.getSelectedSensorPosition() / 4096 * 360; // Should retrun the angle; maybe 4096
+		return LightningMath.constrain(hoodMotor.getSelectedSensorPosition() / 4096 * 360, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE); // Should retrun the angle; maybe 4096
 	}
 
 	/**
@@ -176,17 +176,18 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {		
-		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
+
+	if(Timer.getFPGATimestamp() - startTime < Constants.SHOOTER_COOLDOWN) {
 			hasShot = false;
 		} else {
 			hasShot = getArmed();
 		}
-		
-		prevTarget = currentTarget;
 
 		if(prevTarget != currentTarget) {
-			timeWhenChanged = Timer.getFPGATimestamp();
+			startTime = Timer.getFPGATimestamp();
 		}
+
+		prevTarget = currentTarget;
 		
 		setSmartDashboardCommands();
 

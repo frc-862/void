@@ -40,6 +40,9 @@ public class Indexer extends SubsystemBase {
     private static double bufferTime = 0.5;
     private static boolean buffer = false;
 
+    // For telling us that we are at max balls
+    private boolean atMaxBallCount = false;
+
     // Creates the color sensor
     private final ColorSensorV3 intakeSensor;
 
@@ -54,9 +57,9 @@ public class Indexer extends SubsystemBase {
     }
 
     // Ball 1 color
-    Color ball1Color;
+    Color ball1Color = Color.nothing;
     // Ball 2 color
-    Color ball2Color;
+    Color ball2Color = Color.nothing;
     
     public Indexer() {
         // Sets Motor and color ID/ports
@@ -65,6 +68,7 @@ public class Indexer extends SubsystemBase {
 
         bufferStartTime = Timer.getFPGATimestamp(); // Sets an initial start time 
     }
+
 
     @Override
     public void periodic() {
@@ -87,25 +91,25 @@ public class Indexer extends SubsystemBase {
 
         // automatically suck in balls when we first see them
 
-        // Checks if we are in not in buffer time, but if we are skip this section
-        if (!buffer){ 
             // Does our ball increment and decrement with a limited number of possible cases
             switch(ballCount) {
                 case 0:
-                    if (collect1) {
+                    if (collect1 && !buffer) {
                         ballCount = 1;
                         bufferStartTime = Timer.getFPGATimestamp();
+                        atMaxBallCount = false;
                     } 
                 break;
 
                 case 1:
-                    if (collect1) {
+                    if (collect1 && !buffer) {
                         ballCount = 2;
                         bufferStartTime = Timer.getFPGATimestamp();
+                        atMaxBallCount = false;
                     }
                     if (eject1) {
                         ballCount = 0;
-                        bufferStartTime = Timer.getFPGATimestamp();
+                        atMaxBallCount = false;
                     }
                 break;
 
@@ -113,14 +117,18 @@ public class Indexer extends SubsystemBase {
                     if (eject1) {
                         ballCount = 1;
                         ball1Color = ball2Color;
-                        bufferStartTime = Timer.getFPGATimestamp();
+                        atMaxBallCount = false;
+                    }
+                    if(collect1 && !buffer) {
+                        atMaxBallCount = true;
                     }
                 break;
             }
 
-            lowerPrev = lower;
-            upperPrev = upper;
-        }
+            if (!buffer)  {
+                lowerPrev = lower;
+            }
+                upperPrev = upper;
 
         // Sets the possible color cases of the ball
         switch(getColorSensorOutputs()) {
@@ -151,8 +159,15 @@ public class Indexer extends SubsystemBase {
         } 
         // Puts the ball count to the dashboard
         SmartDashboard.putNumber("Ball Count", getBallCount());
-	}
+	
+        SmartDashboard.putString("ball1 color", ball1Color.toString());
+        SmartDashboard.putString("ball2 color", ball2Color.toString());
+    }
     
+
+    public boolean getAtMaxBallCount(){
+        return atMaxBallCount;
+    }
 
     public void resetBallCount() {
         ballCount = 0;

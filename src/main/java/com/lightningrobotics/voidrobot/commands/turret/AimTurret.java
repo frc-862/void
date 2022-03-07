@@ -89,6 +89,8 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
 
+        System.out.println("turret state ------------------------------------------------------------------------------------------------" + targetingState);
+
         if (turret.getManualOverride()){
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
@@ -158,7 +160,6 @@ public class AimTurret extends CommandBase {
 
         displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
         displayTargetAngle.setDouble(targetAngle);
-
         displayMotorOutput.setDouble(motorOutput);
         turret.setPower(motorOutput);
 
