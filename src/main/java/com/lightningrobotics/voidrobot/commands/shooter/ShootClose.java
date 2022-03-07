@@ -39,14 +39,12 @@ public class ShootClose extends CommandBase {
 
 		SmartDashboard.putBoolean("Shooter Armed", shooter.getArmed());
 		SmartDashboard.putBoolean("Turret Armed", turret.getArmed());
-		hasShot = false;
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
-		if(indexer.getUpperStatus()){
-			startTime = Timer.getFPGATimestamp();
-			hasShot = true;
-		}
+		// if(shooter.getHasShot()){
+		// 	startTime = Timer.getFPGATimestamp();
+		// }
 	}
 
 	@Override
@@ -58,7 +56,7 @@ public class ShootClose extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
+		return false; // return Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
 	}
 	
 }

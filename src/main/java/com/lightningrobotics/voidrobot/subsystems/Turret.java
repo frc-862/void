@@ -93,7 +93,10 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setTarget(double targetAngle) {
-		this.target = targetAngle;
+		double sign = Math.signum(targetAngle);
+        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
+
+        target = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
 	}
 
 	public double rotateX (double xValue, double yValue, double angleInDegrees){
@@ -124,17 +127,8 @@ public class Turret extends SubsystemBase {
 		turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
 	}
 
-	public double getConstrainedAngle(double targetAngle){
-		double sign = Math.signum(targetAngle);
-        targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
-
-        double constrainedAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
-
-		return constrainedAngle;
-	}
-
 	public double getMotorOutput(double constrainedAngle){
-		if(constrainedAngle - getCurrentAngle().getDegrees() <= Constants.SLOW_PID_THRESHOLD) {
+		if(Math.abs(constrainedAngle - getCurrentAngle().getDegrees()) <= Constants.SLOW_PID_THRESHOLD) {
             motorOutput = Constants.TURRET_PID_SLOW.calculate(getCurrentAngle().getDegrees(), constrainedAngle);
         } else {
             motorOutput = Constants.TURRET_PID_FAST.calculate(getCurrentAngle().getDegrees(), constrainedAngle);
