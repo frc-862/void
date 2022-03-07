@@ -1,5 +1,13 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+
+import javax.sound.midi.SysexMessage;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -32,6 +40,11 @@ public class Shooter extends SubsystemBase {
 	private NetworkTableEntry currentHoodAngle;
 	private NetworkTableEntry hasShotShuffEntry;
 
+	// For reading robot_constants json
+	Scanner sc;
+	File robotConstantsFile = Paths.get("/home/lvuser/robot_constants/", "robot_constants.txt").toFile();
+	private double hoodOffset = 15;
+
 	// The power point we want the shooter to be at
 	private double shooterPower;
 	private double hoodPowerSetPoint;
@@ -39,7 +52,7 @@ public class Shooter extends SubsystemBase {
 	private double hoodAngle;
 	private double prevTarget;
 	private double currentTarget;
-	private double timeWhenChanged = 0;
+	private double startTime = 0;
 	private boolean hasShot = false;
 	
 	public Shooter() {
@@ -76,23 +89,27 @@ public class Shooter extends SubsystemBase {
 			.add("has shot", false)
 			.getEntry();
 
-			//TODO: find a prooper solution for this
-		// hoodMotor.setSelectedSensorPosition(0);
+		try {
+			sc = new Scanner(robotConstantsFile);
+			sc.useDelimiter(":");
+		} catch (Exception e) {
+		
+		}
+		
+		 if((Files.exists(Paths.get("/home/lvuser/robot_constants")))){ 
+			if (sc.next().equals("hoodOffset")) {				
+				hoodOffset = Double.parseDouble(sc.next());
+			}
+		}
+
 		hoodMotor.setSensorPhase(true);
 
 	}
 
-	/**
-	 * gets the hood angle in degrees
-	 */
 	public double getHoodAngle() {
-		return hoodMotor.getSelectedSensorPosition() / 4096 * 360; // Should retrun the angle; maybe 4096
+		return  LightningMath.constrain((hoodMotor.getSelectedSensorPosition() / 4096 * 360) - hoodOffset, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE); // Should retrun the angle; maybe 4096
 	}
 
-	/**
-	 * commands the hood to move to an angle using a PID
-	 * @param hoodAngle target hood angle in units
-	 */
 	public void setHoodAngle(double hoodAngle) {
 		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
 		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
@@ -111,17 +128,10 @@ public class Shooter extends SubsystemBase {
 		flywheelMotor.set(TalonFXControlMode.Velocity, shooterVelocity); 
 	}
 
-	/**
-	 * stops the shooter motor
-	 */
 	public void stop() {
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0); 
 	}
 
-	/**
-	 * gets the shooter's RPMs
-	 * @return the RPM's of the shooter
-	 */
 	public double getEncoderRPM() {
 		return flywheelMotor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
 	}
@@ -162,10 +172,6 @@ public class Shooter extends SubsystemBase {
 		flywheelMotor.config_kF(0, kV);
 	}
 
-	/**
-	 * 
-	 * @return the target RPMs for the shooter taken from the dashboard
-	 */
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
 	}
@@ -174,19 +180,29 @@ public class Shooter extends SubsystemBase {
 		return targetHoodAngle.getDouble(0);
 	}
 
-	@Override
-	public void periodic() {		
-		if(Timer.getFPGATimestamp() - timeWhenChanged < Constants.SHOOTER_COOLDOWN) {
-			hasShot = false;
-		} else {
-			hasShot = getArmed();
-		}
-		
-		prevTarget = currentTarget;
+	public boolean getHasShot() {
+		return hasShot;
+	}
 
-		if(prevTarget != currentTarget) {
-			timeWhenChanged = Timer.getFPGATimestamp();
-		}
+	@Override
+	public void periodic() {	
+		
+		
+		SmartDashboard.putNumber("hood offset from funky file", hoodOffset);
+
+		// currentTarget = targetRPM;
+
+		// if(prevTarget != currentTarget) {
+		// 	startTime = Timer.getFPGATimestamp();
+		// }
+		
+		// prevTarget = currentTarget;
+
+		// if(Timer.getFPGATimestamp() - startTime <= Constants.SHOOTER_COOLDOWN) {
+		// 		hasShot = false;
+		// } else {
+		// 		hasShot = getArmed();
+		// }	
 		
 		setSmartDashboardCommands();
 

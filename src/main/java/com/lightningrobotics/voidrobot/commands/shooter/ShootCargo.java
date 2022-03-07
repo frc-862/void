@@ -45,15 +45,15 @@ public class ShootCargo extends CommandBase {
 		}
 			
 
-		hasShot = false;
+		// hasShot = false;
 
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
-		if(indexer.getUpperStatus()){
-			startTime = Timer.getFPGATimestamp();
-			hasShot = true;
-		}
+		// if(indexer.getUpperStatus()){
+		// 	startTime = Timer.getFPGATimestamp();
+		// 	hasShot = true;
+		// }
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class ShootCargo extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
+		return false; // Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
 	}
 	
 }

@@ -89,6 +89,8 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
 
+        System.out.println("turret state ------------------------------------------------------------------------------------------------" + targetingState);
+
         if (turret.getManualOverride()){
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
@@ -119,8 +121,7 @@ public class AimTurret extends CommandBase {
                 lastKnownDistance = vision.getTargetDistance();
                 targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
 
-                targetAngle = turret.getConstrainedAngle(targetAngle);
-                motorOutput = turret.getMotorOutput(targetAngle);
+                turret.setTarget(targetAngle);
                 break;
             case NO_VISION:
                 if(isUsingOdometer){
@@ -145,21 +146,20 @@ public class AimTurret extends CommandBase {
                 // SmartDashboard.putNumber("change in rotation", changeInRotation);
 
                 targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
-                
-                targetAngle = turret.getConstrainedAngle(targetAngle);
-                motorOutput = turret.getMotorOutput(targetAngle);
+
+                turret.setTarget(targetAngle);
                 break;   
             case MANUAL_OVERRIDE:
                 targetAngle = turret.getTarget();
-                targetAngle = turret.getConstrainedAngle(targetAngle);
-                motorOutput = turret.getMotorOutput(targetAngle);
+                turret.setTarget(targetAngle);
                 break;
         }
 
         displayOffset.setDouble(targetOffset); // offsetAngle.getDegrees()
         displayTargetAngle.setDouble(targetAngle);
-
         displayMotorOutput.setDouble(motorOutput);
+        
+        motorOutput = turret.getMotorOutput(turret.getTarget());
         turret.setPower(motorOutput);
 
     }
