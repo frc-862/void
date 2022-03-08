@@ -40,7 +40,6 @@ public class AimTurret extends CommandBase {
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
     private DoubleSupplier POV;
-    private boolean usingManual = false;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
@@ -96,18 +95,11 @@ public class AimTurret extends CommandBase {
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
             if (manualOverrideEntry.getBoolean(false)){
-                if (usingManual){
-                    usingManual = false;
-                    targetingState = TargetingState.VISION;
-                } else {
-                    usingManual = true;
                     targetingState = TargetingState.MANUAL;
-                }
-            }
-            
-            if (!usingManual && vision.hasVision()){
+            } else if (vision.hasVision()) {
                 targetingState = TargetingState.VISION;
-            } else if (!usingManual && !vision.hasVision()){
+            }
+            else{
                 targetingState = TargetingState.NO_VISION;
             }
         }
