@@ -82,8 +82,9 @@ public class RobotContainer extends LightningContainer{
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         //TODO: make this aim bias from d-pad by default and toggle on manual control via shuffleboard
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
-		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+   
+        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
 
         climber.setDefaultCommand(
             new runClimb(

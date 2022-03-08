@@ -33,12 +33,15 @@ public class Shooter extends SubsystemBase {
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter test");
+	private ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
     private NetworkTableEntry displayRPM;
     private NetworkTableEntry setRPM;
     private NetworkTableEntry displayShooterPower;
 	private NetworkTableEntry targetHoodAngle;
 	private NetworkTableEntry currentHoodAngle;
 	private NetworkTableEntry hasShotShuffEntry;
+	private NetworkTableEntry hoodTrimEntry = trimTab.add("Hood Bias", 0).getEntry();
+	private NetworkTableEntry RPMTrimEntry = trimTab.add("RPM Bias", 0).getEntry();
 
 	// For reading robot_constants json
 	Scanner sc;
@@ -111,7 +114,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setHoodAngle(double hoodAngle) {
-		this.hoodAngle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+		this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
 		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
 		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
 	}
@@ -137,8 +140,8 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setRPM(double targetRPMs) {
-		this.targetRPM = targetRPMs;
-		setVelocity(targetRPMs / 600 * 2048);
+		this.targetRPM = targetRPMs + RPMTrimEntry.getDouble(0);
+		setVelocity(this.targetRPM / 600 * 2048);
 	}
 
 	public double getShooterPower() {
