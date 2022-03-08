@@ -8,15 +8,22 @@ import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class MoveHoodManual extends CommandBase {
   Shooter shooter;
   DoubleSupplier power;
+  DoubleSupplier POV;
+  private static ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
+	private static NetworkTableEntry manualHoodEntry = trimTab.add("Manual Hood Control", false).getEntry();
 
-  public MoveHoodManual(Shooter shooter, DoubleSupplier power) {
+  public MoveHoodManual(Shooter shooter, DoubleSupplier POV) {
     this.shooter = shooter;
-    this.power = power;
+    //this.power = power;
+    this.POV = POV;
 
     addRequirements(shooter);
   }
@@ -26,7 +33,9 @@ public class MoveHoodManual extends CommandBase {
 
   @Override
   public void execute() {
-    shooter.setHoodPower(power.getAsDouble());
+    if (manualHoodEntry.getBoolean(false)) {
+      shooter.setHoodPower(POVToStandard(POV) / 20); 
+    }
   }
 
   @Override
@@ -38,4 +47,14 @@ public class MoveHoodManual extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+
+  public double POVToStandard(DoubleSupplier POV){
+    if (POV.getAsDouble() == 0){
+        return 1;
+    } else if (POV.getAsDouble() == 180){
+        return -1;
+    } else {
+        return 0;
+    }
+}
 }
