@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
@@ -95,7 +96,7 @@ public class AimTurret extends CommandBase {
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
             if (manualOverrideEntry.getBoolean(false)){
-                    targetingState = TargetingState.MANUAL;
+                targetingState = TargetingState.MANUAL;
             } else if (vision.hasVision()) {
                 targetingState = TargetingState.VISION;
             }
@@ -106,7 +107,7 @@ public class AimTurret extends CommandBase {
    
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = -1 * (controllerInputX.getAsDouble() / 4);
+                motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
                 break;
             case VISION:
                 isUsingOdometer = true;

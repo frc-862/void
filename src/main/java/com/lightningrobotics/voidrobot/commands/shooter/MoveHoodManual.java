@@ -6,6 +6,7 @@ package com.lightningrobotics.voidrobot.commands.shooter;
 
 import java.util.function.DoubleSupplier;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -33,8 +34,9 @@ public class MoveHoodManual extends CommandBase {
 
   @Override
   public void execute() {
+   
     if (manualHoodEntry.getBoolean(false)) {
-      shooter.setHoodPower(POVToStandard(POV) / 20); 
+      shooter.setHoodPower(POVToStandard(POV) * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
     }
   }
 
