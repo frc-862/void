@@ -64,6 +64,7 @@ public class FourBallTerminal extends CommandBase {
                 new TimedCommand(
                     new ParallelCommandGroup(
                         end4BallPath.getCommand(drivetrain),
+                        
                         new RunIndexer(indexer, () -> 1d),
                         new RunIntake(intake, () -> 1d),
                         new RunShooter(shooter, 4100d) // TODO use vision shoot function instead
@@ -72,38 +73,6 @@ public class FourBallTerminal extends CommandBase {
                 )
         
             ).schedule();
-
-            // new SequentialCommandGroup(
-            //     // Shoot on the fly to first ball
-            //     new TimedCommand(
-            //         new ParallelCommandGroup(
-            //         new SequentialCommandGroup(
-            //             new AutonShoot(indexer, shooter, turret, 4100d, 0d, 22.5),
-            //             new ParallelCommandGroup(
-            //                 new RunIndexer(indexer, () -> 1d),
-            //                 new RunIntake(intake, () -> 1d),
-            //                 new RunShooter(shooter, 4100d) // TODO use vision shoot function instead
-            //             )
-            //         ),
-            //         start4BallPath.getCommand(drivetrain), 
-            //     // ) {
-            //     //     Timer timer;
-            //     //     @Override
-            //     //     public void initialize() {
-            //     //         super.initialize();
-            //     //         timer = new Timer();
-            //     //         timer.reset();
-            //     //         timer.start();
-            //     //     }
-            //     //     @Override
-            //     //     public boolean isFinished() {
-            //     //         return timer.hasElapsed(start4BallPath.getDuration(drivetrain));
-            //     //     }
-            //     // }, 
-            //     new AutonShoot(indexer, shooter, turret, 5000, 0d, 22.5)                
-            // ), start4BallPath.getDuration(drivetrain))
-            // ).schedule();
-            
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
         }
