@@ -9,10 +9,12 @@ import java.util.function.DoubleSupplier;
 
 import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -130,10 +132,13 @@ public class AimTurret extends CommandBase {
                     turretTrim = 0;
 
                 }
-                
+
                 if (syncVision.getAsBoolean()){
                     targetOffset = vision.getOffsetAngle();
+                    vision.startTimer();
                 }
+
+                lastKnownDistance = vision.getTargetDistance();
 
                 //turretTrim += POVToStandard(POV); <-- TODO: Test this
 
@@ -166,7 +171,7 @@ public class AimTurret extends CommandBase {
         displayMotorOutput.setDouble(motorOutput);
         
         motorOutput = turret.getMotorOutput(turret.getTarget());
-        turret.setPower(motorOutput);
+        // turret.setPower(motorOutput);
 
     }
 

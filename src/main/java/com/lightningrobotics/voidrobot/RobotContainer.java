@@ -63,7 +63,7 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs        
         // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
+        // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
         (new JoystickButton(copilot, 5)).whileHeld(new DeployIntake(intake)); //Retract intake
         (new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake)); //Deploy intake
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
