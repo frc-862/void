@@ -15,6 +15,7 @@ public class Intake extends SubsystemBase {
 	private final VictorSPX intakeMotor;
 	private final TalonSRX winch;
 	private boolean isDeployed = false;
+	private boolean isRetracted = false;
 
 
 	public Intake() {
@@ -32,6 +33,15 @@ public class Intake extends SubsystemBase {
 	public void stop() {
 		intakeMotor.set(VictorSPXControlMode.PercentOutput, 0);
 	}
+
+	public void setIsRetracting(boolean isRetracted) {
+		this.isRetracted = isRetracted;
+	}
+
+	public boolean getIsRetracted() {
+		return isRetracted;
+	}
+
 
 	public void setIsDeployed(boolean isDeployed) {
 		this.isDeployed = isDeployed;

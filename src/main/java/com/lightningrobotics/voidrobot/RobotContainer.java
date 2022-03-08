@@ -64,9 +64,8 @@ public class RobotContainer extends LightningContainer{
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
         
         // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
-        (new JoystickButton(copilot, 5)).whileHeld(new DeployIntake(intake)); //Retract intake
-        (new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake)); //Deploy intake
+        (new JoystickButton(copilot, 5)).whileHeld(new ActuateIntake(intake, indexer, -Constants.DEFAULT_WINCH_POWER)); //Retract intake
+        (new JoystickButton(copilot, 6)).whileHeld(new ActuateIntake(intake, indexer, Constants.DEFAULT_WINCH_POWER)); //Deploy intake
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getLeftTriggerAxis())); //manual intake down
         (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //manual indexer down
@@ -87,7 +86,7 @@ public class RobotContainer extends LightningContainer{
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
 		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
 
         climber.setDefaultCommand(
             new runClimb(

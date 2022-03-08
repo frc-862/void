@@ -40,6 +40,8 @@ public class Indexer extends SubsystemBase {
     private static double bufferTime = 0.5;
     private static boolean buffer = false;
 
+    private boolean autoIndex = false;
+
     // For telling us that we are at max balls
     private boolean atMaxBallCount = false;
 
@@ -188,6 +190,14 @@ public class Indexer extends SubsystemBase {
 	public void toShooter() {
 		setPower(INDEX_POWER);
 	}
+
+    public void setAutoIndex(boolean autoIndex) {
+        this.autoIndex =autoIndex;
+    }
+
+    public boolean getAutoIndex() {
+        return autoIndex;
+    }
 
     public boolean getLowerStatus(){
         //the ! is added here to make it trigger on enter, not on release
