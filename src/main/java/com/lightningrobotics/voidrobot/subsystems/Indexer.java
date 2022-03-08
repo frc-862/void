@@ -192,7 +192,7 @@ public class Indexer extends SubsystemBase {
 	}
 
     public void setAutoIndex(boolean autoIndex) {
-        this.autoIndex =autoIndex;
+        this.autoIndex = autoIndex;
     }
 
     public boolean getAutoIndex() {

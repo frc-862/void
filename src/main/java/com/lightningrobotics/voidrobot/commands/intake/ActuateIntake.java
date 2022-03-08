@@ -15,44 +15,42 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ActuateIntake extends CommandBase {
 
-  private Intake intake; 
-  private Indexer indexer;
-  private double power;
+    private Intake intake;
+    private Indexer indexer;
+    private double power;
 
 
-  public ActuateIntake(Intake intake, Indexer indexer, double power) {
-    this.intake = intake;
-    this.indexer = indexer;
-    this.power = power;
+    public ActuateIntake(Intake intake, Indexer indexer, double power) {
+        this.intake = intake;
+        this.indexer = indexer;
+        this.power = power;
 
-    addRequirements(intake);
-    
-  }
+        addRequirements(intake);
 
-  @Override
-  public void initialize() {}
-
-  @Override
-  public void execute() {
-    if(indexer.getLowerStatus() && power == -1){
-      indexer.setAutoIndex(true);
-      intake.stopDeploy();
-    } 
-    else {
-      indexer.setAutoIndex(false);
-      intake.actuateIntake(power);
     }
-    
-  }
 
-  @Override
-  public void end(boolean interrupted) {
-    intake.stopDeploy();
-    indexer.setAutoIndex(true);
-  }
+    @Override
+    public void initialize() {}
 
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    @Override
+    public void execute() {
+        indexer.setAutoIndex(false);
+        if(indexer.getLowerStatus() && power < 0){
+            end(false);
+        }
+        else {
+            intake.actuateIntake(power);
+        }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.stopDeploy();
+        indexer.setAutoIndex(true);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }
