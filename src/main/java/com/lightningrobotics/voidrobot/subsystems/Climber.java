@@ -55,6 +55,7 @@ public class Climber extends SubsystemBase {
 
 	public void stop() {
 		setClimbPower(0, 0);
+		setPivotPower(0, 0);
 	}
 
 }
