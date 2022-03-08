@@ -66,13 +66,13 @@ public class RobotContainer extends LightningContainer{
 
         // Collector Controls:
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> 1)); //B: run collector out
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new DeployIntake(intake)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new RetractIntake(intake)); //SELECT/BACK: Deploy intake
 
         // Indexer Controls:
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> Constants.DEFAULT_INDEXER_POWER)); //LT: run indexer up
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
 
     }
