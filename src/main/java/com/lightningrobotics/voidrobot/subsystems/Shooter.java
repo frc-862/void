@@ -108,6 +108,7 @@ public class Shooter extends SubsystemBase {
 
 	public double getHoodAngle() {
 		return  LightningMath.constrain((hoodMotor.getSelectedSensorPosition() / 4096 * 360) - hoodOffset, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE); // Should retrun the angle; maybe 4096
+		// return hoodMotor.getSelectedSensorPosition() / 4096 * 360 - hoodOffset;
 	}
 
 	public void setHoodAngle(double hoodAngle) {

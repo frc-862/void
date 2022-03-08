@@ -38,10 +38,10 @@ public class ShootCargo extends CommandBase {
 			var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 			shooter.setRPM(rpm);
-			shooter.setHoodAngle(hoodAngle);
+			// shooter.setHoodAngle(hoodAngle);
 		} else { //if no vision
 			shooter.setRPM(4100);
-			shooter.setHoodAngle(0); 
+			// shooter.setHoodAngle(0); 
 		}
 			
 

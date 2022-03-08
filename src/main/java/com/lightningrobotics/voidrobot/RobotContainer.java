@@ -61,8 +61,7 @@ public class RobotContainer extends LightningContainer{
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
-		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
-        
+		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs        
         // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
         (new JoystickButton(copilot, 5)).whileHeld(new DeployIntake(intake)); //Retract intake
@@ -72,6 +71,8 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //manual indexer down
         (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //manual indexer up
         (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
+
+
 
         //Fritz's button bindings
         //(new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake, indexer)); //Retract intake
@@ -85,8 +86,8 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
-		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).get()));
+		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 
         climber.setDefaultCommand(

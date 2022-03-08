@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
@@ -16,8 +17,8 @@ public class Vision extends SubsystemBase {
 	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
 
 	// Entries for Angle & Distance	
-	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Angle");
-	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Distance");
+	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Target Angle");
+	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Target Distance");
 
 	// Placeholder Vars for Angle & Distance
 	private static double targetDistance = -1d;
@@ -40,8 +41,12 @@ public class Vision extends SubsystemBase {
 		offsetAngle = targetAngleEntry.getDouble(offsetAngle);
 		
 		// Update Target Distance
-		targetDistance = -1;
+		// targetDistance = -1;
 		targetDistance = targetDistanceEntry.getDouble(targetDistance);
+
+
+		SmartDashboard.putNumber("inputted target distance from vision", targetDistanceEntry.getDouble(0));
+		SmartDashboard.putNumber("inputted target angle from vision", targetAngleEntry.getDouble(0));
 
 	}
 
@@ -58,7 +63,7 @@ public class Vision extends SubsystemBase {
 	 * @return Number from NetworkTable outputted by vision pipeline [0, 360]
 	 */
 	public double getOffsetAngle() {
-		return offsetAngle; 
+		return -offsetAngle; 
 	}
 
 	/**
@@ -66,7 +71,7 @@ public class Vision extends SubsystemBase {
 	 * @return Number from NetworkTable outputted by vision pipeline
 	 */
 	public double getTargetDistance() {
-		return targetDistanceEntry.getDouble(0); // TODO: units??
+		return targetDistanceEntry.getDouble(0); 
 	}
 
 	/**
