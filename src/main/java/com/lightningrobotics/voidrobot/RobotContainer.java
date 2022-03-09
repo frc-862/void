@@ -80,7 +80,7 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
         //AUTO
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
         //DRIVER
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         //TODO: make this aim bias from d-pad by default and toggle on manual control via shuffleboard

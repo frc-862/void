@@ -40,7 +40,12 @@ public class FourBallHanger extends CommandBase {
     public void execute() {}
 
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        indexer.stop();
+        intake.stop();
+        shooter.stop();
+        indexer.setAutoIndex(true);
+    }
 
     @Override
     public boolean isFinished() {

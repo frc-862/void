@@ -127,5 +127,5 @@ public final class Constants {
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 0.5;
-    public static final double DEFAULT_WINCH_POWER = 0.5;
+    public static final double DEFAULT_WINCH_POWER = 1;
 }
