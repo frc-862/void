@@ -29,6 +29,8 @@ public class Vision extends SubsystemBase {
 	private static double targetDistance = -1d;
 	private static double visionMode = 0;
     private static double offsetAngle = 0d;
+
+	private boolean findMode = false; 
 	
 	private double startVisionTimer = 0;
 
@@ -58,8 +60,9 @@ public class Vision extends SubsystemBase {
 
 		if(Timer.getFPGATimestamp() - startVisionTimer <= Constants.READ_VISION_TIME) {
 			visionArray.add(targetDistance);
-		} else {
-			// visionMode = getMode(visionArray);
+		} else if(findMode){
+			visionMode = getMode(visionArray);
+			findMode = false;
 		}
 
 
@@ -92,7 +95,7 @@ public class Vision extends SubsystemBase {
 	 * @return Number from NetworkTable outputted by vision pipeline
 	 */
 	public double getTargetDistance() {
-		return visionMode; 
+		return targetDistance; 
 	}
 
 	/**
@@ -125,27 +128,27 @@ public class Vision extends SubsystemBase {
 	}
 
 	public double getMode(ArrayList<Double> array){
-		double mode = 0;
-		int count = 0;
-	  if(array.size() > 1) {
-		for (int i = 0; i < array.size() ; i++) {
-		  double x = array.get(i);
-		  int tempCount = 1;
-	  
-		  for(int e = 0; i < array.size() ; e++){
-			double x2 = array.get(e);
-	  
-			if( x == x2)
-			  tempCount++;
-	  
-			if( tempCount > count){
-			  count = tempCount;
-			  mode = x;
-			}
-		  }
-		}
+	double mode = 0;
+	int count = 0;
+		if(array.size() > 1) {
+			for (int i = 0; i < array.size() ; i++) {
+				double x = array.get(i);
+				int tempCount = 1;
 
-		return mode;
+				for(int e = 0; e < array.size() ; e++){
+					double x2 = array.get(e);
+
+					if( x == x2)
+						tempCount++;
+
+					if( tempCount > count){
+						count = tempCount;
+						mode = x;
+					}
+				}
+			}
+
+			return mode;
 
 		} else  {
 			return 0d;
@@ -156,6 +159,8 @@ public class Vision extends SubsystemBase {
 		  startVisionTimer = Timer.getFPGATimestamp();
 		  visionArray.clear();
 		  visionArray.add(0d);
+
+		  findMode = true;
 	  }
 
 }

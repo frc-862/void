@@ -135,10 +135,10 @@ public class AimTurret extends CommandBase {
 
                 if (syncVision.getAsBoolean()){
                     targetOffset = vision.getOffsetAngle();
-                    vision.startTimer();
+                    // vision.startTimer();
                 }
 
-                lastKnownDistance = vision.getTargetDistance();
+                // lastKnownDistance = vision.getTargetDistance();
 
                 //turretTrim += POVToStandard(POV); <-- TODO: Test this
 

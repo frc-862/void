@@ -7,6 +7,7 @@ import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootCargo extends CommandBase {
@@ -35,13 +36,17 @@ public class ShootCargo extends CommandBase {
 		if(vision.hasVision()) {
 			var distance = vision.getTargetDistance();
 			var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-			var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+			// var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-			shooter.setRPM(rpm);
+			// shooter.setRPM(rpm);
 			// shooter.setHoodAngle(hoodAngle);
+
+			SmartDashboard.putNumber("rpm from distance map", rpm);
+
+			
 		} else { //if no vision
 			shooter.setRPM(4100);
-			// shooter.setHoodAngle(0); 
+			shooter.setHoodAngle(0); 
 		}
 			
 
