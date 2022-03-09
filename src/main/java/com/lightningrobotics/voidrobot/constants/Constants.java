@@ -60,6 +60,8 @@ public final class Constants {
     public static final double MIN_TURRET_ANGLE = -90d;
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
+    public static final double READ_VISION_TIME = 1; //seconds
+    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
@@ -84,11 +86,12 @@ public final class Constants {
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+    public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
 
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
 
-    public static final double SHOOT_CLOSE_RPM = 1000;  // 4100 TODO tune these
+    public static final double SHOOT_CLOSE_RPM = 4100;  // 4100 TODO tune these
     public static final double SHOOT_CLOSE_ANGLE = 3;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 
@@ -97,13 +100,13 @@ public final class Constants {
         {
             
             put(0d, 0d);
-            put(10d, 3900d);
-            put(11d, 4000d);
-            put(12d, 4200d);
-            put(13d, 4300d);
-            put(14d, 4450d);
-            put(15d, 4550d);
-            put(16d, 4700d);
+            put(12.8d, 3900d);
+            put(13.6d, 4000d);
+            put(14.4d, 4200d);
+            put(15.2d, 4300d);
+            put(16.1d, 4450d);
+            put(17d, 4550d);
+            put(17.9d, 4700d);
         }
     };
 
@@ -111,13 +114,13 @@ public final class Constants {
     public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
         {
             put(0d, 0d);
-            put(10d, 65.2d);
-            put(11d, 64.9d);
-            put(12d, 64.7d);
-            put(13d, 64.6d);
-            put(14d, 64.3d);
-            put(15d, 64.2d);
-            put(16d, 64.2d);
+            put(12.8d, 1.8d);
+            put(13.6d, 1.5d);
+            put(14.4d, 1.3d);
+            put(15.2d, 1.2d);
+            put(16.1d, 0.9d);
+            put(17.0d, 0.8d);
+            put(17.9d, 0.8d);
         }
     };
 
@@ -125,5 +128,5 @@ public final class Constants {
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 0.5;
-    public static final double DEFAULT_WINCH_POWER = 0.5;
+    public static final double DEFAULT_WINCH_POWER = 1;
 }

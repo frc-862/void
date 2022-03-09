@@ -4,14 +4,18 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-
+import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.LightningMath;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -29,16 +33,17 @@ public class AimTurret extends CommandBase {
     private double initialIMUHeading; 
 
     private static ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
+    private static ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
     private static NetworkTableEntry displayOffset  = turretTab.add("vision offset", 0).getEntry();
     private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
     private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
     private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
-    private static NetworkTableEntry manualOverrideEntry = turretTab.add("Manual Turret", false).getEntry();
+    private static NetworkTableEntry manualOverrideEntry = trimTab.add("Manual Turret", false).getEntry();
+	private static NetworkTableEntry turretTrimEntry = trimTab.add("Turret Bias", 0).getEntry();
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
     private DoubleSupplier POV;
-    private boolean usingManual = false;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
@@ -50,6 +55,8 @@ public class AimTurret extends CommandBase {
     private double initialX = 0d;
     private double initialY = 0d;
 
+    private BooleanSupplier syncVision;
+
     enum TargetingState{
         MANUAL,
         VISION,
@@ -59,13 +66,14 @@ public class AimTurret extends CommandBase {
     
 	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV, BooleanSupplier syncVision) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
         this.POV = POV;
+        this.syncVision = syncVision;
 
         addRequirements(vision, turret);
 
@@ -88,48 +96,55 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void execute() {
-
-        System.out.println("turret state ------------------------------------------------------------------------------------------------" + targetingState);
+        turretTrim = turretTrimEntry.getDouble(0);
 
         if (turret.getManualOverride()){
             targetingState = TargetingState.MANUAL_OVERRIDE;
         } else {
             if (manualOverrideEntry.getBoolean(false)){
-                if (usingManual){
-                    usingManual = false;
-                    targetingState = TargetingState.VISION;
-                } else {
-                    usingManual = true;
-                    targetingState = TargetingState.MANUAL;
-                }
-            }
-            
-            if (!usingManual && vision.hasVision()){
+                targetingState = TargetingState.MANUAL;
+            } else if (vision.hasVision()) {
                 targetingState = TargetingState.VISION;
-            } else if (!usingManual && !vision.hasVision()){
+            }
+            else{
                 targetingState = TargetingState.NO_VISION;
             }
         }
    
+		System.out.println("TURRET STATE" + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = -1 * (controllerInputX.getAsDouble() / 4);
+                motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+				isUsingOdometer = true;
                 break;
             case VISION:
                 isUsingOdometer = true;
                 targetOffset = vision.getOffsetAngle();
                 lastKnownDistance = vision.getTargetDistance();
                 targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
+                targetAngle += turretTrim;
 
                 turret.setTarget(targetAngle);
+                motorOutput = turret.getMotorOutput(turret.getTarget());
                 break;
             case NO_VISION:
                 if(isUsingOdometer){
                     isUsingOdometer = false;
                     resetPose();
                     turretTrim = 0;
+
                 }
-                
+
+                if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
+                    targetOffset = vision.getOffsetAngle();
+                    // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
+                    // vision.startTimer();
+                    isUsingOdometer = true;
+                    vision.setGoodDistance();
+                }
+
+                // lastKnownDistance = vision.getTargetDistance();
+
                 //turretTrim += POVToStandard(POV); <-- TODO: Test this
 
                 double relativeX = drivetrain.getPose().getX() - initialX;
@@ -141,17 +156,19 @@ public class AimTurret extends CommandBase {
 
                 // update rotation data 
                 double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
-                // SmartDashboard.putNumber("odometer x", relativeX);
-                // SmartDashboard.putNumber("odometer y", relativeY);
-                // SmartDashboard.putNumber("change in rotation", changeInRotation);
 
-                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+                // targetOffset = 0;
 
+                targetAngle += turretTrim;
                 turret.setTarget(targetAngle);
+                motorOutput = turret.getMotorOutput(turret.getTarget());
                 break;   
             case MANUAL_OVERRIDE:
                 targetAngle = turret.getTarget();
+                targetAngle += turretTrim;
                 turret.setTarget(targetAngle);
+                motorOutput = turret.getMotorOutput(turret.getTarget());
                 break;
         }
 
@@ -159,7 +176,6 @@ public class AimTurret extends CommandBase {
         displayTargetAngle.setDouble(targetAngle);
         displayMotorOutput.setDouble(motorOutput);
         
-        motorOutput = turret.getMotorOutput(turret.getTarget());
         turret.setPower(motorOutput);
 
     }
@@ -183,9 +199,9 @@ public class AimTurret extends CommandBase {
 
     public double POVToStandard(DoubleSupplier POV){
         if (POV.getAsDouble() == 90){
-            return 1;
-        } else if (POV.getAsDouble() == 270){
             return -1;
+        } else if (POV.getAsDouble() == 270){
+            return 1;
         } else {
             return 0;
         }

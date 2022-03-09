@@ -18,8 +18,8 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -63,49 +63,60 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
         
-        // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))); //intake and deply on right trigger
-        (new JoystickButton(copilot, 5)).whileHeld(new DeployIntake(intake)); //Retract intake
-        (new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake)); //Deploy intake
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getLeftTriggerAxis())); //manual intake down
-        (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //manual indexer down
-        (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //manual indexer up
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
+        // COPILOT:
 
-        //Fritz's button bindings
-        //(new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake, indexer)); //Retract intake
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //manual indexer up
-        //(new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual indexer down
-        // (new JoystickButton(copilot, 2)).whileHeld(new ParallelCommandGroup(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER), new RunIntake(intake, () -> -Constants.DEFAULT_INTAKE_POWER))); //Manual indexer and collector out (spit)
-        
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
+        // Collector Controls:
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
+        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new ActuateIntake(intake, indexer, -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new ActuateIntake(intake, indexer, Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
+
+        // Indexer Controls:
+        (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //LT: run indexer up
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
+
     }
 
     @Override
     protected void configureDefaultCommands() {
+        //AUTO
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
+        //DRIVER
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
-		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).get()));
+		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
 
+       // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
+	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
+
+        //CLIMB
         climber.setDefaultCommand(
             new runClimb(
                 climber,
                 () -> (
-                    climb.getLeftY() +
+                    ((-1*climb.getLeftY()) +
                     // I know some people don't like these so I'll document it
                     // If the d-pad up is pressed, add 1 to total power
-                    climb.getPOV() == 0 ? 1 : 0 +
+                    (climb.getPOV() == 0 ? 1 : 0) +
                     // If the d-pad down is pressed, add -1 to total power
-                    climb.getPOV() == 180 ? -1 : 0
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
                 ),
                 () -> (
-                    climb.getRightY() +
+                    ((-1*climb.getRightY()) +
                     // same thing as above, if it's up add 1
-                    climb.getPOV() == 0 ? 1 : 0 +
+                    (climb.getPOV() == 0 ? 1 : 0) +
                     // if it's down add -1
-                    climb.getPOV() == 180 ? -1 : 0
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                ),
+                //set left and right pivot powers
+                () -> (
+                    climb.getLeftTriggerAxis() - //LT: pivot forwards
+                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
+                ),
+                () -> (
+                    climb.getRightTriggerAxis() - //RT: pivot forwards
+                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
                 )
             )
         );
@@ -126,7 +137,11 @@ public class RobotContainer extends LightningContainer{
     }
 
     @Override
-    protected void initializeDashboardCommands() { }
+    protected void initializeDashboardCommands() { 
+		var tab = Shuffleboard.getTab("shooter test");
+		tab.add(new ResetHood(shooter));
+
+	}
 	
     @Override
     protected void releaseDefaultCommands() { }

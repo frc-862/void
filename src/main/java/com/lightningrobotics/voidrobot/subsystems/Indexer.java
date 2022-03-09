@@ -11,6 +11,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
 public class Indexer extends SubsystemBase {
 
     // Creates our indexer motor
@@ -40,6 +45,8 @@ public class Indexer extends SubsystemBase {
     private static double bufferTime = 0.5;
     private static boolean buffer = false;
 
+    private boolean autoIndex = false;
+
     // For telling us that we are at max balls
     private boolean atMaxBallCount = false;
 
@@ -60,7 +67,12 @@ public class Indexer extends SubsystemBase {
     Color ball1Color = Color.nothing;
     // Ball 2 color
     Color ball2Color = Color.nothing;
+
+    //Create Shuffleboard and entries
+    private static ShuffleboardTab driverVeiw = Shuffleboard.getTab("Competition");
+    private static NetworkTableEntry currentBallCountEntry  = driverVeiw.add("Ball count", 1).getEntry();
     
+
     public Indexer() {
         // Sets Motor and color ID/ports
         indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
@@ -73,6 +85,7 @@ public class Indexer extends SubsystemBase {
     @Override
     public void periodic() {
 
+        
         buffer = !(Timer.getFPGATimestamp() - bufferStartTime > bufferTime); // Tells us when were in our buffer time
         
         // Setting our current beam break status
@@ -158,10 +171,12 @@ public class Indexer extends SubsystemBase {
             break;
         } 
         // Puts the ball count to the dashboard
-        SmartDashboard.putNumber("Ball Count", getBallCount());
 	
         SmartDashboard.putString("ball1 color", ball1Color.toString());
         SmartDashboard.putString("ball2 color", ball2Color.toString());
+
+        currentBallCountEntry.setNumber(ballCount);
+
     }
     
 
@@ -188,6 +203,14 @@ public class Indexer extends SubsystemBase {
 	public void toShooter() {
 		setPower(INDEX_POWER);
 	}
+
+    public void setAutoIndex(boolean autoIndex) {
+        this.autoIndex = autoIndex;
+    }
+
+    public boolean getAutoIndex() {
+        return autoIndex;
+    }
 
     public boolean getLowerStatus(){
         //the ! is added here to make it trigger on enter, not on release

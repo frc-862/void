@@ -88,6 +88,7 @@ public class FourBallTerminal extends CommandBase {
         indexer.stop();
         intake.stop();
         shooter.stop();
+        indexer.setAutoIndex(true);
     }
 
     @Override

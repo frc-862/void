@@ -18,8 +18,8 @@ public final class RobotMap {
     // Climber
     public static final int LEFT_CLIMB = 7;
     public static final int RIGHT_CLIMB = 8;
-    public static final int WINCH3_MOTOR_ID = 9;
-    public static final int WINCH4_MOTOR_ID = 10;
+    public static final int LEFT_PIVOT = 9;
+    public static final int RIGHT_PIVOT = 10;
 
     // Intake
     public static final int INTAKE_MOTOR_ID = 15;
