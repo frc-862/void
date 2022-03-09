@@ -20,6 +20,10 @@ public class ShootCargo extends CommandBase {
 	private double startTime = 0;
 	private boolean hasShot = false;
 
+	private static double rpm;
+	private static double distance;
+	private static double hoodAngle;
+
 	public ShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
 		this.indexer = indexer;
@@ -33,32 +37,31 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 
-		if(vision.hasVision()) {
-			var distance = vision.getTargetDistance();
-			var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-			// var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+			distance = vision.getTargetDistance();
+			rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+			hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-			// shooter.setRPM(rpm);
-			// shooter.setHoodAngle(hoodAngle);
+		// if(vision.hasVision()) {
+				shooter.setRPM(rpm);
+				shooter.setHoodAngle(hoodAngle);
 
-			SmartDashboard.putNumber("rpm from distance map", rpm);
-
-			
-		} else { //if no vision
-			shooter.setRPM(4100);
-			shooter.setHoodAngle(0); 
-		}
+		// } else { //if no vision
+		// 	shooter.setRPM(4100);
+		// 	shooter.setHoodAngle(0); 
+		// }
 			
 
 		// hasShot = false;
 
-		if(shooter.getArmed() && turret.getArmed()) {
+		if(shooter.getArmed()/* && turret.getArmed()*/) {
 			indexer.toShooter();
 		}
 		// if(indexer.getUpperStatus()){
 		// 	startTime = Timer.getFPGATimestamp();
 		// 	hasShot = true;
 		// }
+
+		SmartDashboard.putNumber("hood angle from map", Constants.HOOD_ANGLE_MAP.get(distance));
 	}
 
 	@Override
