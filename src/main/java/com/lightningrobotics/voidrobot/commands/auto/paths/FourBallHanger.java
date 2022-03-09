@@ -1,34 +1,38 @@
-package com.lightningrobotics.voidrobot.commands.auto;
+package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
 import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
 import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class FourBallTerminal extends CommandBase {
+public class FourBallHanger extends CommandBase {
 
+    
     private final Drivetrain drivetrain;
     private final Indexer indexer;
     private final Intake intake;
     private final Shooter shooter;
     private final Turret turret;
+    private final Vision vision;
 
-    Path start4BallPath = new Path("Start4Ball.path", false);
-    Path end4BallPath = new Path("End4Ball.path", false);   
+    Path start3BallHanger = new Path("Start3BallHanger.path", false);
+    Path end3BallHanger = new Path("End3BallHanger.path", false);  
 
-    public FourBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Turret turret) {
+    public FourBallHanger(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Turret turret, Vision vision) {
         this.drivetrain = drivetrain;
         this.indexer = indexer;
         this.intake = intake;
         this.shooter = shooter;
         this.turret = turret;
+        this.vision = vision;
 
         addRequirements(drivetrain, indexer, intake, shooter, turret);
         
@@ -37,51 +41,34 @@ public class FourBallTerminal extends CommandBase {
     @Override
     public void initialize() {
         try {
-
             new SequentialCommandGroup(
-
                 new TimedCommand(
-
                     new SequentialCommandGroup(
                         new ParallelCommandGroup(
 
-                            start4BallPath.getCommand(drivetrain),
+                            start3BallHanger.getCommand(drivetrain),
 
                             new SequentialCommandGroup(
                                 
-                                new AutonShoot1(indexer, shooter, turret, 0.3d, 4100d, 0d, 22.5),
+                                new AutonShootCargo(shooter, indexer, turret, vision),
                                 new AutonIntake(intake, indexer, 1d, 2d),
-                                new AutonShoot2(indexer, shooter, turret, 0, 4100d, 0d, 43.1)
+                                new AutonShootCargo(shooter, indexer, turret, vision)
                             )
-                        )
-
+                        ) 
                     ), 
+                    
+                        start3BallHanger.getDuration(drivetrain) + 3)
+            );
 
-                        start4BallPath.getDuration(drivetrain) + 3
 
-                ), 
 
-                new TimedCommand(
-                    new ParallelCommandGroup(
-                        end4BallPath.getCommand(drivetrain),
-                        
-                        new RunIndexer(indexer, () -> 1d),
-                        new RunIntake(intake, () -> 1d),
-                        new RunShooter(shooter, 4100d) // TODO use vision shoot function instead
-                    ), 
-                    end4BallPath.getDuration(drivetrain) + 5
-                )
-        
-            ).schedule();
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
         }
-
     }
 
     @Override
-    public void execute() {
-    }
+    public void execute() {}
 
     @Override
     public void end(boolean interrupted) {
