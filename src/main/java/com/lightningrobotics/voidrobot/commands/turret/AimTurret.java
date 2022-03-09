@@ -4,15 +4,18 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-
+import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -52,6 +55,8 @@ public class AimTurret extends CommandBase {
     private double initialX = 0d;
     private double initialY = 0d;
 
+    private BooleanSupplier syncVision;
+
     enum TargetingState{
         MANUAL,
         VISION,
@@ -61,13 +66,14 @@ public class AimTurret extends CommandBase {
     
 	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV, BooleanSupplier syncVision) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
         this.POV = POV;
+        this.syncVision = syncVision;
 
         addRequirements(vision, turret);
 
@@ -105,9 +111,11 @@ public class AimTurret extends CommandBase {
             }
         }
    
+		System.out.println("TURRET STATE" + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
                 motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+				isUsingOdometer = true;
                 break;
             case VISION:
                 isUsingOdometer = true;
@@ -123,7 +131,21 @@ public class AimTurret extends CommandBase {
                 if(isUsingOdometer){
                     isUsingOdometer = false;
                     resetPose();
+                    turretTrim = 0;
+
                 }
+
+                if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
+                    targetOffset = vision.getOffsetAngle();
+                    // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
+                    // vision.startTimer();
+                    isUsingOdometer = true;
+                    vision.setGoodDistance();
+                }
+
+                // lastKnownDistance = vision.getTargetDistance();
+
+                //turretTrim += POVToStandard(POV); <-- TODO: Test this
 
                 double relativeX = drivetrain.getPose().getX() - initialX;
                 double relativeY = drivetrain.getPose().getY() - initialY;
@@ -135,7 +157,8 @@ public class AimTurret extends CommandBase {
                 // update rotation data 
                 double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation);
+                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+                // targetOffset = 0;
 
                 targetAngle += turretTrim;
                 turret.setTarget(targetAngle);
@@ -176,9 +199,9 @@ public class AimTurret extends CommandBase {
 
     public double POVToStandard(DoubleSupplier POV){
         if (POV.getAsDouble() == 90){
-            return 1;
-        } else if (POV.getAsDouble() == 270){
             return -1;
+        } else if (POV.getAsDouble() == 270){
+            return 1;
         } else {
             return 0;
         }
