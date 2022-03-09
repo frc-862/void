@@ -63,6 +63,7 @@ public class Shooter extends SubsystemBase {
 
 	public Shooter() {
 
+		
 		// Sets the IDs of the hood and shooter
 		flywheelMotor = new TalonFX(RobotMap.FLYWHEEL_MOTOR_ID);
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);

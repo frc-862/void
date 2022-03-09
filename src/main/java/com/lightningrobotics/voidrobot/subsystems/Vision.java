@@ -13,6 +13,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,6 +27,10 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Target Angle");
 	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Target Distance");
 	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("Target Time");
+
+	private final ShuffleboardTab biasTab = Shuffleboard.getTab("Biases");
+
+	private final NetworkTableEntry distanceBiasEntry = biasTab.add("distance bias", 0).getEntry();
 
 	// Placeholder Vars for Angle & Distance
 	private static double targetDistance = -1d;
@@ -48,6 +54,8 @@ public class Vision extends SubsystemBase {
 	private static boolean lightsOn = false;
 
 	private double lastGoodDistance = 0;
+
+	private double distanceOffset = 0;
 
 	// PDH
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
@@ -94,6 +102,8 @@ public class Vision extends SubsystemBase {
 
 		SmartDashboard.putNumber("last good distance", lastGoodDistance);
 
+		distanceOffset = distanceBiasEntry.getDouble(0);
+
 	}
 
 	/**
@@ -117,7 +127,7 @@ public class Vision extends SubsystemBase {
 	 * @return Number from NetworkTable outputted by vision pipeline
 	 */
 	public double getTargetDistance() {
-		return targetDistance; 
+		return targetDistance + distanceOffset; 
 	}
 
 	/**
@@ -197,6 +207,10 @@ public class Vision extends SubsystemBase {
 
 	  public double getGoodDistance() {
 		  return lastGoodDistance;
+	  }
+
+	  public void setDistanceOffset(double offset) {
+		distanceOffset = offset;
 	  }
 
 }

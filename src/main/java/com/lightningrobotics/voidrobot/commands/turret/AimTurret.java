@@ -111,10 +111,11 @@ public class AimTurret extends CommandBase {
             }
         }
    
-        targetingState = TargetingState.NO_VISION;
+		System.out.println("TURRET STATE" + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
                 motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+				isUsingOdometer = true;
                 break;
             case VISION:
                 isUsingOdometer = true;
@@ -138,7 +139,7 @@ public class AimTurret extends CommandBase {
                     targetOffset = vision.getOffsetAngle();
                     // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
                     // vision.startTimer();
-                    
+                    isUsingOdometer = true;
                     vision.setGoodDistance();
                 }
 
@@ -198,9 +199,9 @@ public class AimTurret extends CommandBase {
 
     public double POVToStandard(DoubleSupplier POV){
         if (POV.getAsDouble() == 90){
-            return 1;
-        } else if (POV.getAsDouble() == 270){
             return -1;
+        } else if (POV.getAsDouble() == 270){
+            return 1;
         } else {
             return 0;
         }

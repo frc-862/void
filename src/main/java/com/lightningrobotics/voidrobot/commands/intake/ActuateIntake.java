@@ -6,6 +6,8 @@ package com.lightningrobotics.voidrobot.commands.intake;
 
 import java.util.function.DoubleSupplier;
 
+import javax.swing.plaf.synth.SynthStyle;
+
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
@@ -34,12 +36,15 @@ public class ActuateIntake extends CommandBase {
 
     @Override
     public void execute() {
-        indexer.setAutoIndex(false);
         if(indexer.getLowerStatus() && power < 0){
-            end(false);
+			indexer.setAutoIndex(false);
+			intake.stopDeploy();
+			System.out.println("this is also running -------------------------");
         }
         else {
+			indexer.setAutoIndex(true);
             intake.actuateIntake(power);
+			System.out.println("this is running --------------------------------------------------------");
         }
     }
 

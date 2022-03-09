@@ -18,6 +18,7 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -67,8 +68,8 @@ public class RobotContainer extends LightningContainer{
         // Collector Controls:
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
         (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
-        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new DeployIntake(intake)); //RB: Retract intake
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new RetractIntake(intake)); //SELECT/BACK: Deploy intake
+        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new ActuateIntake(intake, indexer, -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new ActuateIntake(intake, indexer, Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
 
         // Indexer Controls:
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
@@ -86,7 +87,8 @@ public class RobotContainer extends LightningContainer{
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).get()));
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
 
-        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
+       // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
+	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
         //CLIMB
         climber.setDefaultCommand(
@@ -133,7 +135,11 @@ public class RobotContainer extends LightningContainer{
     }
 
     @Override
-    protected void initializeDashboardCommands() { }
+    protected void initializeDashboardCommands() { 
+		var tab = Shuffleboard.getTab("shooter test");
+		tab.add(new ResetHood(shooter));
+
+	}
 	
     @Override
     protected void releaseDefaultCommands() { }

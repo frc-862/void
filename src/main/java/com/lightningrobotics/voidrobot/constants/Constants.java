@@ -61,7 +61,7 @@ public final class Constants {
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
     public static final double READ_VISION_TIME = 1; //seconds
-    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.5d;
+    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
