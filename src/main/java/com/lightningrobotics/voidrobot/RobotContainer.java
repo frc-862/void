@@ -58,6 +58,7 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureButtonBindings() {
+
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
@@ -81,14 +82,14 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void configureDefaultCommands() {
         //AUTO
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
+        // indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
         //DRIVER
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).get()));
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
 
-       // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
-	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
+        // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
+	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
         //CLIMB
         climber.setDefaultCommand(
