@@ -47,6 +47,8 @@ public class Vision extends SubsystemBase {
 	// Var for if green LEDs are on
 	private static boolean lightsOn = false;
 
+	private double lastGoodDistance = 0;
+
 	// PDH
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
@@ -89,6 +91,8 @@ public class Vision extends SubsystemBase {
 		SmartDashboard.putBoolean("has data", haveData);
 
 		SmartDashboard.putNumber("rpm from map", Constants.DISTANCE_RPM_MAP.get(targetDistance));
+
+		SmartDashboard.putNumber("last good distance", lastGoodDistance);
 
 	}
 
@@ -185,6 +189,14 @@ public class Vision extends SubsystemBase {
 		  
 		
 		return haveData;
+	  }
+
+	  public void setGoodDistance() {
+		  lastGoodDistance = targetDistance;
+	  }
+
+	  public double getGoodDistance() {
+		  return lastGoodDistance;
 	  }
 
 }
