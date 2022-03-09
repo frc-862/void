@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
@@ -45,6 +46,7 @@ public class FourBallTerminal extends CommandBase {
 
             new TimedCommand(
                 new ParallelCommandGroup(
+                    new AutonDeployIntake(intake),
                     new AutonVisionAim(vision, turret),
         
                     new SequentialCommandGroup(
