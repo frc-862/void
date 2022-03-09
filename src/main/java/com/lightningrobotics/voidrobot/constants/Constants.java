@@ -61,6 +61,7 @@ public final class Constants {
     public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
     public static final double READ_VISION_TIME = 1; //seconds
+    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.5d;
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 0.5;
@@ -85,6 +86,7 @@ public final class Constants {
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+    public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
 
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
@@ -126,5 +128,5 @@ public final class Constants {
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 0.5;
-    public static final double DEFAULT_WINCH_POWER = 0.5;
+    public static final double DEFAULT_WINCH_POWER = 1;
 }
