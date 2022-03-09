@@ -114,6 +114,11 @@ public class Shooter extends SubsystemBase {
 
 	public double getHoodAngle() {
 		return  LightningMath.constrain((hoodMotor.getSelectedSensorPosition() / 4096 * 360) - hoodOffset, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE); // Should retrun the angle; maybe 4096
+		// return hoodMotor.getSelectedSensorPosition() / 4096 * 360 - hoodOffset;
+	}
+
+	public double getRawHoodAngle() {
+		return hoodMotor.getSelectedSensorPosition() / 4096 * 360;
 	}
 
 	public void setHoodAngle(double hoodAngle) {
@@ -123,7 +128,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setHoodPower(double power) {
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
+		hoodMotor.set(TalonSRXControlMode.PercentOutput, power); 
 	}
 
 	public void setPower(double power) {
@@ -158,7 +163,7 @@ public class Shooter extends SubsystemBase {
 	// Checks if flywheel RPM is within a threshold
 	public boolean getArmed() {
 		boolean flywheel = Math.abs(getEncoderRPM() - targetRPM) < Constants.SHOOTER_TOLERANCE;
-		SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
+		// SmartDashboard.putNumber("Shooter RPM DIff", getEncoderRPM() - targetRPM);
 		boolean hood = Math.abs(getHoodAngle() - hoodAngle) < Constants.HOOD_TOLERANCE;
 		return flywheel && hood;
 	}
