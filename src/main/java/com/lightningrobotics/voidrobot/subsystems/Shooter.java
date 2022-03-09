@@ -58,6 +58,9 @@ public class Shooter extends SubsystemBase {
 	private double startTime = 0;
 	private boolean hasShot = false;
 	
+	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+	private static NetworkTableEntry shooterArmedEntry = driverView.add("Shooter armed", false).getEntry();
+
 	public Shooter() {
 
 		// Sets the IDs of the hood and shooter
@@ -190,6 +193,7 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {	
 		
+		shooterArmedEntry.setBoolean(getArmed());
 		
 		SmartDashboard.putNumber("hood offset from funky file", hoodOffset);
 

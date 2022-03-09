@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
 public class Turret extends SubsystemBase {
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
@@ -41,7 +42,10 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry setTargetAngleEntry;
 	private NetworkTableEntry leftLimitSwitchEntry;
 	private NetworkTableEntry rightLimitSwitchEntry;
-	
+
+	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+	private static NetworkTableEntry turretArmedEntry = driverView.add("Turret armed", false).getEntry();
+
 	public Turret() {
 
 		// Motor config
