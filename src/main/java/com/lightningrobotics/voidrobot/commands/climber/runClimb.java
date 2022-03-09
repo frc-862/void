@@ -12,20 +12,25 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class runClimb extends CommandBase {
     public final Climber climber;
-    private DoubleSupplier leftPower;
-    private DoubleSupplier rightPower;
+    private DoubleSupplier leftClimbPower;
+    private DoubleSupplier rightClimbPower;
+    private DoubleSupplier leftPivotPower;
+    private DoubleSupplier rightPivotPower;
 
-    public runClimb(Climber climber, DoubleSupplier leftPower, DoubleSupplier rightPower) {
+    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
         this.climber = climber;
-        this.leftPower = leftPower;
-        this.rightPower = rightPower;
+        this.leftClimbPower = leftClimbPower;
+        this.rightClimbPower = rightClimbPower;
+        this.leftPivotPower = leftPivotPower;
+        this.rightPivotPower = rightPivotPower;
 
         addRequirements(climber);
     }
 
     @Override
     public void execute() {
-        climber.setPower(leftPower.getAsDouble(), rightPower.getAsDouble());
+        climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
+        climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
     }
 
     @Override
