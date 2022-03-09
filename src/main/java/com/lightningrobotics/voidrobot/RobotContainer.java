@@ -19,7 +19,6 @@ import com.lightningrobotics.common.command.drivetrain.differential.Differential
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -63,31 +62,33 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 1)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
         
-        // COPILOT
-        (new JoystickButton(copilot, 5)).whileHeld(new ActuateIntake(intake, indexer, -Constants.DEFAULT_WINCH_POWER)); //Retract intake
-        (new JoystickButton(copilot, 6)).whileHeld(new ActuateIntake(intake, indexer, Constants.DEFAULT_WINCH_POWER)); //Deploy intake
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //manual intake up
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getLeftTriggerAxis())); //manual intake down
-        (new JoystickButton(copilot, 1)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //manual indexer down
-        (new JoystickButton(copilot, 4)).whileHeld(new RunIndexer(indexer, () -> Constants.DEFAULT_INDEXER_POWER)); //manual indexer up
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
+        // COPILOT:
 
-        //Fritz's button bindings
-        //(new JoystickButton(copilot, 6)).whileHeld(new RetractIntake(intake, indexer)); //Retract intake
-        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //manual indexer up
-        //(new JoystickButton(copilot, 5)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //Manual indexer down
-        // (new JoystickButton(copilot, 2)).whileHeld(new ParallelCommandGroup(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER), new RunIntake(intake, () -> -Constants.DEFAULT_INTAKE_POWER))); //Manual indexer and collector out (spit)
-        
-        (new JoystickButton(copilot, 8)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //Reset ball count
+        // Collector Controls:
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
+        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new DeployIntake(intake)); //RB: Retract intake
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new RetractIntake(intake)); //SELECT/BACK: Deploy intake
+
+        // Indexer Controls:
+        (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //LT: run indexer up
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
+
     }
 
     @Override
     protected void configureDefaultCommands() {
+        //AUTO
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        //DRIVER
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+        //TODO: make this aim bias from d-pad by default and toggle on manual control via shuffleboard
+        //COPILOT
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX()), () -> copilot.getPOV()));
-		shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
+        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
 
+        //CLIMB
         climber.setDefaultCommand(
             new runClimb(
                 climber,
@@ -105,6 +106,13 @@ public class RobotContainer extends LightningContainer{
                     climb.getPOV() == 0 ? 1 : 0 +
                     // if it's down add -1
                     climb.getPOV() == 180 ? -1 : 0
+                ),
+                //set left and right pivot powers
+                () -> (
+                    climb.getRightTriggerAxis() - climb.getLeftTriggerAxis() //RT: pivot forward, LT: pivot backwards
+                ),
+                () -> (
+                    climb.getRightTriggerAxis() - climb.getLeftTriggerAxis()
                 )
             )
         );
