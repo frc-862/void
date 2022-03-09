@@ -38,8 +38,8 @@ public class ShootCargo extends CommandBase {
 	public void execute() {
 
 			distance = vision.getTargetDistance();
-			rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-			hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+			rpm = Constants.DISTANCE_RPM_MAP.get(vision.getGoodDistance());
+			hoodAngle = Constants.HOOD_ANGLE_MAP.get(vision.getGoodDistance());
 
 		// if(vision.hasVision()) {
 				shooter.setRPM(rpm);

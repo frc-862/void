@@ -134,9 +134,12 @@ public class AimTurret extends CommandBase {
 
                 }
 
-                if (syncVision.getAsBoolean() || vision.hasVision()){
+                if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
                     targetOffset = vision.getOffsetAngle();
+                    // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
                     // vision.startTimer();
+                    
+                    vision.setGoodDistance();
                 }
 
                 // lastKnownDistance = vision.getTargetDistance();
