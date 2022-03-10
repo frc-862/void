@@ -5,8 +5,6 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootClose extends CommandBase {
@@ -15,14 +13,13 @@ public class ShootClose extends CommandBase {
 	private Indexer indexer;
 	private Turret turret;
 
-	private double startTime = 0;
-	private boolean hasShot = false;
-
 	public ShootClose(Shooter shooter, Indexer indexer, Turret turret) {
 
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.turret = turret;
+
+		shooter.setManualHoodOverride(false);
 
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
 	}
@@ -35,16 +32,12 @@ public class ShootClose extends CommandBase {
 	@Override
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_LOW_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
-
-		SmartDashboard.putBoolean("Shooter Armed", shooter.getArmed());
-		SmartDashboard.putBoolean("Turret Armed", turret.getArmed());
+		if(!shooter.getManualHoodOverride()){
+			shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
+		}
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
-		// if(shooter.getHasShot()){
-		// 	startTime = Timer.getFPGATimestamp();
-		// }
 	}
 
 	@Override
@@ -56,7 +49,7 @@ public class ShootClose extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return false; // return Timer.getFPGATimestamp() - startTime > Constants.AUTO_SHOOT_COOLDOWN && hasShot;
+		return false;
 	}
 	
 }

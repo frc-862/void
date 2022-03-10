@@ -101,23 +101,25 @@ public final class Constants {
     //distance in meters, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
-            
-            put(0d, 0d);
-            put(2.6924, 3600d);
-			put(2.5908d, 3700d);
-			put(3.2004d, 3950d);
-			put(4.191d, 4100d);
-			put(4.064d, 4100d);
-			put(4.6482d, 4300d);
-			put(3.6576d, 4100d);
-			put(3.3528d, 3900d);
+
+			put(0d, 0d);
+			put(2.286d, 3500d);
+            put(2.5908d, 3700d);
+			put(2.6924d, 3600d);
 			put(3.048d, 3800d);
+			put(3.175d, 3900d);
+			put(3.2004d, 3950d);
+			put(3.3528d, 3900d);
+			put(3.6576d, 4100d);
+			put(3.9624d, 4250d);
+			put(4.064d, 4100d);
+			put(4.191d, 4100d);
 			put(4.6482d, 4300d);
-			put(5.0292d, 4500d);
+			put(5.0292, 4500d);
 			put(5.1816d, 4700d);
-			put(5.7919d, 4900d);
+			put(5.4864d, 4850d);
+			put(5.7912d, 4900d);
 			put(6.4008d, 5350d);
-			put(5.4964d, 4850d);
         }
     };
 
@@ -127,21 +129,21 @@ public final class Constants {
             put(0d, 0d);
             put(2.286d, 0d);
 			put(2.5908d, 0d);
-			put(3.175d, 0d);
 			put(2.6924, 0.7);
-			put(3.2004, 0.95);
-			put(4.191d, 1.5d);
-			put(4.064d, 1.5d);
-			put(3.9624d, 2d);
-			put(3.6576d, 1.8d);
-			put(3.3528d, 1.7d);
 			put(3.048d, 1.6d);
+			put(3.175d, 0d);
+			put(3.2004, 0.95);
+			put(3.3528d, 1.7d);
+			put(3.6576d, 1.8d);
+			put(3.9624d, 2d);
+			put(4.064d, 1.5d);
+			put(4.191d, 1.5d);
 			put(4.6482d, 2.6d);
 			put(5.0292, 3.3d);
 			put(5.1816d, 3.85d);
-			put(5.7919d, 4.4d);
-			put(6.4008d, 5.5d);
 			put(5.4964d, 4.4d);
+			put(5.7912d, 4.4d);
+			put(6.4008d, 5.5d);
         }
     };
 

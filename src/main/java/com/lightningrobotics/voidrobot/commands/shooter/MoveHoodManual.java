@@ -17,16 +17,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class MoveHoodManual extends CommandBase {
   Shooter shooter;
   DoubleSupplier power;
-  DoubleSupplier POV;
-  private static ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
-	private static NetworkTableEntry manualHoodEntry = trimTab.add("Manual Hood Control", false).getEntry();
+  private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+	private static NetworkTableEntry manualHoodEntry = driverView.add("Manual Hood Control", false).getEntry();
 
-  public MoveHoodManual(Shooter shooter, DoubleSupplier POV) {
+  public MoveHoodManual(Shooter shooter, DoubleSupplier power) {
     this.shooter = shooter;
     //this.power = power;
-    this.POV = POV;
-
-    addRequirements(shooter);
+	this.power = power;
   }
 
   @Override
@@ -34,10 +31,12 @@ public class MoveHoodManual extends CommandBase {
 
   @Override
   public void execute() {
+
+		shooter.setManualHoodOverride(true);
    
-    if (manualHoodEntry.getBoolean(false)) {
-      shooter.setHoodPower(POVToStandard(POV) * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
-    }
+		if (manualHoodEntry.getBoolean(false)) {
+			shooter.setHoodPower(power.getAsDouble() * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
+		} 
   }
 
   @Override
@@ -49,14 +48,5 @@ public class MoveHoodManual extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+}
 
-  public double POVToStandard(DoubleSupplier POV){
-    if (POV.getAsDouble() == 0){
-        return 1;
-    } else if (POV.getAsDouble() == 180){
-        return -1;
-    } else {
-        return 0;
-    }
-}
-}
