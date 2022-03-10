@@ -45,8 +45,14 @@ public class FourBallTerminal extends CommandBase {
         try {
 
             new TimedCommand(
+
                 new ParallelCommandGroup(
-                    new AutonDeployIntake(intake),
+
+                    new TimedCommand(
+
+                        new AutonDeployIntake(intake), 
+                            3),
+
                     new AutonVisionAim(vision, turret),
         
                     new SequentialCommandGroup(
@@ -54,6 +60,7 @@ public class FourBallTerminal extends CommandBase {
                         new TimedCommand(
 
                             new SequentialCommandGroup(
+
                                 new ParallelCommandGroup(
 
                                     start4BallPath.getCommand(drivetrain),
@@ -63,6 +70,7 @@ public class FourBallTerminal extends CommandBase {
                                         new AutonShootCargo(shooter, indexer, turret, vision),
                                         new AutonIntake(intake, indexer, 1d, 2d),
                                         new AutonShootCargo(shooter, indexer, turret, vision)
+
                                     )
                                 )
 
@@ -73,14 +81,18 @@ public class FourBallTerminal extends CommandBase {
                         ), 
 
                         new TimedCommand(
+
                             new ParallelCommandGroup(
                                 end4BallPath.getCommand(drivetrain),
                                 
                                 new RunIndexer(indexer, () -> 1d),
                                 new RunIntake(intake, () -> 1d),
                                 new RunShooter(shooter, 4100d) // TODO use vision shoot function instead
+
                             ), 
+                            
                             end4BallPath.getDuration(drivetrain) + 3
+
                         )
                 
                     )

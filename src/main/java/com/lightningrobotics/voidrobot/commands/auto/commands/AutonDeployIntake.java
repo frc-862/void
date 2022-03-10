@@ -10,12 +10,11 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutonDeployIntake extends TimedCommand {
+public class AutonDeployIntake extends CommandBase {
 
   private final Intake intake;
 
   public AutonDeployIntake(Intake intake) {
-    super(new AutonDeployIntake(intake), 3);
     this.intake = intake;
   }
 
