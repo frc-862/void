@@ -4,6 +4,7 @@
 
 package com.lightningrobotics.voidrobot.commands.turret;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Vision;
@@ -15,10 +16,12 @@ public class AdjustBias extends CommandBase {
 
 	private final Vision vision;
 	private DoubleSupplier POV; 
+	private BooleanSupplier xButton;
 
-  public AdjustBias(Vision vision, DoubleSupplier POV) {
+  public AdjustBias(Vision vision, DoubleSupplier POV, BooleanSupplier xButton) {
 	  this.POV = POV;
 		this.vision = vision;
+		this.xButton = xButton;
 	}
 
   @Override
@@ -33,6 +36,10 @@ public class AdjustBias extends CommandBase {
 		case 180: 
 			vision.adjustBias(-0.1);
 		break;
+	}
+
+	if(xButton.getAsBoolean()) {
+		vision.zeroBias();
 	}
 
   }

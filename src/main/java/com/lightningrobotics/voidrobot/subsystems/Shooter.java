@@ -124,7 +124,7 @@ public class Shooter extends SubsystemBase {
 	public void setHoodAngle(double hoodAngle) {
 		if(manualOverrideHood) {
 			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
-			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), manualOverrideTarget;
+			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), manualOverrideTarget);
 			setHoodPower(hoodPowerSetPoint);
 		} else {
 			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
@@ -189,9 +189,8 @@ public class Shooter extends SubsystemBase {
 
 	// Update Displays on Dashboard
 	 public void setSmartDashboardCommands() {
-	// 	displayRPM.setDouble(getEncoderRPM());
-	// 	currentHoodAngle.setDouble(getHoodAngle());
-	// 	hasShotShuffEntry.setBoolean(hasShot);
+		displayRPM.setDouble(getEncoderRPM());
+		currentHoodAngle.setDouble(getHoodAngle());
 	 }
 
 	private void configPIDGains(double kP, double kI, double kD, double kV) {

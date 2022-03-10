@@ -55,6 +55,8 @@ public class Vision extends SubsystemBase {
 
 	private double distanceOffset = 0;
 
+	private boolean disableVision = false;
+
 	// PDH
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
@@ -88,19 +90,8 @@ public class Vision extends SubsystemBase {
 			lastVisionTimestamp = visionTimestamp;
 		}
 
-		SmartDashboard.putNumber("inputted target distance from vision", targetDistance);
-		SmartDashboard.putNumber("inputted target angle from vision", offsetAngle);
-
-		SmartDashboard.putNumber("vision size", visionArray.size());
-		SmartDashboard.putNumber("vision mode", visionMode);
-
-		SmartDashboard.putBoolean("has data", haveData);
-
-		SmartDashboard.putNumber("rpm from map", Constants.DISTANCE_RPM_MAP.get(targetDistance));
-
-		SmartDashboard.putNumber("last good distance", lastGoodDistance);
-
 		SmartDashboard.putNumber("added bias", distanceOffset);
+		SmartDashboard.putBoolean("vision disabled", disableVision);
 
 	}
 
@@ -154,7 +145,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public boolean hasVision(){
-		return targetDistance > 0;
+		return targetDistance > 0 || !disableVision;
 	}
 
 	public double getMode(ArrayList<Double> array){
@@ -213,6 +204,14 @@ public class Vision extends SubsystemBase {
 
 	public void adjustBias(double delta) {
 		distanceOffset += delta;
+	}
+
+	public void zeroBias() {
+		distanceOffset = 0;
+	}
+
+	public void toggleDisableVision() {
+		disableVision = !disableVision;
 	}
 
 }

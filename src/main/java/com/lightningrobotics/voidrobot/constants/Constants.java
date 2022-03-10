@@ -97,7 +97,7 @@ public final class Constants {
 
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
-    //distance in feet, power in RPMs 
+    //distance in meters, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
             
@@ -120,7 +120,7 @@ public final class Constants {
         }
     };
 
-    //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
+    //distance in meters, angle in degrees
     public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
         {
             put(0d, 0d);
