@@ -91,36 +91,57 @@ public final class Constants {
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
 
-    public static final double SHOOT_CLOSE_RPM = 4100;  // 4100 TODO tune these
-    public static final double SHOOT_CLOSE_ANGLE = 3;
+    public static final double SHOOT_LOW_RPM = 1500;  // 4100 TODO tune these
+    public static final double SHOOT_LOW_ANGLE = 5.5;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 
-    //distance in feet, power in RPMs 
+	public static final double SHOOT_TARMAC_RPM = 3800;
+	public static final double SHOOT_TARMAC_ANGLE = 0;
+
+    //distance in meters, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
             
             put(0d, 0d);
-            put(12.8d, 3900d);
-            put(13.6d, 4000d);
-            put(14.4d, 4200d);
-            put(15.2d, 4300d);
-            put(16.1d, 4450d);
-            put(17d, 4550d);
-            put(17.9d, 4700d);
+            put(2.6924, 3600d);
+			put(2.5908d, 3700d);
+			put(3.2004d, 3950d);
+			put(4.191d, 4100d);
+			put(4.064d, 4100d);
+			put(4.6482d, 4300d);
+			put(3.6576d, 4100d);
+			put(3.3528d, 3900d);
+			put(3.048d, 3800d);
+			put(4.6482d, 4300d);
+			put(5.0292d, 4500d);
+			put(5.1816d, 4700d);
+			put(5.7919d, 4900d);
+			put(6.4008d, 5350d);
+			put(5.4964d, 4850d);
         }
     };
 
-    //height in pixels, angle in degrees //TODO: distance or pixels?  Also tune.
+    //distance in meters, angle in degrees
     public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
         {
             put(0d, 0d);
-            put(12.8d, 1.8d);
-            put(13.6d, 1.5d);
-            put(14.4d, 1.3d);
-            put(15.2d, 1.2d);
-            put(16.1d, 0.9d);
-            put(17.0d, 0.8d);
-            put(17.9d, 0.8d);
+            put(2.286d, 0d);
+			put(2.5908d, 0d);
+			put(3.175d, 0d);
+			put(2.6924, 0.7);
+			put(3.2004, 0.95);
+			put(4.191d, 1.5d);
+			put(4.064d, 1.5d);
+			put(3.9624d, 2d);
+			put(3.6576d, 1.8d);
+			put(3.3528d, 1.7d);
+			put(3.048d, 1.6d);
+			put(4.6482d, 2.6d);
+			put(5.0292, 3.3d);
+			put(5.1816d, 3.85d);
+			put(5.7919d, 4.4d);
+			put(6.4008d, 5.5d);
+			put(5.4964d, 4.4d);
         }
     };
 

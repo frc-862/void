@@ -34,8 +34,8 @@ public class ShootClose extends CommandBase {
 
 	@Override
 	public void execute() {
-		shooter.setRPM(Constants.SHOOT_CLOSE_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_CLOSE_ANGLE);
+		shooter.setRPM(Constants.SHOOT_LOW_RPM);
+		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
 
 		SmartDashboard.putBoolean("Shooter Armed", shooter.getArmed());
 		SmartDashboard.putBoolean("Turret Armed", turret.getArmed());

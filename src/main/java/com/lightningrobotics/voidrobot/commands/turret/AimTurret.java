@@ -10,6 +10,7 @@ import java.util.function.DoubleSupplier;
 import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -43,7 +44,6 @@ public class AimTurret extends CommandBase {
 
     private static double motorOutput;
     private DoubleSupplier controllerInputX;
-    private DoubleSupplier POV;
     private final Drivetrain drivetrain;
 
     private double targetOffset;
@@ -55,7 +55,7 @@ public class AimTurret extends CommandBase {
     private double initialX = 0d;
     private double initialY = 0d;
 
-    private BooleanSupplier syncVision;
+	private MovingAverageFilter maf = new MovingAverageFilter(3);
 
     enum TargetingState{
         MANUAL,
@@ -66,14 +66,12 @@ public class AimTurret extends CommandBase {
     
 	private TargetingState targetingState;
 
-    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX, DoubleSupplier POV, BooleanSupplier syncVision) {
+    public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain, LightningIMU imu, DoubleSupplier controllerInputX) {
         this.vision = vision;
         this.drivetrain = drivetrain;
         this.turret = turret;
         this.imu = imu;
         this.controllerInputX = controllerInputX;
-        this.POV = POV;
-        this.syncVision = syncVision;
 
         addRequirements(vision, turret);
 
@@ -111,10 +109,10 @@ public class AimTurret extends CommandBase {
             }
         }
    
-		System.out.println("TURRET STATE" + targetingState + "--------------------------------------------");
+		System.out.println("TURRET STATE --------------------- " + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+                motorOutput = controllerInputX.getAsDouble() * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
 				isUsingOdometer = true;
                 break;
             case VISION:
@@ -123,6 +121,8 @@ public class AimTurret extends CommandBase {
                 lastKnownDistance = vision.getTargetDistance();
                 targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
                 targetAngle += turretTrim;
+
+				targetAngle = maf.filter(targetAngle);
 
                 turret.setTarget(targetAngle);
                 motorOutput = turret.getMotorOutput(turret.getTarget());
@@ -135,18 +135,6 @@ public class AimTurret extends CommandBase {
 
                 }
 
-                if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
-                    targetOffset = vision.getOffsetAngle();
-                    // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
-                    // vision.startTimer();
-                    isUsingOdometer = true;
-                    vision.setGoodDistance();
-                }
-
-                // lastKnownDistance = vision.getTargetDistance();
-
-                //turretTrim += POVToStandard(POV); <-- TODO: Test this
-
                 double relativeX = drivetrain.getPose().getX() - initialX;
                 double relativeY = drivetrain.getPose().getY() - initialY;
 
@@ -158,7 +146,6 @@ public class AimTurret extends CommandBase {
                 double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
                 targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
-                // targetOffset = 0;
 
                 targetAngle += turretTrim;
                 turret.setTarget(targetAngle);
@@ -195,16 +182,6 @@ public class AimTurret extends CommandBase {
         initialX = drivetrain.getPose().getX();
         initialY = drivetrain.getPose().getY();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
-    }
-
-    public double POVToStandard(DoubleSupplier POV){
-        if (POV.getAsDouble() == 90){
-            return -1;
-        } else if (POV.getAsDouble() == 270){
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
 }
