@@ -7,7 +7,6 @@ import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallTerminal;
-import com.lightningrobotics.voidrobot.commands.auto.*;
 import com.lightningrobotics.voidrobot.commands.climber.MakeHoodAndTurretZero;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
