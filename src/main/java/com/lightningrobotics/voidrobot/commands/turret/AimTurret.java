@@ -35,11 +35,13 @@ public class AimTurret extends CommandBase {
 
     private static ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
     private static ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
+	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+
     private static NetworkTableEntry displayOffset  = turretTab.add("vision offset", 0).getEntry();
     private static NetworkTableEntry displayTargetAngle = turretTab.add("target angle", 0).getEntry();
     private static NetworkTableEntry displayConstrainedAngle = turretTab.add("constrained angle", 0).getEntry();
     private static NetworkTableEntry displayMotorOutput = turretTab.add("motor output", 0).getEntry();
-    private static NetworkTableEntry manualOverrideEntry = trimTab.add("Manual Turret", false).getEntry();
+    private static NetworkTableEntry manualOverrideEntry = driverView.add("Manual Turret", false).getEntry();
 	private static NetworkTableEntry turretTrimEntry = trimTab.add("Turret Bias", 0).getEntry();
 
     private static double motorOutput;

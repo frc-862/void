@@ -17,14 +17,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class MoveHoodManual extends CommandBase {
   Shooter shooter;
   DoubleSupplier power;
-  DoubleSupplier POV;
-  private static ShuffleboardTab trimTab = Shuffleboard.getTab("Biases");
-	private static NetworkTableEntry manualHoodEntry = trimTab.add("Manual Hood Control", false).getEntry();
+  private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+	private static NetworkTableEntry manualHoodEntry = driverView.add("Manual Hood Control", false).getEntry();
 
-  public MoveHoodManual(Shooter shooter, DoubleSupplier POV) {
+  public MoveHoodManual(Shooter shooter, DoubleSupplier power) {
     this.shooter = shooter;
     //this.power = power;
-    this.POV = POV;
+	this.power = power;
 
     addRequirements(shooter);
   }
@@ -34,10 +33,12 @@ public class MoveHoodManual extends CommandBase {
 
   @Override
   public void execute() {
+
+		shooter.setManualHoodOverride(manualHoodEntry.getBoolean(false));
    
-    if (manualHoodEntry.getBoolean(false)) {
-      shooter.setHoodPower(POVToStandard(POV) * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
-    }
+		if (manualHoodEntry.getBoolean(false)) {
+			shooter.setHoodPower(power.getAsDouble() * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
+		} 
   }
 
   @Override

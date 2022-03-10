@@ -36,7 +36,7 @@ public class Climber extends SubsystemBase {
 		rightClimbPivot.setNeutralMode(NeutralMode.Brake);
 
 		//TODO: correctly set the inverts of the climb motors
-		leftClimbWinch.setInverted(true);
+		leftClimbWinch.setInverted(false);
 		rightClimbWinch.setInverted(false);
 
 		leftClimbPivot.setInverted(false);

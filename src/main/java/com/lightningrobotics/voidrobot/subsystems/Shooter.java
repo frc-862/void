@@ -2,11 +2,8 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
-
-import javax.sound.midi.SysexMessage;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -19,7 +16,6 @@ import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,13 +55,13 @@ public class Shooter extends SubsystemBase {
 	private boolean hasShot = false;
 	private boolean disableHood = false;
 	private boolean manualOverrideHood = false;
+	private boolean manualOverrideHoodPower = false;
 	private double manualOverrideTarget = 0;
 	
 	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
 	private static ShuffleboardTab disableTab = Shuffleboard.getTab("disable tab");
 	private static NetworkTableEntry shooterArmedEntry = driverView.add("Shooter armed", false).getEntry();
     private static NetworkTableEntry disableHoodEntry = disableTab.add("disable hood", false).getEntry();
-
 	public Shooter() {
 
 		
@@ -141,9 +137,21 @@ public class Shooter extends SubsystemBase {
 	public void setHoodPower(double power) {
 		if(disableHood) {
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		} else if(manualOverrideHoodPower) {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, power); //TODO: use a set manual hood power
 		} else {
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
 		}
+	}
+
+	public void setManualHoodPower(double power) {
+		if(manualOverrideHoodPower) {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
+		}
+	}
+
+	public void setManualHoodOverride(boolean override) {
+		manualOverrideHoodPower = override; 
 	}
 
 	public void setPower(double power) {

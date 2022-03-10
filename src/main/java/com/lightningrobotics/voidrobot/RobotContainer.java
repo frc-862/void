@@ -6,6 +6,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.auto.*;
+import com.lightningrobotics.voidrobot.commands.climber.MakeHoodAndTurretZero;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
@@ -78,6 +79,9 @@ public class RobotContainer extends LightningContainer{
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
 
+		//Climb Control:
+		(new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter)); //LB: run indexer down
+
     }
 
     @Override
@@ -89,8 +93,8 @@ public class RobotContainer extends LightningContainer{
 		// vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        // shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getPOV()));
-	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
+        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
         //CLIMB
         climber.setDefaultCommand(
