@@ -137,6 +137,10 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setVelocity(double shooterVelocity) {
+		if(shooterVelocity == 0) {
+			stop();
+			return;
+		}
 		flywheelMotor.set(TalonFXControlMode.Velocity, shooterVelocity); 
 	}
 

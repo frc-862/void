@@ -30,8 +30,6 @@ public class Vision extends SubsystemBase {
 
 	private final ShuffleboardTab biasTab = Shuffleboard.getTab("Biases");
 
-	private final NetworkTableEntry distanceBiasEntry = biasTab.add("distance bias", 0).getEntry();
-
 	// Placeholder Vars for Angle & Distance
 	private static double targetDistance = -1d;
 	private static double visionMode = 0;
@@ -102,7 +100,7 @@ public class Vision extends SubsystemBase {
 
 		SmartDashboard.putNumber("last good distance", lastGoodDistance);
 
-		distanceOffset = distanceBiasEntry.getDouble(0);
+		SmartDashboard.putNumber("added bias", distanceOffset);
 
 	}
 
@@ -156,7 +154,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public boolean hasVision(){
-		return targetDistance != -0;
+		return targetDistance > 0;
 	}
 
 	public double getMode(ArrayList<Double> array){
@@ -212,5 +210,9 @@ public class Vision extends SubsystemBase {
 	  public void setDistanceOffset(double offset) {
 		distanceOffset = offset;
 	  }
+
+	public void adjustBias(double delta) {
+		distanceOffset += delta;
+	}
 
 }

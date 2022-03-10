@@ -10,6 +10,7 @@ import java.util.function.DoubleSupplier;
 import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -56,6 +57,8 @@ public class AimTurret extends CommandBase {
     private double initialY = 0d;
 
     private BooleanSupplier syncVision;
+
+	private MovingAverageFilter maf = new MovingAverageFilter(3);
 
     enum TargetingState{
         MANUAL,
@@ -111,10 +114,10 @@ public class AimTurret extends CommandBase {
             }
         }
    
-		System.out.println("TURRET STATE" + targetingState + "--------------------------------------------");
+		System.out.println("TURRET STATE --------------------- " + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = POVToStandard(POV) * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+                motorOutput = POV.getAsDouble() * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
 				isUsingOdometer = true;
                 break;
             case VISION:
@@ -123,6 +126,8 @@ public class AimTurret extends CommandBase {
                 lastKnownDistance = vision.getTargetDistance();
                 targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
                 targetAngle += turretTrim;
+
+				targetAngle = maf.filter(targetAngle);
 
                 turret.setTarget(targetAngle);
                 motorOutput = turret.getMotorOutput(turret.getTarget());
@@ -135,13 +140,13 @@ public class AimTurret extends CommandBase {
 
                 }
 
-                if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
-                    targetOffset = vision.getOffsetAngle();
-                    // lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
-                    // vision.startTimer();
-                    isUsingOdometer = true;
-                    vision.setGoodDistance();
-                }
+                // if (syncVision.getAsBoolean() && vision.hasVision()/* || vision.hasVision()*/){
+                //     targetOffset = vision.getOffsetAngle();
+                //     lastKnownDistance = Units.feetToMeters(vision.getTargetDistance());
+                //     vision.startTimer();
+                //     isUsingOdometer = true;
+                //     vision.setGoodDistance();
+                // }
 
                 // lastKnownDistance = vision.getTargetDistance();
 
