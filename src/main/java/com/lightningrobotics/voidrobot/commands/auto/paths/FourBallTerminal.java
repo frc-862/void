@@ -42,16 +42,17 @@ public class FourBallTerminal extends CommandBase {
 
     @Override
     public void initialize() {
+        vision.turnOnVisionLight();
         try {
 
             new TimedCommand(
 
                 new ParallelCommandGroup(
 
-                    new TimedCommand(
+                    // new TimedCommand(
 
-                        new AutonDeployIntake(intake), 
-                            3),
+                    //     new AutonDeployIntake(intake), 
+                    //         3),
 
                     new AutonVisionAim(vision, turret),
         

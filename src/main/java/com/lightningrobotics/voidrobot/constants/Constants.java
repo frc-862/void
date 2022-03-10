@@ -10,13 +10,13 @@ import com.lightningrobotics.util.InterpolatedMap;
 public final class Constants {
 
     // Drivetrain
-    public static final double KP = 0.00058943;
+    public static final double KP = 0.00066934;
     public static final double KI = 0.01;
     public static final double KD = 0.04;
     
-    public static final double KS = 0.6848;
-    public static final double KV = 2.0829;
-    public static final double KA = 0.22588;
+    public static final double KS = 0.74863;
+    public static final double KV = 2.1297;
+    public static final double KA = 0.35019;
 
     public static final boolean LEFT_1_INVERT = false;
     public static final boolean LEFT_2_INVERT = false;
@@ -28,7 +28,7 @@ public final class Constants {
 
     public static final double MAX_SPEED = 2.2;
     public static final double MAX_ACCELERATION = 0.75;
-    public static final double TRACK_WIDTH = 0.76211; // 0.6565; 
+    public static final double TRACK_WIDTH = 0.75616; // 0.6565; 
 	public static final double WHEEL_DIAMETER = 4.0725;
 	public static final double GEAR_REDUCTION = 6.7d;
 	public static final double TICKS_PER_REV_FALCON = 2048d;
