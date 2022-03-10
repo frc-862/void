@@ -93,7 +93,7 @@ public class RobotContainer extends LightningContainer{
 		// vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-        shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+     	//shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
         //CLIMB
@@ -145,8 +145,9 @@ public class RobotContainer extends LightningContainer{
     @Override
     protected void initializeDashboardCommands() { 
 		var tab = Shuffleboard.getTab("shooter test");
+		var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(shooter));
-
+		compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	}
 	
     @Override

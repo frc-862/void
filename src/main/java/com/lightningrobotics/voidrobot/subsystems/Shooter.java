@@ -153,7 +153,9 @@ public class Shooter extends SubsystemBase {
 	public void setManualHoodOverride(boolean override) {
 		manualOverrideHoodPower = override; 
 	}
-
+	public boolean getManualHoodOverride() {
+		return manualOverrideHoodPower;
+	}
 	public void setPower(double power) {
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, power); 
 	}

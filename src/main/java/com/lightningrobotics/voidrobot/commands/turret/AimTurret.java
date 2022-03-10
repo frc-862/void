@@ -114,7 +114,7 @@ public class AimTurret extends CommandBase {
 		System.out.println("TURRET STATE --------------------- " + targetingState + "--------------------------------------------");
         switch(targetingState) {
             case MANUAL: 
-                motorOutput = controllerInputX.getAsDouble() * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
+                motorOutput = -controllerInputX.getAsDouble() * Constants.TURRET_MANUAL_SPEED_MULTIPLIER;
 				isUsingOdometer = true;
                 break;
             case VISION:

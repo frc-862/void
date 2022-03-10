@@ -24,8 +24,6 @@ public class MoveHoodManual extends CommandBase {
     this.shooter = shooter;
     //this.power = power;
 	this.power = power;
-
-    addRequirements(shooter);
   }
 
   @Override
@@ -34,7 +32,7 @@ public class MoveHoodManual extends CommandBase {
   @Override
   public void execute() {
 
-		shooter.setManualHoodOverride(manualHoodEntry.getBoolean(false));
+		shooter.setManualHoodOverride(true);
    
 		if (manualHoodEntry.getBoolean(false)) {
 			shooter.setHoodPower(power.getAsDouble() * Constants.HOOD_MANUAL_SPEED_MULTIPLIER); 
@@ -50,14 +48,5 @@ public class MoveHoodManual extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+}
 
-  public double POVToStandard(DoubleSupplier POV){
-    if (POV.getAsDouble() == 0){
-        return 1;
-    } else if (POV.getAsDouble() == 180){
-        return -1;
-    } else {
-        return 0;
-    }
-}
-}

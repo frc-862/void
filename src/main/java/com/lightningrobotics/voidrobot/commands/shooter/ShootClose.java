@@ -19,6 +19,8 @@ public class ShootClose extends CommandBase {
 		this.indexer = indexer;
 		this.turret = turret;
 
+		shooter.setManualHoodOverride(false);
+
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
 	}
 	@Override
@@ -30,8 +32,9 @@ public class ShootClose extends CommandBase {
 	@Override
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_LOW_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
-
+		if(!shooter.getManualHoodOverride()){
+			shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
+		}
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
