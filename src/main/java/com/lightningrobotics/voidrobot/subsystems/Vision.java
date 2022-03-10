@@ -70,7 +70,7 @@ public class Vision extends SubsystemBase {
 		
 		// Update Target Distance
 		// targetDistance = -1;
-		targetDistance = targetDistanceEntry.getDouble(targetDistance) / 12;
+		targetDistance = Units.inchesToMeters(targetDistanceEntry.getDouble(targetDistance));
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
 

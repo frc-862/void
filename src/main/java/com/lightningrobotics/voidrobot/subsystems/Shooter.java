@@ -57,9 +57,14 @@ public class Shooter extends SubsystemBase {
 	private double currentTarget;
 	private double startTime = 0;
 	private boolean hasShot = false;
+	private boolean disableHood = false;
+	private boolean manualOverrideHood = false;
+	private double manualOverrideTarget = 0;
 	
 	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+	private static ShuffleboardTab disableTab = Shuffleboard.getTab("disable tab");
 	private static NetworkTableEntry shooterArmedEntry = driverView.add("Shooter armed", false).getEntry();
+    private static NetworkTableEntry disableHoodEntry = disableTab.add("disable hood", false).getEntry();
 
 	public Shooter() {
 
@@ -77,9 +82,6 @@ public class Shooter extends SubsystemBase {
 		configPIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
 
 		// Creates the tables to see important values
-		displayShooterPower = shooterTab
-			.add("shooter power output", getShooterPower())
-			.getEntry();
 		setRPM = shooterTab
 			.add("set RPM", 0)
 			.getEntry(); 
@@ -91,9 +93,6 @@ public class Shooter extends SubsystemBase {
 			.getEntry();
 		currentHoodAngle = shooterTab
 			.add("current hood angle", 0)
-			.getEntry();
-		hasShotShuffEntry = shooterTab
-			.add("has shot", false)
 			.getEntry();
 
 		try {
@@ -123,13 +122,28 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setHoodAngle(double hoodAngle) {
-		this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
-		hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, hoodPowerSetPoint);
+		if(manualOverrideHood) {
+			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), manualOverrideTarget;
+			setHoodPower(hoodPowerSetPoint);
+		} else {
+			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), this.hoodAngle);
+			setHoodPower(hoodPowerSetPoint);
+		}
+	}
+
+	public void setManualHoodOverride(boolean override, double manualOverrideTarget) {
+		manualOverrideHood = override;
+		this.manualOverrideTarget = manualOverrideTarget;
 	}
 
 	public void setHoodPower(double power) {
-		hoodMotor.set(TalonSRXControlMode.PercentOutput, power); 
+		if(disableHood) {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		} else {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, power);
+		}
 	}
 
 	public void setPower(double power) {
@@ -174,12 +188,11 @@ public class Shooter extends SubsystemBase {
 	}
 
 	// Update Displays on Dashboard
-	public void setSmartDashboardCommands() {
-		displayRPM.setDouble(getEncoderRPM());
-		displayShooterPower.setDouble(getShooterPower());
-		currentHoodAngle.setDouble(getHoodAngle());
-		hasShotShuffEntry.setBoolean(hasShot);
-	}
+	 public void setSmartDashboardCommands() {
+	// 	displayRPM.setDouble(getEncoderRPM());
+	// 	currentHoodAngle.setDouble(getHoodAngle());
+	// 	hasShotShuffEntry.setBoolean(hasShot);
+	 }
 
 	private void configPIDGains(double kP, double kI, double kD, double kV) {
 		flywheelMotor.config_kP(0, kP);
@@ -221,7 +234,9 @@ public class Shooter extends SubsystemBase {
 		// 		hasShot = getArmed();
 		// }	
 		
-		setSmartDashboardCommands();
+		 setSmartDashboardCommands();
+
+		disableHood = disableHoodEntry.getBoolean(false);
 
 	}
 

@@ -50,8 +50,8 @@ public class ShootCargo extends CommandBase {
 				shooter.setHoodAngle(hoodAngle);
 
 		} else { //if no vision
-			shooter.setRPM(4100);
-			shooter.setHoodAngle(0); 
+			shooter.setRPM(Constants.SHOOT_TARMAC_RPM);
+			shooter.setHoodAngle(Constants.SHOOT_TARMAC_ANGLE); 
 		}
 			
 

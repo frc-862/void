@@ -27,14 +27,15 @@ public class Turret extends SubsystemBase {
 	private double realY = 0d;
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
-	private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
-	private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
+	// private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
+	// private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
 
 
 	private boolean isArmed = false;
 	private double target;
 	private static double motorOutput;
 	private boolean manualOverride = false;
+	private boolean disableTurret = false;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry currentAngle;
@@ -44,6 +45,10 @@ public class Turret extends SubsystemBase {
 	private NetworkTableEntry rightLimitSwitchEntry;
 
 	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
+
+	private static ShuffleboardTab disableTab = Shuffleboard.getTab("disable tab");
+    private static NetworkTableEntry disableTurretEntry = disableTab.add("disable turret", false).getEntry();
+	
 	private static NetworkTableEntry turretArmedEntry = driverView.add("Turret armed", false).getEntry();
 
 	public Turret() {
@@ -70,6 +75,8 @@ public class Turret extends SubsystemBase {
 		isArmed = Math.abs(target - getCurrentAngle().getDegrees()) < Constants.TURRET_ANGLE_TOLERANCE; 
 		SmartDashboard.putBoolean("Turret Armed", isArmed);
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
+
+		disableTurret = disableTurretEntry.getBoolean(false);
 	}
 
 	public boolean getArmed() {
@@ -128,7 +135,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setPower(double power) {
-		turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
+		if(disableTurret) {
+			turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		} else {
+			turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
+		}
 	}
 
 	public double getMotorOutput(double constrainedAngle){
