@@ -54,18 +54,18 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureAutonomousCommands() {
-		// Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
-		// Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
+		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
+		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
         try {
             
-        Autonomous.register("4 ball hanger", new Path("3-4BallHanger.path", false).getCommand(drivetrain));
+        Autonomous.register("test 4 ball hanger", new Path("3-4BallHanger.path", false).getCommand(drivetrain));
             
         } catch (Exception e) {
             //TODO: handle exception
         }
 
         try {
-            Autonomous.register("4 ball terminal", new Path("4-5BallTerminal.path", false).getCommand(drivetrain));
+            Autonomous.register("test 4 ball terminal", new Path("4-5BallTerminal.path", false).getCommand(drivetrain));
                 
             } catch (Exception e) {
                 //TODO: handle exception
