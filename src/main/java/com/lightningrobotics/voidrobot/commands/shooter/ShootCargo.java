@@ -27,8 +27,6 @@ public class ShootCargo extends CommandBase {
 		this.vision = vision;
 		this.turret = turret;
 
-
-		shooter.setManualHoodOverride(false);
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
 
 	}
@@ -41,16 +39,14 @@ public class ShootCargo extends CommandBase {
 			hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 		if(vision.hasVision()) {
-				shooter.setRPM(rpm);
-				if(!shooter.getManualHoodOverride()){
-					shooter.setHoodAngle(hoodAngle);
-				}
+			shooter.setRPM(rpm);
+			shooter.setHoodAngle(hoodAngle);
+				
 
 		} else { //if no vision
 			shooter.setRPM(Constants.SHOOT_TARMAC_RPM);	
-			if(!shooter.getManualHoodOverride()){
-				shooter.setHoodAngle(Constants.SHOOT_TARMAC_ANGLE);
-			}
+			shooter.setHoodAngle(Constants.SHOOT_TARMAC_ANGLE);
+			
 		}
 			
 		if(shooter.getArmed() && turret.getArmed()) {

@@ -144,10 +144,10 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void initializeDashboardCommands() { 
-		var tab = Shuffleboard.getTab("shooter test");
-		var compTab = Shuffleboard.getTab("Competition");
-		tab.add(new ResetHood(shooter));
-		compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+		// var tab = Shuffleboard.getTab("shooter test");
+		// var compTab = Shuffleboard.getTab("Competition");
+		// tab.add(new ResetHood(shooter));
+		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	}
 	
     @Override
