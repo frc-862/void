@@ -75,7 +75,7 @@ public class AimTurret extends CommandBase {
         this.imu = imu;
         this.controllerInputX = controllerInputX;
 
-        addRequirements(vision, turret);
+        addRequirements(turret);
 
 		// displayOffset = turretTab.add("test offset", 0).getEntry();
         // displayTargetAngle = turretTab.add("target angle", 0).getEntry();

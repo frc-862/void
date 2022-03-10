@@ -9,7 +9,6 @@ import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.cscore.VideoEvent;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AdjustBias extends CommandBase {
@@ -19,7 +18,7 @@ public class AdjustBias extends CommandBase {
 	private BooleanSupplier xButton;
 
   public AdjustBias(Vision vision, DoubleSupplier POV, BooleanSupplier xButton) {
-	  this.POV = POV;
+	  	this.POV = POV;
 		this.vision = vision;
 		this.xButton = xButton;
 	}
@@ -44,11 +43,11 @@ public class AdjustBias extends CommandBase {
 
   }
 
-  @Override
-  public void end(boolean interrupted) {}
+	@Override
+	public void end(boolean interrupted) {}
 
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+	@Override
+	public boolean isFinished() {
+		return false;
+	}
 }

@@ -24,7 +24,7 @@ public class MakeHoodAndTurretZero extends CommandBase {
 	this.shooter = shooter;
 	this.turret = turret;  
 	
-	addRequirements(shooter);
+	addRequirements(shooter, turret);
   }
 
   // Called when the command is initially scheduled.
@@ -33,6 +33,7 @@ public class MakeHoodAndTurretZero extends CommandBase {
 	  turret.setManualOverride(true);
 	  shooter.setManualHoodOverride(true, 0);
 	  turret.setTarget(0);
+    shooter.setHoodAngle(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

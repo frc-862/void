@@ -96,7 +96,7 @@ public class RobotContainer extends LightningContainer{
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
 
 		//Climb Control:
-		(new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter)); //LB: run indexer down
+		(new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
 
     }
 
@@ -106,7 +106,7 @@ public class RobotContainer extends LightningContainer{
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
-		// vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
      	//shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));

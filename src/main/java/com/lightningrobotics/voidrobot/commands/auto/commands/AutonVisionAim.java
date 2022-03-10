@@ -26,7 +26,7 @@ public class AutonVisionAim extends CommandBase {
 		this.vision = vision;
 		this.turret = turret;
 
-		addRequirements(vision, turret);
+		addRequirements(turret);
 	}
 
 	@Override

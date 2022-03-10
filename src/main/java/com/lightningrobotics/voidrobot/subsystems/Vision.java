@@ -72,7 +72,7 @@ public class Vision extends SubsystemBase {
 		
 		// Update Target Distance
 		// targetDistance = -1;
-		targetDistance = Units.inchesToMeters(targetDistanceEntry.getDouble(targetDistance));
+		targetDistance = Units.inchesToMeters(targetDistanceEntry.getDouble(targetDistance)) + distanceOffset;
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
 
@@ -116,7 +116,7 @@ public class Vision extends SubsystemBase {
 	 * @return Number from NetworkTable outputted by vision pipeline
 	 */
 	public double getTargetDistance() {
-		return targetDistance + distanceOffset; 
+		return targetDistance;
 	}
 
 	/**
