@@ -5,7 +5,8 @@ import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-import com.lightningrobotics.voidrobot.commands.auto.*;
+import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
+import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallTerminal;
 import com.lightningrobotics.voidrobot.commands.climber.MakeHoodAndTurretZero;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
@@ -52,8 +53,23 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureAutonomousCommands() {
-		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret));
-		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter));
+		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
+		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
+        try {
+            
+        Autonomous.register("test 4 ball hanger", new Path("3-4BallHanger.path", false).getCommand(drivetrain));
+            
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+
+        try {
+            Autonomous.register("test 4 ball terminal", new Path("4-5BallTerminal.path", false).getCommand(drivetrain));
+                
+            } catch (Exception e) {
+                //TODO: handle exception
+            }
+
         if(TESTING) registerTestPaths();        
     }
 
