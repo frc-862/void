@@ -6,6 +6,7 @@ package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
@@ -18,6 +19,8 @@ public class AutonVisionAim extends CommandBase {
 
 	private double targetAngle;
 	private double motorOutput;
+
+	private MovingAverageFilter maf = new MovingAverageFilter(3);
 
 	public AutonVisionAim(Vision vision, Turret turret) {
 		this.vision = vision;
@@ -32,11 +35,11 @@ public class AutonVisionAim extends CommandBase {
 	@Override
 	public void execute() {
 		targetAngle = turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle();
+		targetAngle = maf.filter(targetAngle);
 		turret.setTarget(targetAngle);
 
 		motorOutput = turret.getMotorOutput(turret.getTarget());
 		turret.setPower(motorOutput);
-		
 	}
 
 	@Override

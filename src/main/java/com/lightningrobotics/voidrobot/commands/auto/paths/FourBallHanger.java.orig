@@ -1,12 +1,12 @@
 package com.lightningrobotics.voidrobot.commands.auto.paths;
 
-import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionAim;
+import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
+import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
+import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -41,49 +41,25 @@ public class FourBallHanger extends CommandBase {
     @Override
     public void initialize() {
         try {
-            new TimedCommand(
-                
-                new ParallelCommandGroup(
-
-                    new TimedCommand(
-                        new AutonDeployIntake(intake), 
-                        3),
-
-                    new AutonVisionAim(vision, turret),
-
-                    // all paths sequences
+            new SequentialCommandGroup(
+                new TimedCommand(
                     new SequentialCommandGroup(
+                        new ParallelCommandGroup(
 
-                        // first path sequence
-                        new TimedCommand(
+                            start3BallHanger.getCommand(drivetrain),
 
                             new SequentialCommandGroup(
                                 
-                                new ParallelCommandGroup(
-                                    start3BallHanger.getCommand(drivetrain),
-                                    new AutonIntake(intake, indexer, 1d, 2d)
-                                    
-                            ),
-
-                            new AutonShootCargo(shooter, indexer, turret, vision)
-
-                        ),  start3BallHanger.getDuration(drivetrain) + 3),
-
-                        new TimedCommand(
-                        
-                            new SequentialCommandGroup(
-
-                                new ParallelCommandGroup(
-                                    end3BallHanger.getCommand(drivetrain),
-                                    new AutonIntake(intake, indexer, 1d, 1)
-                                ), 
-
+                                new AutonShootCargo(shooter, indexer, turret, vision),
+                                new AutonIntake(intake, indexer, 1d, 2d),
                                 new AutonShootCargo(shooter, indexer, turret, vision)
-                            
-                            ), end3BallHanger.getDuration(drivetrain) + 3)
+                            )
+                        ) 
+                    ), 
+                    
+                        start3BallHanger.getDuration(drivetrain) + 3)
+            );
 
-                    )
-                ), start3BallHanger.getDuration(drivetrain) + end3BallHanger.getDuration(drivetrain) + 6);
 
 
         } catch (Exception e) {
