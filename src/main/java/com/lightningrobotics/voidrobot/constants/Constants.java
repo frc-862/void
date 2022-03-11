@@ -91,8 +91,8 @@ public final class Constants {
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
 
-    public static final double SHOOT_LOW_RPM = 1500;  // 4100 TODO tune these
-    public static final double SHOOT_LOW_ANGLE = 5.5;
+    public static final double SHOOT_LOW_RPM = 1750;  // 4100 TODO tune these
+    public static final double SHOOT_LOW_ANGLE = 3.0;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 
 	public static final double SHOOT_TARMAC_RPM = 3800;
@@ -101,7 +101,6 @@ public final class Constants {
     //distance in meters, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
-
 			put(0d, 0d);
 			put(2.286d, 3500d);
             put(2.5908d, 3700d);

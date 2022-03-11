@@ -38,6 +38,7 @@ public class Shooter extends SubsystemBase {
 	private NetworkTableEntry hasShotShuffEntry;
 	private NetworkTableEntry hoodTrimEntry = trimTab.add("Hood Bias", 0).getEntry();
 	private NetworkTableEntry RPMTrimEntry = trimTab.add("RPM Bias", 0).getEntry();
+	private NetworkTableEntry displayTargetRPM;
 
 	// For reading robot_constants json
 	Scanner sc;
@@ -57,6 +58,8 @@ public class Shooter extends SubsystemBase {
 	private boolean manualOverrideHood = false;
 	private boolean manualOverrideHoodPower = false;
 	private double manualOverrideTarget = 0;
+
+	private boolean toggleZero = false;
 	
 	private static ShuffleboardTab driverView = Shuffleboard.getTab("Competition");
 	private static ShuffleboardTab disableTab = Shuffleboard.getTab("disable tab");
@@ -87,6 +90,9 @@ public class Shooter extends SubsystemBase {
 		targetHoodAngle = shooterTab
 			.add("set hood angle", 0)
 			.getEntry();
+		displayTargetRPM = shooterTab
+			.add("target RPM", 0)
+			.getEntry();
 		currentHoodAngle = shooterTab
 			.add("current hood angle", 0)
 			.getEntry();
@@ -106,6 +112,14 @@ public class Shooter extends SubsystemBase {
 
 		hoodMotor.setSensorPhase(true);
 
+	}
+
+	public void setToggleZero() {
+		toggleZero = !toggleZero;
+	}
+
+	public boolean getToggleZero() {
+		return toggleZero;
 	}
 
 	public double getHoodAngle() {
@@ -132,6 +146,7 @@ public class Shooter extends SubsystemBase {
 	public void setManualHoodOverride(boolean override, double manualOverrideTarget) {
 		manualOverrideHood = override;
 		this.manualOverrideTarget = manualOverrideTarget;
+		setHoodAngle(manualOverrideTarget);
 	}
 
 	public void setHoodPower(double power) {
@@ -170,6 +185,7 @@ public class Shooter extends SubsystemBase {
 
 	public void stop() {
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, 0); 
+		hoodMotor.set(TalonSRXControlMode.PercentOutput, 0); 
 	}
 
 	public double getEncoderRPM() {
@@ -177,7 +193,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setRPM(double targetRPMs) {
-		this.targetRPM = targetRPMs + RPMTrimEntry.getDouble(0);
+		this.targetRPM = targetRPMs; // + RPMTrimEntry.getDouble(0);
 		setVelocity(this.targetRPM / 600 * 2048);
 	}
 
@@ -200,6 +216,7 @@ public class Shooter extends SubsystemBase {
 	// Update Displays on Dashboard
 	 public void setSmartDashboardCommands() {
 		displayRPM.setDouble(getEncoderRPM());
+		displayTargetRPM.setDouble(targetRPM);
 		currentHoodAngle.setDouble(getHoodAngle());
 	 }
 
@@ -228,6 +245,7 @@ public class Shooter extends SubsystemBase {
 		shooterArmedEntry.setBoolean(getArmed());
 		
 		SmartDashboard.putNumber("hood offset from funky file", hoodOffset);
+		SmartDashboard.putNumber("raw hood angle", getRawHoodAngle());
 
 		// currentTarget = targetRPM;
 
@@ -243,7 +261,7 @@ public class Shooter extends SubsystemBase {
 		// 		hasShot = getArmed();
 		// }	
 		
-		 setSmartDashboardCommands();
+		setSmartDashboardCommands();
 
 		disableHood = disableHoodEntry.getBoolean(false);
 

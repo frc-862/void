@@ -53,7 +53,7 @@ public class FourBallTerminal extends CommandBase {
                     // deploy intake
                     new TimedCommand(
                         new AutonDeployIntake(intake), 
-                            3),
+                            1),
 
                     // run the aimt the whole time
                     new AutonVisionAim(vision, turret),
@@ -67,12 +67,7 @@ public class FourBallTerminal extends CommandBase {
                                 new SequentialCommandGroup(
 
                                     start4BallPath.getCommand(drivetrain),
-
-                                    new SequentialCommandGroup(
-                                        
-                                        new AutonShootCargo(shooter, indexer, turret, vision)
-
-                                    )
+                                    new AutonShootCargo(shooter, indexer, turret, vision)
 
                                 ),  start4BallPath.getDuration(drivetrain) + 3
 
@@ -103,7 +98,7 @@ public class FourBallTerminal extends CommandBase {
 
                             new ParallelCommandGroup(
                                 end4BallPath.getCommand(drivetrain),
-                                new AutonIntake(intake, indexer, 1d, 1)
+                                new AutonIntake(intake, indexer, 1d, 1d)
                             ),
             
                                 new AutonShootCargo(shooter, indexer, turret, vision)

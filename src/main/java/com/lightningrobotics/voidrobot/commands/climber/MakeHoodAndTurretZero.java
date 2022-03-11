@@ -30,10 +30,15 @@ public class MakeHoodAndTurretZero extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
+	shooter.setToggleZero();
+
 	  turret.setManualOverride(true);
 	  shooter.setManualHoodOverride(true, 0);
 	  turret.setTarget(0);
     shooter.setHoodAngle(0);
+
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,6 +55,6 @@ public class MakeHoodAndTurretZero extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return preventFritzStoopid.getBoolean(false);
+    return shooter.getToggleZero(); //return preventFritzStoopid.getBoolean(false);
   }
 }

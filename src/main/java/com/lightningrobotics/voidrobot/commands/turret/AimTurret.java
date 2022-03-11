@@ -106,9 +106,9 @@ public class AimTurret extends CommandBase {
             } else if (vision.hasVision()) {
                 targetingState = TargetingState.VISION;
             }
-            else{
-                targetingState = TargetingState.NO_VISION;
-            }
+            // else{
+            //     targetingState = TargetingState.NO_VISION;
+            // }
         }
    
 		System.out.println("TURRET STATE --------------------- " + targetingState + "--------------------------------------------");
@@ -130,28 +130,28 @@ public class AimTurret extends CommandBase {
                 motorOutput = turret.getMotorOutput(turret.getTarget());
                 break;
             case NO_VISION:
-                if(isUsingOdometer){
-                    isUsingOdometer = false;
-                    resetPose();
-                    turretTrim = 0;
+                // if(isUsingOdometer){
+                //     isUsingOdometer = false;
+                //     resetPose();
+                //     turretTrim = 0;
 
-                }
+                // }
 
-                double relativeX = drivetrain.getPose().getX() - initialX;
-                double relativeY = drivetrain.getPose().getY() - initialY;
+                // double relativeX = drivetrain.getPose().getX() - initialX;
+                // double relativeY = drivetrain.getPose().getY() - initialY;
 
-                // rotate from odometer-center to robot-center
-                relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
-                relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
+                // // rotate from odometer-center to robot-center
+                // relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
+                // relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
-                // update rotation data 
-                double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
+                // // update rotation data 
+                // double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-                targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+                // targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
-                targetAngle += turretTrim;
-                turret.setTarget(targetAngle);
-                motorOutput = turret.getMotorOutput(turret.getTarget());
+                // targetAngle += turretTrim;
+                // turret.setTarget(targetAngle);
+                // motorOutput = turret.getMotorOutput(turret.getTarget());
                 break;   
             case MANUAL_OVERRIDE:
                 targetAngle = turret.getTarget();
