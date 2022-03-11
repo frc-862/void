@@ -1,7 +1,6 @@
 package com.lightningrobotics.voidrobot.commands.indexer;
 
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
-import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -10,7 +9,6 @@ public class AutoIndexCargo extends CommandBase {
 
     // Creates our indexer subsystem
     private Indexer indexer;
-    private Intake intake;
 
     private static double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
     private static double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
@@ -18,9 +16,8 @@ public class AutoIndexCargo extends CommandBase {
 
     private static double power = 1; // the power we want the indexer to run at
 
-    public AutoIndexCargo(Indexer indexer, Intake intake) {
+    public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
-        this.intake = intake;
 
 		addRequirements(indexer);
 	}
@@ -31,7 +28,7 @@ public class AutoIndexCargo extends CommandBase {
     @Override
     public void execute() {
 
-        if (indexer.getCollectedBall() && indexer.getAutoIndex()) {
+        if (indexer.getCollectedBall()) { // && indexer.getAutoIndex()
             startIndexTime = Timer.getFPGATimestamp();
         }
 

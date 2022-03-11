@@ -41,29 +41,23 @@ public class ShootCargo extends CommandBase {
 		if (distance > 0) {
 			distance = maf.filter(distance);
 		} else {
-			distance = maf.get();
+			distance = maf.get(); // TODO
 		}
 		
 		rpm = Constants.DISTANCE_RPM_MAP.get(distance);
 		hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-		// if(vision.hasVision()) {
-			shooter.setRPM(rpm);
-			shooter.setHoodAngle(hoodAngle);
-			System.out.println("Has Vision");
-
-		// } else { //if no vision
-			// shooter.setRPM(Constants.SHOOT_TARMAC_RPM);	
-			// shooter.setHoodAngle(Constants.SHOOT_TARMAC_ANGLE);
-			// System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO Vision");
+		shooter.setRPM(rpm);
+		shooter.setHoodAngle(hoodAngle);
+		System.out.println("Has Vision");
 			
-		// }
-			
-		if(shooter.getArmed() && turret.getArmed()) {
+		if(shooter.getArmed() && turret.getArmed()) { // TODO if (shooter.getArmed() && turret.getArmed() && shooter.getShooterPower() > 0) {
 			indexer.toShooter();
 		}
 
 		SmartDashboard.putNumber("hood angle from map", Constants.HOOD_ANGLE_MAP.get(distance));
+		SmartDashboard.putNumber("shooter from map", Constants.DISTANCE_RPM_MAP.get(distance));
+		
 	}
 
 	@Override

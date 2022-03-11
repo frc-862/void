@@ -64,7 +64,7 @@ public final class Constants {
     public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
-    public static final double DEFAULT_INDEXER_POWER = 0.5;
+    public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
     public static final double RED_THRESHOLD = 0.295;
     public static final double BLUE_THRESHOLD = 0.25;
 
@@ -149,6 +149,6 @@ public final class Constants {
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
-    public static final double DEFAULT_INTAKE_POWER = 0.5;
+    public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
 }

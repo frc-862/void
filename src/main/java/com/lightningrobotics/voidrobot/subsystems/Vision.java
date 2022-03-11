@@ -90,7 +90,7 @@ public class Vision extends SubsystemBase {
 			lastVisionTimestamp = visionTimestamp;
 		}
 
-		SmartDashboard.putNumber("added bias", distanceOffset);
+		SmartDashboard.putNumber("vision distance bias", distanceOffset);
 		SmartDashboard.putBoolean("vision disabled", disableVision);
 
 	}

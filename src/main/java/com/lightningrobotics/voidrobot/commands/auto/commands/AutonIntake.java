@@ -1,42 +1,42 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
-import java.util.function.DoubleSupplier;
-
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonIntake extends CommandBase {
-    private final Intake intake;
-    private double power;
-    private Indexer indexer;
+	
+    private Intake intake;
+    // private Indexer indexer;
     private double ballsWanted;
 
-    public AutonIntake(Intake intake, Indexer indexer, double power, double ballsWanted) {
-        this.intake = intake;
-        this.indexer = indexer;
-        this.power = power;
-        this.ballsWanted = ballsWanted;
+    // public AutonIntake(Intake intake, double ballsWanted) {
+	public AutonIntake(Intake intake) {
 
-        addRequirements(intake, indexer);
+		this.intake = intake;
+        // this.indexer = indexer;
+        // this.ballsWanted = ballsWanted;
+
+        addRequirements(intake);
     }    
 
     @Override
-    public void execute() {
-        intake.setPower(power);
-        indexer.setPower(power);
+    public void execute() {/*  */
+        intake.setPower(Constants.DEFAULT_INDEXER_POWER);
+        // indexer.setPower(Constants.DEFAULT_INTAKE_POWER);
     }
 
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
         intake.stop();
-        indexer.stop();
     }
 
     @Override
     public boolean isFinished(){
-        return indexer.getBallCount() == ballsWanted;
-    }
+        // return indexer.getBallCount() == ballsWanted;
+		return false;
+	}
 }

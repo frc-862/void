@@ -29,15 +29,16 @@ public class AutonShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 
-		if(vision.hasVision()) {
-			var distance = vision.getTargetDistance();
-			var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-			var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+		var distance = vision.getTargetDistance();
+		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-			shooter.setRPM(rpm);
-			shooter.setHoodAngle(hoodAngle);
+		System.out.println("wanted RPM " + rpm);
+		System.out.println("current RPM " + shooter.getEncoderRPM());
 
-		}
+		shooter.setRPM(rpm);
+		shooter.setHoodAngle(hoodAngle);
+
 
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();

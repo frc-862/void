@@ -8,6 +8,8 @@ import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.ToggleZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallTerminal;
+import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
+import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBallTest;
 import com.lightningrobotics.voidrobot.commands.climber.MakeHoodAndTurretZero;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
@@ -54,28 +56,15 @@ public class RobotContainer extends LightningContainer{
 
     @Override
     protected void configureAutonomousCommands() {
-		Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
-		Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
-        // try {
-        // Autonomous.register("test 4 ball hanger", new Path("3-4BallHanger.path", false).getCommand(drivetrain));
-            
-        // } catch (Exception e) {
-        //     //TODO: handle exception
-        // }
-
-        // try {
-        //     Autonomous.register("test 4 ball terminal", new Path("4-5BallTerminal.path", false).getCommand(drivetrain));
-                
-        //     } catch (Exception e) {
-        //         //TODO: handle exception
-        //     }
-
-		try {
+        try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-				
-			} catch (Exception e) {
-				//TODO: handle exception>
-			}
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, turret, indexer, intake, vision));
+			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
+			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
+		} catch (Exception e) {
+			System.err.println("I did an oopsie.");
+		}
+
         if(TESTING) registerTestPaths();        
     }
 
@@ -85,10 +74,11 @@ public class RobotContainer extends LightningContainer{
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, indexer, turret, vision), false); // Auto shoot
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, indexer, turret, vision), false); // Auto shoot
-        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret), false); // Shoot close no vision
+        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret, vision), false); // Shoot close no vision
 		(new JoystickButton(driverRight, 3)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
-		(new JoystickButton(driverLeft, 2)).whileHeld(new ToggleZeroTurretHood(shooter, turret));
+		// (new JoystickButton(driverLeft, 2)).whileHeld(new ToggleZeroTurretHood(shooter, turret));
+		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(shooter, turret)); // TODO test
 
         // COPILOT:
 
@@ -114,7 +104,7 @@ public class RobotContainer extends LightningContainer{
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain, imu, () -> copilotFilter.filter(copilot.getRightX())));
-		// vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
 		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
      	//shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
