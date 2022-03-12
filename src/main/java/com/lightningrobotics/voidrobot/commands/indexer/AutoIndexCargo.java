@@ -16,10 +16,12 @@ public class AutoIndexCargo extends CommandBase {
 
     private static double power = 1; // the power we want the indexer to run at
 
+	private boolean isStopped = false;
+
     public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
 
-		addRequirements(indexer);
+		// addRequirements(indexer);
 	}
 
     @Override
@@ -34,11 +36,15 @@ public class AutoIndexCargo extends CommandBase {
 
         if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
             indexer.setPower(power);
+			isStopped = false;
         } 
         else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2 && !indexer.getAtMaxBallCount()) { // Checks to see if we have reached the amount of time we want to index, then stops
             indexer.setPower(power);
-        } else {
+			isStopped = false;
+        } 
+		else if(!isStopped){
             indexer.setPower(0);
+			isStopped = true;
         } 
     }
 

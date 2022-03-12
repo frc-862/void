@@ -133,8 +133,7 @@ public class Shooter extends SubsystemBase {
 
 	public void setHoodAngle(double hoodAngle) {
 		if(manualOverrideHood) {
-			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
-			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), manualOverrideTarget);
+			hoodPowerSetPoint = Constants.HOOD_PID.calculate(getHoodAngle(), LightningMath.constrain(manualOverrideTarget, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE));
 			setHoodPower(hoodPowerSetPoint);
 		} else {
 			this.hoodAngle = LightningMath.constrain(hoodAngle + hoodTrimEntry.getDouble(0), Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
