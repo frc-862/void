@@ -50,6 +50,8 @@ public class Indexer extends SubsystemBase {
     // For telling us that we are at max balls
     private boolean atMaxBallCount = false;
 
+	private boolean autoShoot = false;
+
     // Creates the color sensor
     private final ColorSensorV3 intakeSensor;
 
@@ -172,12 +174,17 @@ public class Indexer extends SubsystemBase {
         } 
         // Puts the ball count to the dashboard
 	
+
         SmartDashboard.putString("ball1 color", ball1Color.toString());
         SmartDashboard.putString("ball2 color", ball2Color.toString());
 
         currentBallCountEntry.setNumber(ballCount);
 
     }
+
+	public void initializeBallsHeld() {
+		ballCount = 1;
+	}
     
 
     public boolean getAtMaxBallCount(){
@@ -245,4 +252,14 @@ public class Indexer extends SubsystemBase {
         setPower(0d);
     }
     
+	public boolean getAutoShoot() {
+		return autoShoot;
+	}
+
+	public void setAutoShoot(boolean autoShoot) {
+		this.autoShoot = autoShoot; 
+	}
+
+	
+
 }

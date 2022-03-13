@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands.shooter;
+package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
@@ -6,36 +6,40 @@ import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootClose extends CommandBase {
+public class AutonShootCargo extends CommandBase {
 
 	private Shooter shooter;
+	private Vision vision;
 	private Indexer indexer;
 	private Turret turret;
-	private Vision vision;
 
-	public ShootClose(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
-
+	public AutonShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
 		this.indexer = indexer;
-		this.turret = turret;
 		this.vision = vision;
+		this.turret = turret;
 
-		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
-	}
-	@Override
-	public void initialize() {
-		turret.setManualOverride(true);
-		turret.setTarget(0d);
-		vision.turnOffVisionLight();
+		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
+
 	}
 
 	@Override
 	public void execute() {
-		shooter.setRPM(Constants.SHOOT_LOW_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
-		
+
+		var distance = vision.getTargetDistance();
+		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+
+		System.out.println("wanted RPM " + rpm);
+		System.out.println("current RPM " + shooter.getEncoderRPM());
+
+		shooter.setRPM(rpm);
+		shooter.setHoodAngle(hoodAngle);
+
+
 		if(shooter.getArmed() && turret.getArmed()) {
 			indexer.toShooter();
 		}
@@ -45,12 +49,11 @@ public class ShootClose extends CommandBase {
 	public void end(boolean interrupted) {
 		shooter.stop();
 		indexer.stop();
-		turret.setManualOverride(false);
 	}
 
 	@Override
 	public boolean isFinished() {
-		return false;
+		return indexer.getBallCount() == 0;
 	}
 	
 }

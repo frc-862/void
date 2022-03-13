@@ -1,5 +1,6 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
@@ -21,6 +22,8 @@ public class ShootCargo extends CommandBase {
 	private static double distance;
 	private static double hoodAngle;
 
+	private MovingAverageFilter maf = new MovingAverageFilter(10);
+
 	public ShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
 		this.indexer = indexer;
@@ -34,26 +37,27 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 
-			distance = vision.getTargetDistance();
-			rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-			hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
-
-		if(vision.hasVision()) {
-			shooter.setRPM(rpm);
-			shooter.setHoodAngle(hoodAngle);
-				
-
-		} else { //if no vision
-			shooter.setRPM(Constants.SHOOT_TARMAC_RPM);	
-			shooter.setHoodAngle(Constants.SHOOT_TARMAC_ANGLE);
-			
+		distance = vision.getTargetDistance();
+		if (distance > 0) {
+			distance = maf.filter(distance);
+		} else {
+			distance = maf.get(); // TODO
 		}
+		
+		rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+
+		shooter.setRPM(rpm);
+		shooter.setHoodAngle(hoodAngle);
+		System.out.println("Has Vision");
 			
-		if(shooter.getArmed() && turret.getArmed()) {
+		if(shooter.getArmed() && turret.getArmed()) { // TODO if (shooter.getArmed() && turret.getArmed() && shooter.getShooterPower() > 0) {
 			indexer.toShooter();
 		}
 
 		SmartDashboard.putNumber("hood angle from map", Constants.HOOD_ANGLE_MAP.get(distance));
+		SmartDashboard.putNumber("shooter from map", Constants.DISTANCE_RPM_MAP.get(distance));
+		
 	}
 
 	@Override

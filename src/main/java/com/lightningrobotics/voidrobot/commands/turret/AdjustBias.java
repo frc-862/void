@@ -6,22 +6,24 @@ package com.lightningrobotics.voidrobot.commands.turret;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.cscore.VideoEvent;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AdjustBias extends CommandBase {
 
 	private final Vision vision;
-	private DoubleSupplier POV; 
+	private IntSupplier POV; 
 	private BooleanSupplier xButton;
 
-  public AdjustBias(Vision vision, DoubleSupplier POV, BooleanSupplier xButton) {
-	  this.POV = POV;
+  public AdjustBias(Vision vision, IntSupplier POV, BooleanSupplier xButton) {
+	  	this.POV = POV;
 		this.vision = vision;
 		this.xButton = xButton;
+
+		addRequirements(vision);
 	}
 
   @Override
@@ -29,12 +31,12 @@ public class AdjustBias extends CommandBase {
 
   @Override
   public void execute() {
-	switch((int)POV.getAsDouble()) {
+	switch(POV.getAsInt()) {
 		case 0: 
-			vision.adjustBias(0.1);
+			vision.adjustBias(0.05);
 		break;
 		case 180: 
-			vision.adjustBias(-0.1);
+			vision.adjustBias(-0.05);
 		break;
 	}
 
@@ -44,11 +46,11 @@ public class AdjustBias extends CommandBase {
 
   }
 
-  @Override
-  public void end(boolean interrupted) {}
+	@Override
+	public void end(boolean interrupted) {}
 
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+	@Override
+	public boolean isFinished() {
+		return false;
+	}
 }

@@ -10,13 +10,13 @@ import com.lightningrobotics.util.InterpolatedMap;
 public final class Constants {
 
     // Drivetrain
-    public static final double KP = 0.00058943;
+    public static final double KP = 0.00066934;
     public static final double KI = 0.01;
     public static final double KD = 0.04;
     
-    public static final double KS = 0.6848;
-    public static final double KV = 2.0829;
-    public static final double KA = 0.22588;
+    public static final double KS = 0.74863;
+    public static final double KV = 2.1297;
+    public static final double KA = 0.35019;
 
     public static final boolean LEFT_1_INVERT = false;
     public static final boolean LEFT_2_INVERT = false;
@@ -28,7 +28,7 @@ public final class Constants {
 
     public static final double MAX_SPEED = 2.2;
     public static final double MAX_ACCELERATION = 0.75;
-    public static final double TRACK_WIDTH = 0.76211; // 0.6565; 
+    public static final double TRACK_WIDTH = 0.75616; // 0.6565; 
 	public static final double WHEEL_DIAMETER = 4.0725;
 	public static final double GEAR_REDUCTION = 6.7d;
 	public static final double TICKS_PER_REV_FALCON = 2048d;
@@ -64,7 +64,7 @@ public final class Constants {
     public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
-    public static final double DEFAULT_INDEXER_POWER = 0.5;
+    public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
     public static final double RED_THRESHOLD = 0.295;
     public static final double BLUE_THRESHOLD = 0.25;
 
@@ -91,8 +91,8 @@ public final class Constants {
     public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
     public static final double MIN_HOOD_ANGLE = 0.3;
 
-    public static final double SHOOT_LOW_RPM = 1500;  // 4100 TODO tune these
-    public static final double SHOOT_LOW_ANGLE = 5.5;
+    public static final double SHOOT_LOW_RPM = 1750;  // 4100 TODO tune these
+    public static final double SHOOT_LOW_ANGLE = 3.0;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 
 	public static final double SHOOT_TARMAC_RPM = 3800;
@@ -101,7 +101,6 @@ public final class Constants {
     //distance in meters, power in RPMs 
     public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
         {
-
 			put(0d, 0d);
 			put(2.286d, 3500d);
             put(2.5908d, 3700d);
@@ -150,6 +149,6 @@ public final class Constants {
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
-    public static final double DEFAULT_INTAKE_POWER = 0.5;
+    public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
 }
