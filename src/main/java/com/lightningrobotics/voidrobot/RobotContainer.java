@@ -8,6 +8,8 @@ import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.ToggleZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallTerminal;
+import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
+import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBallTest;
 import com.lightningrobotics.voidrobot.commands.climber.MakeHoodAndTurretZero;
@@ -58,8 +60,11 @@ public class RobotContainer extends LightningContainer{
     protected void configureAutonomousCommands() {
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("2 Ball", new TwoBallTest(drivetrain, shooter, turret, indexer, intake, vision));
+			Autonomous.register("test 2 Ball", new TwoBallTest(drivetrain, shooter, turret, indexer, intake, vision));
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, turret, indexer, intake, vision));
+			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, turret, indexer, intake, vision));
 			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
+			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
 			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
@@ -83,8 +88,8 @@ public class RobotContainer extends LightningContainer{
         // COPILOT:
 
         // Collector Controls:
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getRightTriggerAxis())); //RT: run collector in
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> 1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new ActuateIntake(intake, indexer, -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new ActuateIntake(intake, indexer, Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
 

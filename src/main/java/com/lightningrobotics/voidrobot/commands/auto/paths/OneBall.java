@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class TwoBall extends ParallelCommandGroup {
+public class OneBall extends ParallelCommandGroup {
 
 	private static Path path = new Path("1-2Ball.path", false);
 
-	public TwoBall(Drivetrain drivetrain, Shooter shooter, Turret turret, Indexer indexer, Intake intake, Vision vision) throws Exception {
+	public OneBall(Drivetrain drivetrain, Shooter shooter, Turret turret, Indexer indexer, Intake intake, Vision vision) throws Exception {
 		super(
 
 		// Aim Turret
@@ -35,11 +35,7 @@ public class TwoBall extends ParallelCommandGroup {
 			// Deploy Intake
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
-			// Run Path & Collect 1
-			new ParallelCommandGroup(
-				new TimedCommand(new AutonIntake(intake), path.getDuration(drivetrain)+1),
-				path.getCommand(drivetrain)
-			),
+			path.getCommand(drivetrain),
 
 			// Shoot 2 (Preload & Collected)
 			new AutonShootCargo(shooter, indexer, turret, vision)

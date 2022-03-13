@@ -19,15 +19,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class FourBallTerminal extends ParallelCommandGroup {
+public class ThreeBallTerminal extends ParallelCommandGroup {
 
     private static Path start4BallPath = new Path("Start4Ball.path", false);
     private static Path middle4BallPath = new Path("Middle4Ball.path", false);
     private static Path end4BallPath = new Path("End4Ball.path", false);   
 
-
 	
-    public FourBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Turret turret, Vision vision) throws Exception {
+    public ThreeBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Turret turret, Vision vision) throws Exception {
         super(
 			
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
@@ -43,7 +42,7 @@ public class FourBallTerminal extends ParallelCommandGroup {
 
 				// Set Initial Balls Held To 1
 				new InstantCommand(indexer::initializeBallsHeld, indexer),
-
+    
 				// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
 				start4BallPath.getCommand(drivetrain),
@@ -53,13 +52,6 @@ public class FourBallTerminal extends ParallelCommandGroup {
 					new TimedCommand(new AutonIntake(intake), middle4BallPath.getDuration(drivetrain)+1),
 					middle4BallPath.getCommand(drivetrain)
 				),
-
-				new AutonShootCargo(shooter, indexer, turret, vision),
-
-				new ParallelCommandGroup(
-					new TimedCommand(new AutonIntake(intake), end4BallPath.getDuration(drivetrain)+2),
-					end4BallPath.getCommand(drivetrain)
-				), 
 
 				new AutonShootCargo(shooter, indexer, turret, vision)
 

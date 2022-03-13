@@ -43,4 +43,5 @@ public class ToggleZeroTurretHood extends CommandBase {
 		turret.setPower(0);
 		shooter.setHoodPower(0);
 	}
+	
 }
