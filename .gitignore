@@ -163,3 +163,8 @@ bin/
 
 # VS Code preferences
 .vscode/*
+
+.SysId/*
+*/.SysId/*
+.Glass/*
+*/,Glass/*

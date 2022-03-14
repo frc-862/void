@@ -2,13 +2,24 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2022.1.1"
+    id "edu.wpi.first.GradleRIO" version "2022.4.1"
+}
+
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = "https://maven.pkg.github.com/frc-862/lightning"
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+        }
+    }
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def ROBOT_MAIN_CLASS = "com.lightningrobotics.voidrobot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -52,6 +63,7 @@ def includeDesktopSupport = false
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
+    implementation 'com.lightningrobotics:common:0.0.4'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -87,3 +99,21 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+// Custom tasks
+tasks.register('paths', Copy) {
+    from "PathWeaver/Paths/"
+    include "*.path"
+    into "src/main/deploy/paths"
+}
+tasks.register('prune', Delete) {
+	delete(files("src/main/deploy/paths/"))
+}
+tasks.register('makedirs') {
+	mkdir "src/main/deploy/paths"
+}
+
+// Automatically copy paths over on build
+makedirs.dependsOn('prune')
+paths.dependsOn('makedirs')
+build.dependsOn('paths')
