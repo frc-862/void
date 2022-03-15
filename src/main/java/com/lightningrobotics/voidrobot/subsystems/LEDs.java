@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Random;
 
@@ -49,6 +50,8 @@ public class LEDs extends SubsystemBase {
 		Blue = LEDTab
 			.add("blue", 0)
 			.getEntry();
+
+		CommandScheduler.getInstance().registerSubsystem(this);
 
     }
 

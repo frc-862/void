@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
 import com.lightningrobotics.common.util.LightningMath;
@@ -13,6 +14,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Drivetrain extends DifferentialDrivetrain {
 
@@ -53,10 +55,16 @@ public class Drivetrain extends DifferentialDrivetrain {
         );
         this.imu = imu;
 
-        for (int i = 0; i < RIGHT_MOTORS.length; i++){
-            ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
-            ((WPI_TalonFX)LEFT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
-        }
+
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Brake);   
+            motor.configOpenloopRamp(0.1); // TODO Tune this number for eric <3         
+        });
+        
+        intitLogging();
+
+		CommandScheduler.getInstance().registerSubsystem(this);
 
     }
 
@@ -64,9 +72,19 @@ public class Drivetrain extends DifferentialDrivetrain {
         return ((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() < 0.05 && ((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() < 0.05;
     }
 
+    private void intitLogging() {
+        DataLogger.addDataElement("leftVelocity", leftVelocitySupplier);
+        DataLogger.addDataElement("rightVelocity", rightVelocitySupplier);
+        DataLogger.addDataElement("leftPosition", leftPositionSupplier);
+        DataLogger.addDataElement("rightPosition", rightPositionSupplier);
+        DataLogger.addDataElement("heading", () -> this.getPose().getRotation().getDegrees());
+        DataLogger.addDataElement("poseX", () -> this.getPose().getX());
+        DataLogger.addDataElement("poseY", () -> this.getPose().getY());
+    }
+
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("headiong", imu.getHeading().getDegrees());
+        SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
     }
 }

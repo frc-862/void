@@ -44,7 +44,7 @@ public class ShootCargoManual extends CommandBase {
 		// }
 			
 		
-			indexer.toShooter();
+		indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 	
 
 		SmartDashboard.putNumber("hood angle from map", Constants.HOOD_ANGLE_MAP.get(distance));

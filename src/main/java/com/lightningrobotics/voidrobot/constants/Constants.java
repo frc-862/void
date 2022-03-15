@@ -58,7 +58,7 @@ public final class Constants {
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 90d;
     public static final double MIN_TURRET_ANGLE = -90d;
-    public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
+    public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
     public static final double READ_VISION_TIME = 1; //seconds
     public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
@@ -67,6 +67,7 @@ public final class Constants {
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
     public static final double RED_THRESHOLD = 0.295;
     public static final double BLUE_THRESHOLD = 0.25;
+    public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
     public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune

@@ -34,14 +34,14 @@ public class AutonShootCargo extends CommandBase {
 		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 		System.out.println("wanted RPM " + rpm);
-		System.out.println("current RPM " + shooter.getEncoderRPM());
+		System.out.println("current RPM " + shooter.getCurrentRPM());
 
 		shooter.setRPM(rpm);
 		shooter.setHoodAngle(hoodAngle);
 
 
 		if(shooter.getArmed() && turret.getArmed()) {
-			indexer.toShooter();
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}
 

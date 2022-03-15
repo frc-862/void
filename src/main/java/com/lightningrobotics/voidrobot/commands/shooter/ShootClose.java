@@ -37,7 +37,7 @@ public class ShootClose extends CommandBase {
 		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
 		
 		if(shooter.getArmed() && turret.getArmed()) {
-			indexer.toShooter();
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}
 
