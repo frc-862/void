@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands.shooter;
+package com.lightningrobotics.voidrobot.commands.hood;
 
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;

@@ -19,7 +19,6 @@ public class RunIntake extends CommandBase {
 
     @Override
     public void execute() {
-        System.out.println("Running Intake...");
         intake.setPower(power.getAsDouble());
     }
 

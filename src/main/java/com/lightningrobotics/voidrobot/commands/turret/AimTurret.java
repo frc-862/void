@@ -48,7 +48,7 @@ public class AimTurret extends CommandBase {
             targetAngle = maf.filter(targetAngle);
             lastKnownHeading = targetAngle;
 
-            turret.setTarget(targetAngle);
+            turret.setAngle(targetAngle);
             resetPose();
 
         } else {
@@ -64,7 +64,7 @@ public class AimTurret extends CommandBase {
 
             targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
-            turret.setTarget(targetAngle);
+            turret.setAngle(targetAngle);
         }
     }
 

@@ -38,7 +38,7 @@ public class AutoIndexCargo extends CommandBase {
             indexer.setPower(power);
 			isStopped = false;
         } 
-        else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2 && !indexer.getAtMaxBallCount()) { // Checks to see if we have reached the amount of time we want to index, then stops
+        else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2 && indexer.getBallCount() != 2) { // Checks to see if we have reached the amount of time we want to index, then stops
             indexer.setPower(power);
 			isStopped = false;
         } 

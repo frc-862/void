@@ -1,23 +1,22 @@
 package com.lightningrobotics.voidrobot.commands;
 
-import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ToggleZeroTurretHood extends CommandBase {
+public class ZeroTurretHood extends CommandBase {
 
-	private Shooter shooter;
+	private Hood hood;
 	private Turret turret;
 
-	public ToggleZeroTurretHood(Shooter shooter, Turret turret) {
-		this.shooter = shooter;
+	public ZeroTurretHood(Hood hood, Turret turret) {
+		this.hood = hood;
 		this.turret = turret;
-		addRequirements(shooter, turret);
+		addRequirements(hood, turret);
 	}
 
 	@Override
@@ -25,19 +24,21 @@ public class ToggleZeroTurretHood extends CommandBase {
 
 	@Override
 	public void execute() {
-
-		var targetAngle = 0;
-		turret.setTarget(targetAngle);
+		turret.setAngle(0);
 		var motorOutput = turret.getMotorOutput(turret.getTarget());
-
 		turret.setPower(motorOutput);
-		shooter.setHoodAngle(0);
+		hood.setAngle(0);
 	}
 
 	@Override
 	public void end(boolean interrupted) {
 		turret.setPower(0);
-		shooter.setHoodPower(0);
+		hood.setPower(0);
 	}
+
+	@Override
+    public boolean isFinished() {
+        return turret.onTarget() && hood.onTarget();
+    }
 	
 }

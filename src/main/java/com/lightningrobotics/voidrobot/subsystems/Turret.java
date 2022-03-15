@@ -120,7 +120,7 @@ public class Turret extends SubsystemBase {
 		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
 	}
 
-	public void setTarget(double targetAngle) {
+	public void setAngle(double targetAngle) {
 		manualOverride = false;
 		double sign = Math.signum(targetAngle);
         targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);

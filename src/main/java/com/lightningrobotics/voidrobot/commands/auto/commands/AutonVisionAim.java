@@ -31,7 +31,7 @@ public class AutonVisionAim extends CommandBase {
 	public void execute() {
 		targetAngle = turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle();
 		targetAngle = maf.filter(targetAngle);
-		turret.setTarget(targetAngle);
+		turret.setAngle(targetAngle);
 
 		motorOutput = turret.getMotorOutput(turret.getTarget());
 		turret.setPower(motorOutput);

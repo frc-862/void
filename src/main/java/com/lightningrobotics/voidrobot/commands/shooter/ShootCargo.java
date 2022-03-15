@@ -16,8 +16,8 @@ public class ShootCargo extends CommandBase {
 
 	private Shooter shooter;
 	private Hood hood;
-	private Vision vision;
 	private Indexer indexer;
+	private Vision vision;
 	private Turret turret;
 
 	private static double rpm;

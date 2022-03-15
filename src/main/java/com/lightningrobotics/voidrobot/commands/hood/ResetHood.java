@@ -1,4 +1,4 @@
-package com.lightningrobotics.voidrobot.commands.shooter;
+package com.lightningrobotics.voidrobot.commands.hood;
 
 import java.io.FileWriter;
 import java.io.IOException;
