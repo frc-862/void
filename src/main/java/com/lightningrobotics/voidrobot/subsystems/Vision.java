@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
 
 	// Network Table for Vision
-	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-	// Entries for Angle & Distance	
-	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Target Angle");
-	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Target Distance");
-	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("Target Time");
+	// Entries for Angle & Distance
+	private final NetworkTableEntry targetOffsetX = visionTable.getEntry("tx");
+	private final NetworkTableEntry targetOffsetY = visionTable.getEntry("ty");
+	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("tl");
 
 	private final ShuffleboardTab biasTab = Shuffleboard.getTab("Biases");
 
@@ -47,7 +47,7 @@ public class Vision extends SubsystemBase {
 	private static boolean haveData = false;
 
 	private ArrayList<Double> visionArray = new ArrayList<Double>();
-	
+
 	// Var for if green LEDs are on
 	private static boolean lightsOn = false;
 
@@ -66,13 +66,13 @@ public class Vision extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		
+
 		// Update Target Angle
-		offsetAngle = targetAngleEntry.getDouble(offsetAngle);
-		
+		offsetAngle = targetOffsetX.getDouble(offsetAngle);
+
 		// Update Target Distance
 		// targetDistance = -1;
-		targetDistance = Units.inchesToMeters(targetDistanceEntry.getDouble(targetDistance)) + distanceOffset;
+		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1))) + distanceOffset;
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
 
@@ -93,6 +93,14 @@ public class Vision extends SubsystemBase {
 		SmartDashboard.putNumber("vision distance bias", distanceOffset);
 		SmartDashboard.putBoolean("vision disabled", disableVision);
 
+	}
+
+	public double limelightOffsetToDistance(double offset) {
+		double mountHeight = 34;
+		double hubHeight = 104;
+		double mountAngle = 30;
+
+		return (hubHeight-mountHeight)/Math.tan(mountAngle+offset);
 	}
 
 	/**
