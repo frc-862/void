@@ -30,6 +30,10 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
+
+	
+	private boolean disableHood = false;
+	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
 	
 	private double hoodOffset;
 
@@ -58,10 +62,11 @@ public class Hood extends SubsystemBase {
 	@Override
 	public void periodic() {	
 		
-		// if (!manualOverride) {
-		// 	PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
-		// 	hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
-		// }
+		disableHood = hoodDisable.getBoolean(false);
+		if (!manualOverride && !disableHood) {
+			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
+		}
 		
 		setSmartDashboardCommands();
 

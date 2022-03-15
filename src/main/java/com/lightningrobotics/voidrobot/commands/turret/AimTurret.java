@@ -16,7 +16,7 @@ public class AimTurret extends CommandBase {
     private double targetAngle; 
     private double targetOffset;
     private double lastKnownHeading = 0;
-    private double lastKnownDistance = 0;
+    private double lastKnownDistance = 2; // TODO 
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
@@ -34,7 +34,7 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void initialize() {
-
+        resetPose();
     }
 
     @Override
@@ -52,19 +52,21 @@ public class AimTurret extends CommandBase {
             resetPose();
 
         } else {
-            // double relativeX = drivetrain.getPose().getX() - initialX;
-            // double relativeY = drivetrain.getPose().getY() - initialY;
+            double relativeX = drivetrain.getPose().getX() - initialX;
+            double relativeY = drivetrain.getPose().getY() - initialY;
 
-            // // rotate from odometer-center to robot-center
-            // relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
-            // relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
+            // rotate from odometer-center to robot-center
+            relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
+            relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
-            // // update rotation data 
-            // double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
+            // update rotation data 
+            double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-            // targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+            targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
-            // turret.setAngle(targetAngle);
+            turret.setAngle(targetAngle);
+            // TODO: set the distance somewhere so we can maybe shoot without vision
+        
         }
     }
 
