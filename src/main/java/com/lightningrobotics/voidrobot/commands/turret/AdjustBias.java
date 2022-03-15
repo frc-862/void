@@ -1,11 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.lightningrobotics.voidrobot.commands.turret;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Vision;
@@ -15,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AdjustBias extends CommandBase {
 
 	private final Vision vision;
+
 	private IntSupplier POV; 
 	private BooleanSupplier xButton;
 

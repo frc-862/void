@@ -2,61 +2,48 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Indexer extends SubsystemBase {
 
     // Creates our indexer motor
-    private final VictorSPX indexer;
-
-	// Indexer Power
-	private final double INDEX_POWER = 1.0;
+    private final VictorSPX indexerMotor;
 
     // Creates our beam breaks that count the balls
-    private static final DigitalInput enterSensor = new DigitalInput(RobotMap.ENTER_BEAM_BREAK);
-    private static final DigitalInput exitSensor  = new DigitalInput(RobotMap.EXIT_BEAM_BREAK);
+    private final DigitalInput enterSensor = new DigitalInput(RobotMap.ENTER_BEAM_BREAK);
+    private final DigitalInput exitSensor  = new DigitalInput(RobotMap.EXIT_BEAM_BREAK);
+
+    Debouncer enterDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
+    Debouncer exitDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
 
     // define variables to store beam break data
-    private static boolean lower;
-    private static boolean upper;
+    private boolean lower;
+    private boolean upper;
 
     // define variables to remember previous value of beam break data
-    private static boolean lowerPrev;
-    private static boolean upperPrev;
+    private boolean lowerPrev;
+    private boolean upperPrev;
 
     // Lazy variables so I don't have to type out falling and rising edge logic multiple times
-    private static boolean collect1;
-    private static boolean eject1;
-
-    // Creating a start time and setting a buffer timer variable
-    private static double bufferStartTime;
-    private static double bufferTime = 0.5;
-    private static boolean buffer = false;
-
-    private boolean autoIndex = false;
-
-    // For telling us that we are at max balls
-    private boolean atMaxBallCount = false;
-
-	private boolean autoShoot = false;
+    private boolean collect1;
+    private boolean eject1;
 
     // Creates the color sensor
-    private final ColorSensorV3 intakeSensor;
+    private final ColorSensorV3 intakeColorSensor;
 
     // Initialize ball count to 0 on enable
-    public static int ballCount = 0;
+    public int ballCount = 0;
 
     // Enum to determin the color of each ball
     enum Color {
@@ -66,33 +53,31 @@ public class Indexer extends SubsystemBase {
     }
 
     // Ball 1 color
-    Color ball1Color = Color.nothing;
+    Color upperBallColor = Color.nothing;
     // Ball 2 color
-    Color ball2Color = Color.nothing;
+    Color lowerBallColor = Color.nothing;
 
-    //Create Shuffleboard and entries
-    private static ShuffleboardTab driverVeiw = Shuffleboard.getTab("Competition");
-    private static NetworkTableEntry currentBallCountEntry  = driverVeiw.add("Ball count", 1).getEntry();
-    
+    private ShuffleboardTab indexerTab = Shuffleboard.getTab("Indexer");
 
     public Indexer() {
         // Sets Motor and color ID/ports
-        indexer = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
-        intakeSensor = new ColorSensorV3(RobotMap.I2C_PORT);
+        indexerMotor = new VictorSPX(RobotMap.INDEXER_MOTOR_ID);
+        intakeColorSensor = new ColorSensorV3(RobotMap.I2C_PORT);
 
-        bufferStartTime = Timer.getFPGATimestamp(); // Sets an initial start time 
+        initLogging();
+
+        indexerTab.addString("upper ball color", () -> upperBallColor.toString());
+        indexerTab.addString("llower ball color", () -> lowerBallColor.toString());
+        indexerTab.addNumber("ball count", () -> ballCount);
+
+		CommandScheduler.getInstance().registerSubsystem(this);
     }
-
 
     @Override
     public void periodic() {
-
-        
-        buffer = !(Timer.getFPGATimestamp() - bufferStartTime > bufferTime); // Tells us when were in our buffer time
-        
         // Setting our current beam break status
-        lower = getLowerStatus();
-        upper = getUpperStatus();
+        lower = getEnterStatus();
+        upper = getExitStatus();
 
         collect1 = !lowerPrev && lower; //Rising edge 
         eject1 = !upper && upperPrev; //Falling edge
@@ -104,92 +89,52 @@ public class Indexer extends SubsystemBase {
             eject1 = temp;
         }
 
-        // automatically suck in balls when we first see them
-
-            // Does our ball increment and decrement with a limited number of possible cases
-            switch(ballCount) {
-                case 0:
-                    if (collect1 && !buffer) {
-                        ballCount = 1;
-                        bufferStartTime = Timer.getFPGATimestamp();
-                        atMaxBallCount = false;
-                    } 
-                break;
-
-                case 1:
-                    if (collect1 && !buffer) {
-                        ballCount = 2;
-                        bufferStartTime = Timer.getFPGATimestamp();
-                        atMaxBallCount = false;
-                    }
-                    if (eject1) {
-                        ballCount = 0;
-                        atMaxBallCount = false;
-                    }
-                break;
-
-                case 2:
-                    if (eject1) {
-                        ballCount = 1;
-                        ball1Color = ball2Color;
-                        atMaxBallCount = false;
-                    }
-                    if(collect1 && !buffer) {
-                        atMaxBallCount = true;
-                    }
-                break;
-            }
-
-            if (!buffer)  {
-                lowerPrev = lower;
-            }
-                upperPrev = upper;
+        if (collect1) {
+            ballCount++;
+        }
+        if (eject1) {
+            ballCount--;
+        }
+        ballCount = LightningMath.constrain(ballCount, 0, 2);
 
         // Sets the possible color cases of the ball
         switch(getColorSensorOutputs()) {
             case 0: 
                 if(ballCount == 0) {
-                    ball1Color = Color.nothing;
-                    ball2Color = Color.nothing;
+                    upperBallColor = Color.nothing;
+                    lowerBallColor = Color.nothing;
                 }
             break;
 
             case 1:
                 if(ballCount == 1) {
-                    ball1Color = Color.red;
-                    ball2Color = Color.nothing;
+                    upperBallColor = Color.red;
+                    lowerBallColor = Color.nothing;
                 } else if(ballCount == 2) {
-                    ball2Color = Color.red;
+                    lowerBallColor = Color.red;
                 }
             break;
 
             case 2:
                 if(ballCount == 1) {
-                    ball1Color = Color.blue;
-                    ball2Color = Color.nothing;
+                    upperBallColor = Color.blue;
+                    lowerBallColor = Color.nothing;
                 } else if(ballCount == 2) {
-                    ball2Color = Color.blue;
+                    lowerBallColor = Color.blue;
                 }
             break;
-        } 
-        // Puts the ball count to the dashboard
-	
+        }
+    }
 
-        SmartDashboard.putString("ball1 color", ball1Color.toString());
-        SmartDashboard.putString("ball2 color", ball2Color.toString());
-
-        currentBallCountEntry.setNumber(ballCount);
-
+    private void initLogging() {
+        DataLogger.addDataElement("enterSensor", () -> getEnterStatus() ? 1 : 0);
+        DataLogger.addDataElement("exitSensor", () -> getExitStatus() ? 1 : 0);
+        DataLogger.addDataElement("colorSensor", this::getColorSensorOutputs); // 1 red, 2 blue, 0 nothing 
     }
 
 	public void initializeBallsHeld() {
 		ballCount = 1;
 	}
-    
-
-    public boolean getAtMaxBallCount(){
-        return atMaxBallCount;
-    }
 
     public void resetBallCount() {
         ballCount = 0;
@@ -204,29 +149,17 @@ public class Indexer extends SubsystemBase {
     }
 
     public void setPower(double power) {
-        indexer.set(VictorSPXControlMode.PercentOutput, power);
+        indexerMotor.set(VictorSPXControlMode.PercentOutput, power);
     }
 
-	public void toShooter() {
-		setPower(INDEX_POWER);
-	}
-
-    public void setAutoIndex(boolean autoIndex) {
-        this.autoIndex = autoIndex;
-    }
-
-    public boolean getAutoIndex() {
-        return autoIndex;
-    }
-
-    public boolean getLowerStatus(){
+    public boolean getEnterStatus(){
         //the ! is added here to make it trigger on enter, not on release
-        return !enterSensor.get();
+        return enterDebouncer.calculate(!enterSensor.get());
     }
 
-    public boolean getUpperStatus(){
+    public boolean getExitStatus(){
         //the ! is added here to make it trigger on enter, not on release
-        return !exitSensor.get();
+        return exitDebouncer.calculate(!exitSensor.get());
     }
 
     public int getBallCount(){
@@ -234,10 +167,10 @@ public class Indexer extends SubsystemBase {
     }
 
     public int getColorSensorOutputs() {
-        if(intakeSensor.getColor().red >= Constants.RED_THRESHOLD) {
+        if(intakeColorSensor.getColor().red >= Constants.RED_THRESHOLD) {
             // SmartDashboard.putString("Color", "red");
             return 1;
-        } else if(intakeSensor.getColor().blue >= Constants.BLUE_THRESHOLD) {
+        } else if(intakeColorSensor.getColor().blue >= Constants.BLUE_THRESHOLD) {
             // SmartDashboard.putString("Color", "blue");
             return 2;
         }        
@@ -245,21 +178,11 @@ public class Indexer extends SubsystemBase {
     }
     
     private boolean isMotorReversing() {
-        return indexer.getMotorOutputPercent() < 0;
+        return indexerMotor.getMotorOutputPercent() < 0;
     }
 
     public void stop() {
-        setPower(0d);
-    }
-    
-	public boolean getAutoShoot() {
-		return autoShoot;
-	}
-
-	public void setAutoShoot(boolean autoShoot) {
-		this.autoShoot = autoShoot; 
-	}
-
-	
+        setPower(0);
+    }	
 
 }

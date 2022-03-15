@@ -5,8 +5,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -35,12 +37,20 @@ public class Climber extends SubsystemBase {
 		leftClimbPivot.setNeutralMode(NeutralMode.Brake);
 		rightClimbPivot.setNeutralMode(NeutralMode.Brake);
 
-		//TODO: correctly set the inverts of the climb motors
 		leftClimbWinch.setInverted(false);
 		rightClimbWinch.setInverted(false);
 
 		leftClimbPivot.setInverted(false);
 		rightClimbPivot.setInverted(true);
+
+		initLogging();
+
+		CommandScheduler.getInstance().registerSubsystem(this);
+	}
+
+	private void initLogging() {
+		DataLogger.addDataElement("leftClimbPosition", () -> leftClimbWinch.getSelectedSensorPosition());
+		DataLogger.addDataElement("rightClimbPosition", () -> rightClimbWinch.getSelectedSensorPosition());
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {

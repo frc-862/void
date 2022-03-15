@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Random;
 
@@ -50,6 +51,14 @@ public class LEDs extends SubsystemBase {
 			.add("blue", 0)
 			.getEntry();
 
+		CommandScheduler.getInstance().registerSubsystem(this);
+
+    }
+
+    @Override
+    public void periodic() {
+        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
+        led.setData(buffer);
     }
 
     public static final Color LightningOrange = new Color(1, .5, 0);
@@ -108,11 +117,5 @@ public class LEDs extends SubsystemBase {
 
     public void stopLEDs() {
         withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 0));
-    }
-
-    @Override
-    public void periodic() {
-        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
-        led.setData(buffer);
     }
 }
