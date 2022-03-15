@@ -30,7 +30,7 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
-
+	
 	private double hoodOffset;
 
 	// The power point we want the shooter to be at
@@ -39,7 +39,6 @@ public class Hood extends SubsystemBase {
 	private boolean manualOverride = false;
 
 	public Hood() {
-		
 		// Sets the IDs of the hood and shooter
 		hoodMotor = new TalonSRX(RobotMap.HOOD_MOTOR_ID);
 		hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog);
@@ -53,6 +52,18 @@ public class Hood extends SubsystemBase {
 		initLogging();
 
 		CommandScheduler.getInstance().registerSubsystem(this);
+
+	}
+
+	@Override
+	public void periodic() {	
+		
+		// if (!manualOverride) {
+		// 	PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
+		// 	hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
+		// }
+		
+		setSmartDashboardCommands();
 
 	}
 
@@ -120,17 +131,4 @@ public class Hood extends SubsystemBase {
 		targetAngle.setDouble(getSetPoint());
 		rawAngle.setDouble(getRawAngle());
 	 }
-
-	@Override
-	public void periodic() {	
-		
-		if (!manualOverride) {
-			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
-			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
-		}
-		
-		setSmartDashboardCommands();
-
-	}
-
 }

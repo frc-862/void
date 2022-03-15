@@ -5,7 +5,7 @@ package com.lightningrobotics.voidrobot.constants;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
-import com.lightningrobotics.util.InterpolatedMap;
+import com.lightningrobotics.common.util.InterpolationMap;
 
 public final class Constants {
 
@@ -100,7 +100,7 @@ public final class Constants {
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
     //distance in meters, power in RPMs 
-    public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
+    public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
 			put(0d, 0d);
 			put(2.286d, 3500d);
@@ -124,7 +124,7 @@ public final class Constants {
     };
 
     //distance in meters, angle in degrees
-    public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
+    public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
             put(0d, 0d);
             put(2.286d, 0d);

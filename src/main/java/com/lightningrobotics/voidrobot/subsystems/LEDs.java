@@ -55,6 +55,12 @@ public class LEDs extends SubsystemBase {
 
     }
 
+    @Override
+    public void periodic() {
+        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
+        led.setData(buffer);
+    }
+
     public static final Color LightningOrange = new Color(1, .5, 0);
     
     public void withEachLed(BiConsumer<AddressableLEDBuffer, Integer> l) {
@@ -111,11 +117,5 @@ public class LEDs extends SubsystemBase {
 
     public void stopLEDs() {
         withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 0));
-    }
-
-    @Override
-    public void periodic() {
-        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
-        led.setData(buffer);
     }
 }

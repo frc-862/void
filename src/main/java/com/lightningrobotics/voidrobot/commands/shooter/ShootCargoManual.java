@@ -7,15 +7,13 @@ import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootCargoManual extends CommandBase {
 
-	private Shooter shooter;
-	private Indexer indexer;
-	private Hood hood;
+	private final Shooter shooter;
+	private final Indexer indexer;
+	private final Hood hood;
 
 	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;

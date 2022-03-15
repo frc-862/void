@@ -27,8 +27,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
@@ -36,26 +35,26 @@ public class RobotContainer extends LightningContainer {
 	public static final boolean TESTING = true;
 
     // Subsystems
-	private final LightningIMU imu = LightningIMU.navX();
-    private final Climber climber = new Climber();
-	private final Drivetrain drivetrain = new Drivetrain(imu);
-    private final Turret turret = new Turret();
-	private final Shooter shooter = new Shooter();
-	private final Indexer indexer = new Indexer();
-	private final Intake intake = new Intake();
-    private final Vision vision = new Vision();
-	private final LEDs leds = new LEDs();
-    private final Hood hood = new Hood();
+	private static final LightningIMU imu = LightningIMU.navX();
+    private static final Climber climber = new Climber();
+	private static final Drivetrain drivetrain = new Drivetrain(imu);
+    private static final Turret turret = new Turret();
+	private static final Shooter shooter = new Shooter();
+	private static final Indexer indexer = new Indexer();
+	private static final Intake intake = new Intake();
+    private static final Vision vision = new Vision();
+    private static final Hood hood = new Hood();
+	private static final LEDs leds = new LEDs();
 	
 	// Joysticks
-	private final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
-	private final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
-	private final XboxController copilot = new XboxController(JoystickConstants.COPILOT_PORT);
-	private final XboxController climb = new XboxController(JoystickConstants.CLIMB_PORT);
+	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
+	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
+	private static final XboxController copilot = new XboxController(JoystickConstants.COPILOT_PORT);
+	private static final XboxController climb = new XboxController(JoystickConstants.CLIMB_PORT);
 
 	// Joystick Filters
-	private final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
-    private final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
+    private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
+    private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -83,7 +82,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, vision), false); // Shoot close no vision
 		(new JoystickButton(driverRight, 3)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
-		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
+		(new JoystickButton(driverLeft, 2)).whenPressed(new ZeroTurretHood(hood, turret));
 		// (new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(shooter, turret)); // TODO test
 
         // COPILOT:
@@ -112,8 +111,6 @@ public class RobotContainer extends LightningContainer {
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
-		// shooter.setDefaultCommand(new MoveHoodSetpoint(shooter));
-     	//shooter.setDefaultCommand(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
         //CLIMB

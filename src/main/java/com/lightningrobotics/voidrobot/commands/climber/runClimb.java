@@ -7,7 +7,9 @@ import com.lightningrobotics.voidrobot.subsystems.Climber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class runClimb extends CommandBase {
+    
     public final Climber climber;
+
     private DoubleSupplier leftClimbPower;
     private DoubleSupplier rightClimbPower;
     private DoubleSupplier leftPivotPower;

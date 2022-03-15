@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class ResetHood extends InstantCommand {
 
-	private Hood hood;
+	private final Hood hood;
 	
 	public ResetHood(Hood hood) {
 		this.hood = hood;
+		
 		addRequirements(hood);	
 	}
 

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class RunShooter extends CommandBase {
     
     // Creates the shooter subsystem
-    private Shooter shooter;
+    private final Shooter shooter;
 
     private double targetRPM;
 

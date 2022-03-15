@@ -7,7 +7,9 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RunIntake extends CommandBase {
+
     private final Intake intake;
+    
     private DoubleSupplier power;
 
     public RunIntake(Intake intake, DoubleSupplier power) {

@@ -50,12 +50,6 @@ public class Vision extends SubsystemBase {
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
 
-	private void initLogging() {
-		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
-		DataLogger.addDataElement("targetDistance", () -> targetDistance);
-		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
-	}
-
 	@Override
 	public void periodic() {
 		// Update Target Angle
@@ -75,6 +69,12 @@ public class Vision extends SubsystemBase {
 			lastVisionTimestamp = visionTimestamp;
 		}
 
+	}
+
+	private void initLogging() {
+		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
+		DataLogger.addDataElement("targetDistance", () -> targetDistance);
+		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
 	}
 
 	public boolean isOnTarget() {

@@ -52,20 +52,27 @@ public class AimTurret extends CommandBase {
             resetPose();
 
         } else {
-            double relativeX = drivetrain.getPose().getX() - initialX;
-            double relativeY = drivetrain.getPose().getY() - initialY;
+            // double relativeX = drivetrain.getPose().getX() - initialX;
+            // double relativeY = drivetrain.getPose().getY() - initialY;
 
-            // rotate from odometer-center to robot-center
-            relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
-            relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
+            // // rotate from odometer-center to robot-center
+            // relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
+            // relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
-            // update rotation data 
-            double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
+            // // update rotation data 
+            // double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-            targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+            // targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
-            turret.setAngle(targetAngle);
+            // turret.setAngle(targetAngle);
         }
+    }
+
+    public void resetPose(){
+        initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
+        initialX = drivetrain.getPose().getX();
+        initialY = drivetrain.getPose().getY();
+        lastKnownHeading = turret.getCurrentAngle().getDegrees();
     }
 
     @Override
@@ -77,12 +84,4 @@ public class AimTurret extends CommandBase {
     public boolean isFinished() {
         return false;
     }
-
-    public void resetPose(){
-        initialOdometerGyroReading = drivetrain.getPose().getRotation().getDegrees();
-        initialX = drivetrain.getPose().getX();
-        initialY = drivetrain.getPose().getY();
-        lastKnownHeading = turret.getCurrentAngle().getDegrees();
-    }
-
 }

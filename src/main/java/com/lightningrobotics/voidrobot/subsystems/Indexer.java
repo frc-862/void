@@ -73,14 +73,6 @@ public class Indexer extends SubsystemBase {
 		CommandScheduler.getInstance().registerSubsystem(this);
     }
 
-
-    private void initLogging() {
-        DataLogger.addDataElement("enterSensor", () -> getEnterStatus() ? 1 : 0);
-        DataLogger.addDataElement("exitSensor", () -> getExitStatus() ? 1 : 0);
-        DataLogger.addDataElement("colorSensor", this::getColorSensorOutputs); // 1 red, 2 blue, 0 nothing 
-    }
-
-
     @Override
     public void periodic() {
         // Setting our current beam break status
@@ -132,6 +124,12 @@ public class Indexer extends SubsystemBase {
                 }
             break;
         }
+    }
+
+    private void initLogging() {
+        DataLogger.addDataElement("enterSensor", () -> getEnterStatus() ? 1 : 0);
+        DataLogger.addDataElement("exitSensor", () -> getExitStatus() ? 1 : 0);
+        DataLogger.addDataElement("colorSensor", this::getColorSensorOutputs); // 1 red, 2 blue, 0 nothing 
     }
 
 	public void initializeBallsHeld() {

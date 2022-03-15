@@ -38,11 +38,21 @@ public class Shooter extends SubsystemBase {
 
 		configPIDGains(Constants.SHOOTER_KP, Constants.SHOOTER_KI, Constants.SHOOTER_KD, Constants.SHOOTER_KF);
 
-		DataLogger.addDataElement("shooterRPM", this::getCurrentRPM);
-		DataLogger.addDataElement("targetShooterRPM", () -> targetRPM);
+		initLogging();
 		
 		CommandScheduler.getInstance().registerSubsystem(this);
 
+	}
+
+	@Override
+	public void periodic() {	
+		setSmartDashboardCommands();
+
+	}
+
+	private void initLogging() {
+		DataLogger.addDataElement("shooterRPM", this::getCurrentRPM);
+		DataLogger.addDataElement("targetShooterRPM", () -> targetRPM);
 	}
 
 	public boolean onTarget() {
@@ -97,12 +107,6 @@ public class Shooter extends SubsystemBase {
 
 	public double getRPMFromDashboard() {
 		return setRPM.getDouble(0);
-	}
-
-	@Override
-	public void periodic() {	
-		setSmartDashboardCommands();
-
 	}
 
 }

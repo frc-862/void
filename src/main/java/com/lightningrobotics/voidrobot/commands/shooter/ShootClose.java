@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootClose extends CommandBase {
 
-	private Shooter shooter;
-	private Hood hood;
-	private Indexer indexer;
-	private Turret turret;
-	private Vision vision;
+	private final Shooter shooter;
+	private final Hood hood;
+	private final Indexer indexer;
+	private final Turret turret;
+	private final Vision vision;
 
 	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;

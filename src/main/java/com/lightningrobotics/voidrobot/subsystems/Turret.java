@@ -62,12 +62,6 @@ public class Turret extends SubsystemBase {
 		CommandScheduler.getInstance().registerSubsystem(this);
 
 	}
-
-	private void initLogging() {
-		DataLogger.addDataElement("centorSensor", () -> getCenterSensor() ? 1 : 0);
-		DataLogger.addDataElement("turretTarget", this::getTarget);
-		DataLogger.addDataElement("turretCurrent", () -> getCurrentAngle().getDegrees());
-	}
 	
 	@Override
 	public void periodic() {
@@ -85,6 +79,12 @@ public class Turret extends SubsystemBase {
 		if (getCenterSensor()) {
 			resetEncoder();
 		}
+	}
+
+	private void initLogging() {
+		DataLogger.addDataElement("centorSensor", () -> getCenterSensor() ? 1 : 0);
+		DataLogger.addDataElement("turretTarget", this::getTarget);
+		DataLogger.addDataElement("turretCurrent", () -> getCurrentAngle().getDegrees());
 	}
 
 	public boolean onTarget() {

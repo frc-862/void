@@ -2,7 +2,6 @@ package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -11,19 +10,18 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RunShooterDashboard extends CommandBase {
     
-	private static ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
-	private static NetworkTableEntry setRPMEntry = shooterTestTab.add("set RPM", 0).getEntry();
-	private static NetworkTableEntry setAngleEntry = shooterTestTab.add("set hood angle", 0).getEntry();
     // Creates the shooter subsystem
-    private Shooter shooter;
-    private Hood hood;
-	Vision vision;
+    private final Shooter shooter;
+    private final Hood hood;
 
-    public RunShooterDashboard(Shooter shooter, Hood hood, Vision vision) {
+	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
+	private NetworkTableEntry setRPMEntry = shooterTestTab.add("set RPM", 0).getEntry();
+	private NetworkTableEntry setAngleEntry = shooterTestTab.add("set hood angle", 0).getEntry();
+
+    public RunShooterDashboard(Shooter shooter, Hood hood) {
         this.shooter = shooter;
         this.hood = hood;
         addRequirements(shooter, hood);
-		this.vision = vision;
 		
     }
 

@@ -8,20 +8,20 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AutoIndexCargo extends CommandBase {
 
     // Creates our indexer subsystem
-    private Indexer indexer;
+    private final Indexer indexer;
 
-    private static double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
-    private static double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
-    private static double startIndexTime = 0d; // Setting a default start time of 0
+    private double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
+    private double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
+    private double startIndexTime = 0d; // Setting a default start time of 0
 
-    private static double power = 1; // the power we want the indexer to run at
+    private double power = 1; // the power we want the indexer to run at
 
 	private boolean isStopped = false;
 
     public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
 
-		// addRequirements(indexer);
+		// addRequirements(indexer); TODO maybe fix
 	}
 
     @Override
