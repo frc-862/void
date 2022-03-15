@@ -2,7 +2,6 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
@@ -99,8 +98,9 @@ public class Vision extends SubsystemBase {
 		double mountHeight = 34;
 		double hubHeight = 104;
 		double mountAngle = 30;
+		double hubCenterOffset = 24;
 
-		return (hubHeight-mountHeight)/Math.tan(mountAngle+offset);
+		return (hubHeight-mountHeight)/Math.tan(mountAngle+offset) + hubCenterOffset;
 	}
 
 	/**
