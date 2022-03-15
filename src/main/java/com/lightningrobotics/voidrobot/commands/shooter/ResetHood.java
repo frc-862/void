@@ -4,17 +4,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Hood;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class ResetHood extends InstantCommand {
 
-	private Shooter shooter;
+	private Hood hood;
 	
-	public ResetHood(Shooter shooter) {
-		this.shooter = shooter;
-		addRequirements(shooter);	
+	public ResetHood(Hood hood) {
+		this.hood = hood;
+		addRequirements(hood);	
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class ResetHood extends InstantCommand {
 
 		try {
 			FileWriter fw = new FileWriter(newFile, false);
-			var offset = shooter.getRawHoodAngle();
+			var offset = hood.getRawAngle();
 			String newline = "hoodOffset: " + offset;
 			fw.write(newline);
 			System.out.println(newline);

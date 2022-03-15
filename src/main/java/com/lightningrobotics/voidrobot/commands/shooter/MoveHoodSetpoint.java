@@ -1,5 +1,6 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
+import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -13,14 +14,13 @@ public class MoveHoodSetpoint extends CommandBase {
 
     private static ShuffleboardTab hoodTab = Shuffleboard.getTab("Hood");
 	private static NetworkTableEntry hoodSetpoint = hoodTab.add("Hood Setpoint", DEFAULT_HOOD_ANGLE).getEntry();
-    private static NetworkTableEntry hoodAngle = hoodTab.add("Hood Angle", DEFAULT_HOOD_ANGLE).getEntry();
 
-	private Shooter shooter;
+	private Hood hood;
 
-	public MoveHoodSetpoint(Shooter shooter) {
-		this.shooter = shooter;
+	public MoveHoodSetpoint(Hood hood) {
+		this.hood = hood;
 
-		addRequirements(shooter);
+		addRequirements(hood);
 	}
 
 	@Override
@@ -29,13 +29,12 @@ public class MoveHoodSetpoint extends CommandBase {
 
 	@Override
 	public void execute() {
-		shooter.setHoodAngle(hoodSetpoint.getDouble(DEFAULT_HOOD_ANGLE));
-		hoodAngle.setDouble(shooter.getHoodAngle());
+		hood.setAngle(hoodSetpoint.getDouble(DEFAULT_HOOD_ANGLE));
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.setHoodPower(0);
+		hood.stop();
 	}
 
 	@Override

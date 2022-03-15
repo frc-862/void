@@ -61,12 +61,12 @@ public class RobotContainer extends LightningContainer{
     protected void configureAutonomousCommands() {
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("test 2 Ball", new TwoBallTest(drivetrain, shooter, turret, indexer, intake, vision));
-			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, turret, indexer, intake, vision));
-			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, turret, indexer, intake, vision));
-			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, turret, vision));
-			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, turret, vision));
+			Autonomous.register("test 2 Ball", new TwoBallTest(drivetrain, shooter, hood, turret, indexer, intake, vision));
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
+			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
+			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, hood, turret, vision));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
 		}
@@ -79,7 +79,7 @@ public class RobotContainer extends LightningContainer{
 
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, turret, vision), false); // Auto shoot
-        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, indexer, turret, vision), false); // Auto shoot
+        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, vision), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, indexer, turret, vision), false); // Shoot close no vision
 		(new JoystickButton(driverRight, 3)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
@@ -166,7 +166,7 @@ public class RobotContainer extends LightningContainer{
     protected void initializeDashboardCommands() { 
 		 var tab = Shuffleboard.getTab("shooter test");
 		// var compTab = Shuffleboard.getTab("Competition");
-		 tab.add(new ResetHood(shooter));
+		 tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	}
 	
