@@ -11,9 +11,11 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
+import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 import com.lightningrobotics.common.geometry.kinematics.differential.DifferentialDrivetrainState;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -43,6 +45,11 @@ public class AutoShoot extends CommandBase {
 
   @Override
   public void initialize() {
+
+    //check if the current ball is not the same color as the alliance
+    boolean isEnenmyBall = DriverStation.getAlliance().toString() != indexer.getUpperBallColor().toString() && indexer.getUpperBallColor() != BallColor.nothing;
+    
+    // check if drive speed is slow enough
     DifferentialDrivetrainState drivetrainState = ((DifferentialDrivetrainState)drivetrain.getDriveState());
     boolean isDrivingSlow = 
       drivetrainState.getLeftSpeed() <= Constants.MAXIMUM_SPEED_TO_SHOOT 
@@ -52,7 +59,8 @@ public class AutoShoot extends CommandBase {
     if(indexer.getBallCount() != 0 
     && isDrivingSlow
     && vision.hasVision() 
-    && turret.onTarget()) {
+    && turret.onTarget()
+    && !isEnenmyBall) {
 
       distance = vision.getTargetDistance();
       if (distance > 0) {
@@ -72,11 +80,21 @@ public class AutoShoot extends CommandBase {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       }
     }
+    else if(isEnenmyBall) { 
+      shooter.setRPM(Constants.EJECT_BALL_RPM);
+      hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
+      if(shooter.onTarget() && hood.onTarget()) {
+        indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+      } 
+    }
+
+    // Start time when ball hit top sensor
     if(indexer.getExitStatus()){
       startTime = Timer.getFPGATimestamp();
     }
           
+    // Stop indexer after a while
     if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){
       indexer.setPower(0);
       shooter.coast();
