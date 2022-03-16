@@ -95,7 +95,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public double limelightOffsetToDistance(double offset) {
-		double mountHeight = 34;
+		double mountHeight = 39;
 		double hubHeight = 104;
 		double mountAngle = 30;
 		double hubCenterOffset = 24;
