@@ -5,8 +5,8 @@ import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionAim;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
+import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,7 +21,7 @@ public class TwoBallTest extends ParallelCommandGroup {
 		super(
 
 		// Aim Turret
-		new AutonVisionAim(vision, turret),
+		new AimTurret(vision, turret, drivetrain),
 
 		new AutoIndexCargo(indexer), // TODO test this
 

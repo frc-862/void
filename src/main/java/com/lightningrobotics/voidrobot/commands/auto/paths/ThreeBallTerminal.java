@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
@@ -22,11 +23,11 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
     public ThreeBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
         super(
 			
-			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
             new AimTurret(vision, turret, drivetrain),
 
-			new AutoIndexCargo(indexer),
+            new AutonAutoIndex(indexer),
 
 			new SequentialCommandGroup(
 				// Set Initial Balls Held To 1
@@ -48,98 +49,3 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
         
     }
 }
-
-    // @Override
-    // public void initialize() {
-        // vision.turnOnVisionLight();
-        // try {
-
-        //     new TimedCommand(
-
-        //         new ParallelCommandGroup(
-
-        //             // deploy intake
-        //             new TimedCommand(
-        //                 new AutonDeployIntake(intake), 
-        //                     1),
-
-        //             // run the aimt the whole time
-        //             new AutonVisionAim(vision, turret),
-        
-        //             // all the paths
-        //             new SequentialCommandGroup(
-
-        //                 // start path sequence
-        //                 new TimedCommand(
-
-        //                         new SequentialCommandGroup(
-
-        //                             start4BallPath.getCommand(drivetrain),
-        //                             new AutonShootCargo(shooter, indexer, turret, vision)
-
-        //                         ),  start4BallPath.getDuration(drivetrain) + 3
-
-        //                 ), 
-
-        //                 // middle path sequence
-        //                 new TimedCommand(
-
-        //                     new SequentialCommandGroup(
-        //                         new ParallelCommandGroup(
-        //                             middle4BallPath.getCommand(drivetrain)//,
-        //                             // new AutonIntake(intake, indexer, 2d)
-        //                         ),
-
-        //                         new AutonShootCargo(shooter, indexer, turret, vision)
-
-
-        //                     ),  middle4BallPath.getDuration(drivetrain) + 3
-
-        //                     ),
-
-
-
-        //                 // end path sequence
-        //                 new TimedCommand(
-
-        //                     new SequentialCommandGroup(
-
-        //                     new ParallelCommandGroup(
-        //                         end4BallPath.getCommand(drivetrain)//,
-        //                         // new AutonIntake(intake, indexer, 1d)
-        //                     ),
-            
-        //                         new AutonShootCargo(shooter, indexer, turret, vision)
-
-        //                     ),  end4BallPath.getDuration(drivetrain) + 3
-
-        //                 )
-                
-        //             )
-        //         ), 
-        //         start4BallPath.getDuration(drivetrain) + middle4BallPath.getDuration(drivetrain) + end4BallPath.getDuration(drivetrain) + 9).schedule();
-            
-//         } catch (Exception e) {
-//             System.err.println("Unexpected Error: " + e.getMessage());
-//         }
-
-//     }
-
-//     @Override
-//     public void execute() {
-//     }
-
-//     @Override
-//     public void end(boolean interrupted) {
-//         indexer.stop();
-//         intake.stop();
-//         shooter.stop();
-//         turret.stop();
-//     }
-
-//     @Override
-//     public boolean isFinished() {
-//         return false;
-//     }
-	
-// }

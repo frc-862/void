@@ -117,7 +117,7 @@ public class RobotContainer extends LightningContainer {
             new runClimb(
                 climber,
                 () -> (
-                    ((-1*climb.getLeftY()) +
+                    ((-1*climb.getLeftY()) + 
                     // I know some people don't like these so I'll document it
                     // If the d-pad up is pressed, add 1 to total power
                     (climb.getPOV() == 0 ? 1 : 0) +

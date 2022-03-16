@@ -94,8 +94,12 @@ public class Indexer extends SubsystemBase {
         }
         if (eject1) {
             ballCount--;
+            System.out.println("llajskdfaskdjfhlkasjdfhlkasjdfhlkajsdfhlkjashdflkjadshflkjashdfkjadshfkjhasdklfjhadslkjfhaskljdfhaklsjdhflkjasdhflkjashdflkajh");
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
+
+        lowerPrev = lower;
+        upperPrev = upper;
 
         // Sets the possible color cases of the ball
         switch(getColorSensorOutputs()) {
