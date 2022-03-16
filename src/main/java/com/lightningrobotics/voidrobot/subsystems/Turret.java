@@ -125,7 +125,7 @@ public class Turret extends SubsystemBase {
 		double sign = Math.signum(targetAngle);
         targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
 
-        targetAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
+        this.targetAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
 	}
 
 	public void resetEncoder() {
@@ -162,4 +162,4 @@ public class Turret extends SubsystemBase {
 	public double getTarget(){
 		return targetAngle;
 	}
-}
+}	
