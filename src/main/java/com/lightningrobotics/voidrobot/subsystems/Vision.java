@@ -1,7 +1,6 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.util.ArrayList;
-
+import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
@@ -25,6 +24,7 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry targetOffsetX = visionTable.getEntry("tx");
 	private final NetworkTableEntry targetOffsetY = visionTable.getEntry("ty");
 	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("tl");
+	private final NetworkTableEntry targetDetected = visionTable.getEntry("tv");
 
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
 	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
@@ -40,13 +40,6 @@ public class Vision extends SubsystemBase {
 
 	private static boolean haveData = false;
 
-	private ArrayList<Double> visionArray = new ArrayList<Double>();
-
-	// Var for if green LEDs are on
-	private static boolean lightsOn = false;
-
-	private double lastGoodDistance = 0;
-
 	private double distanceOffset = 0;
 
 	// PDH
@@ -55,7 +48,7 @@ public class Vision extends SubsystemBase {
 	public Vision() {
 		turnOffVisionLight();
 		
-		//initLogging();
+		initLogging();
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
@@ -64,9 +57,8 @@ public class Vision extends SubsystemBase {
 	public void periodic() {
 		// Update Target Angle
 		offsetAngle = targetOffsetX.getDouble(offsetAngle);
-
+		
 		// Update Target Distance
-		// targetDistance = -1;
 		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1))) + distanceOffset;
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
@@ -89,13 +81,19 @@ public class Vision extends SubsystemBase {
 		double mountAngle = 30;
 		double hubCenterOffset = 24;
 
-		return (hubHeight-mountHeight)/Math.tan(mountAngle+offset) + hubCenterOffset;
+		return (hubHeight-mountHeight)/Math.tan(Math.toRadians(mountAngle+Math.abs(offset))) + hubCenterOffset;
 	}
 
-	/**
-	 * Check if turret angle is within tolerance
-	 * @return If turret is ready for shooting
-	 */
+	private void initLogging() {
+		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
+		DataLogger.addDataElement("targetDistance", () -> targetDistance);
+		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
+	}
+
+	public void setGyroDistance(double gyroDistance) {
+		this.gyroDistance = gyroDistance;
+	}
+
 	public boolean isOnTarget() {
 		return Math.abs(getOffsetAngle()) < Constants.TURRET_TOLERANCE;
 	}
@@ -126,7 +124,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public boolean hasVision(){
-		return targetDistance > 0;
+		return targetDistance > 0 && targetDetected.getDouble(0) == 1;
 	}
 
 	public boolean isNewData() {
