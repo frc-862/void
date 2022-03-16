@@ -82,8 +82,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, vision), false); // Shoot close no vision
 		(new JoystickButton(driverRight, 3)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
-		(new JoystickButton(driverLeft, 2)).whenPressed(new ZeroTurretHood(hood, turret));
-		// (new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(shooter, turret)); // TODO test
+		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
 
         // COPILOT:
 
@@ -108,7 +107,7 @@ public class RobotContainer extends LightningContainer {
         //AUTO
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
+        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));

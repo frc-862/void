@@ -3,12 +3,9 @@ package com.lightningrobotics.voidrobot.commands;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ZeroTurretHood extends InstantCommand {
+public class ZeroTurretHood extends CommandBase {
 
 	private final Hood hood;
 	private final Turret turret;
@@ -21,9 +18,23 @@ public class ZeroTurretHood extends InstantCommand {
 	}
 
 	@Override
-	public void initialize() {	
+	public void initialize() {}
+
+	@Override
+	public void execute() {
 		turret.setAngle(0);
 		hood.setAngle(0);
 	}
+
+	@Override
+	public void end(boolean interrupted) {
+	}
+
+	@Override
+	public boolean isFinished() {
+		return false;
+	}
 	
+
+
 }

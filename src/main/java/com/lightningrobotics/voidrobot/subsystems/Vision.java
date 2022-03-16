@@ -35,6 +35,8 @@ public class Vision extends SubsystemBase {
 	private double lastVisionTimestamp = 0;
 	private double visionTimestamp = 0;
 
+	private double gyroDistance = 0;
+
 	private static boolean haveData = false;
 
 	private double distanceOffset = 0;
@@ -64,6 +66,7 @@ public class Vision extends SubsystemBase {
 
 		if(!hasVision() || lastVisionTimestamp == visionTimestamp) {
 			haveData = false;
+			targetDistance = gyroDistance;
 		} else {
 			haveData = true;
 			lastVisionTimestamp = visionTimestamp;
@@ -75,6 +78,10 @@ public class Vision extends SubsystemBase {
 		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
 		DataLogger.addDataElement("targetDistance", () -> targetDistance);
 		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
+	}
+
+	public void setGyroDistance(double gyroDistance) {
+		this.gyroDistance = gyroDistance;
 	}
 
 	public boolean isOnTarget() {

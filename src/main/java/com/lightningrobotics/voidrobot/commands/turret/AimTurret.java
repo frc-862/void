@@ -5,6 +5,8 @@ import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
 
+import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
@@ -16,12 +18,13 @@ public class AimTurret extends CommandBase {
     private double targetAngle; 
     private double targetOffset;
     private double lastKnownHeading = 0;
-    private double lastKnownDistance = 2; // TODO 
+    private double lastKnownDistance = 3; // TODO 
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
 
-	private MovingAverageFilter maf = new MovingAverageFilter(3);
+	// private MovingAverageFilter maf = new MovingAverageFilter(3);
+    private MedianFilter mf = new MedianFilter(3);
 
     public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain) {
         this.vision = vision;
@@ -45,7 +48,7 @@ public class AimTurret extends CommandBase {
             lastKnownDistance = vision.getTargetDistance();
             targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
 
-            targetAngle = maf.filter(targetAngle);
+            targetAngle = mf.calculate(targetAngle);
             lastKnownHeading = targetAngle;
 
             turret.setAngle(targetAngle);
@@ -64,10 +67,14 @@ public class AimTurret extends CommandBase {
 
             targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
+            vision.setGyroDistance(relativeX + lastKnownDistance);
+
             turret.setAngle(targetAngle);
             // TODO: set the distance somewhere so we can maybe shoot without vision
         
         }
+
+        SmartDashboard.putNumber("set target angle", targetAngle);
     }
 
     public void resetPose(){
