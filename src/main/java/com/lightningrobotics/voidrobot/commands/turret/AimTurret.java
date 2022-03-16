@@ -18,7 +18,8 @@ public class AimTurret extends CommandBase {
     private double targetAngle; 
     private double targetOffset;
     private double lastKnownHeading = 0;
-    private double lastKnownDistance = 3; // TODO 
+    private double lastKnownDistance = 1.5; // TODO 
+    private double gryoDistance;
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
@@ -43,7 +44,7 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
    
-        if (vision.hasVision()) {
+        if (false) { // vision.hasVision()
             targetOffset = vision.getOffsetAngle();
             lastKnownDistance = vision.getTargetDistance();
             targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
@@ -59,15 +60,15 @@ public class AimTurret extends CommandBase {
             double relativeY = drivetrain.getPose().getY() - initialY;
 
             // rotate from odometer-center to robot-center
-            relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
-            relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
+            relativeX = rotateX(relativeX, relativeY, initialOdometerGyroReading);
+            relativeY = rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
             // update rotation data 
             double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-            targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+            targetAngle = getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
 
-            vision.setGyroDistance(relativeX + lastKnownDistance);
+            vision.setGyroDistance(gryoDistance);
 
             turret.setAngle(targetAngle);
             // TODO: set the distance somewhere so we can maybe shoot without vision
@@ -83,6 +84,24 @@ public class AimTurret extends CommandBase {
         initialY = drivetrain.getPose().getY();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
     }
+
+    public double getTargetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+		
+		double realX = rotateX(relativeX, relativeY, realTargetHeading);
+		double realY = rotateY(relativeX, relativeY, realTargetHeading);
+
+        gryoDistance = lastVisionDistance-realY;
+		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
+        
+	}
+
+	public double rotateX (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
+	}	
+
+	public double rotateY (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
+	}
 
     @Override
     public void end(boolean interrupted) {
