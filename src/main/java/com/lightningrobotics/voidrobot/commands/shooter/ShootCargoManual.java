@@ -35,6 +35,12 @@ public class ShootCargoManual extends CommandBase {
 	public void end(boolean interrupted) {
 		shooter.coast();
 		indexer.stop();
+
+		if (indexer.getBallCount() == 0) {
+			hood.setAngle(0);
+		} else {
+			hood.setPower(0);
+		}
 	}
 
 	@Override
