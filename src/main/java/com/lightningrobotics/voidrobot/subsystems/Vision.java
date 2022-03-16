@@ -25,6 +25,7 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry targetOffsetY = visionTable.getEntry("ty");
 	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("tl");
 	private final NetworkTableEntry targetDetected = visionTable.getEntry("tv");
+	private final NetworkTableEntry ledMode = visionTable.getEntry("ledMode");
 
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
 	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
@@ -107,11 +108,11 @@ public class Vision extends SubsystemBase {
 	}
 
 	public void turnOnVisionLight(){
-		pdh.setSwitchableChannel(true);
+		ledMode.setNumber(3);
 	}
 
 	public void turnOffVisionLight(){
-		pdh.setSwitchableChannel(false);
+		ledMode.setNumber(1);
 	}
 
 	public void toggleVisionLights() {
@@ -120,7 +121,7 @@ public class Vision extends SubsystemBase {
 	}
 
 	public boolean visionLightsOn() {
-		return pdh.getSwitchableChannel();
+		return ledMode.getDouble(0) == 3 || ledMode.getDouble(0) == 0;
 	}
 
 	public boolean hasVision(){
