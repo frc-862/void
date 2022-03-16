@@ -101,6 +101,9 @@ public final class Constants {
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
+    public static final double EJECT_BALL_RPM = 1500;
+    public static final double EJECT_BALL_HOOD_ANGLE = 5; //TODO: tune
+
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
