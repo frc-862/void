@@ -110,6 +110,7 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         // turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+        shooter.setDefaultCommand(new AutoShoot(drivetrain, vision, turret, indexer, shooter, hood));
 
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, vision));
 
