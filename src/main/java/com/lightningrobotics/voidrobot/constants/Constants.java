@@ -5,7 +5,7 @@ package com.lightningrobotics.voidrobot.constants;
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
-import com.lightningrobotics.util.InterpolatedMap;
+import com.lightningrobotics.common.util.InterpolationMap;
 
 public final class Constants {
 
@@ -58,7 +58,7 @@ public final class Constants {
     public static final double DEFAULT_ANGLE = 0;
     public static final double MAX_TURRET_ANGLE = 90d;
     public static final double MIN_TURRET_ANGLE = -90d;
-    public static final double TURRET_ANGLE_TOLERANCE = 5; // degrees
+    public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
     public static final double READ_VISION_TIME = 1; //seconds
     public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
@@ -67,6 +67,7 @@ public final class Constants {
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
     public static final double RED_THRESHOLD = 0.295;
     public static final double BLUE_THRESHOLD = 0.25;
+    public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
     public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
@@ -99,7 +100,7 @@ public final class Constants {
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
     //distance in meters, power in RPMs 
-    public static final InterpolatedMap DISTANCE_RPM_MAP = new InterpolatedMap() {
+    public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
 			put(0d, 0d);
 			put(2.286d, 3500d);
@@ -123,7 +124,7 @@ public final class Constants {
     };
 
     //distance in meters, angle in degrees
-    public static final InterpolatedMap HOOD_ANGLE_MAP = new InterpolatedMap() {
+    public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
             put(0d, 0d);
             put(2.286d, 0d);

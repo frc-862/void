@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -12,17 +13,19 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AutonShootCargo extends CommandBase {
 
 	private Shooter shooter;
+	private Hood hood;
 	private Vision vision;
 	private Indexer indexer;
 	private Turret turret;
 
-	public AutonShootCargo(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
+	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.vision = vision;
 		this.turret = turret;
+		this.hood = hood;
 
-		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
+		addRequirements(shooter, hood, indexer); // not adding vision or turret as it is read only
 
 	}
 
@@ -34,14 +37,14 @@ public class AutonShootCargo extends CommandBase {
 		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 		System.out.println("wanted RPM " + rpm);
-		System.out.println("current RPM " + shooter.getEncoderRPM());
+		System.out.println("current RPM " + shooter.getCurrentRPM());
 
 		shooter.setRPM(rpm);
-		shooter.setHoodAngle(hoodAngle);
+		hood.setAngle(hoodAngle);
 
 
-		if(shooter.getArmed() && turret.getArmed()) {
-			indexer.toShooter();
+		if(shooter.onTarget() && turret.onTarget()) {
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}
 

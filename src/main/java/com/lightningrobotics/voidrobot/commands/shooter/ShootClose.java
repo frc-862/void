@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -10,14 +11,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootClose extends CommandBase {
 
-	private Shooter shooter;
-	private Indexer indexer;
-	private Turret turret;
-	private Vision vision;
+	private final Shooter shooter;
+	private final Hood hood;
+	private final Indexer indexer;
+	private final Turret turret;
+	private final Vision vision;
 
-	public ShootClose(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
-
+	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
+		this.hood = hood;
 		this.indexer = indexer;
 		this.turret = turret;
 		this.vision = vision;
@@ -26,26 +28,25 @@ public class ShootClose extends CommandBase {
 	}
 	@Override
 	public void initialize() {
-		turret.setManualOverride(true);
-		turret.setTarget(0d);
+		turret.setAngle(0d);
 		vision.turnOffVisionLight();
 	}
 
 	@Override
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_LOW_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
+		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
 		
-		if(shooter.getArmed() && turret.getArmed()) {
-			indexer.toShooter();
+		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.stop();
+		shooter.coast();
 		indexer.stop();
-		turret.setManualOverride(false);
+		hood.setAngle(0);
 	}
 
 	@Override

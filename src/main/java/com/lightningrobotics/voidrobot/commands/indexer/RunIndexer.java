@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class RunIndexer extends CommandBase {
 
     // Creates the indexer subsystem
-    private Indexer indexer;
+    private final Indexer indexer;
 
     // The power we want to supply to the indexer
     private DoubleSupplier power;
