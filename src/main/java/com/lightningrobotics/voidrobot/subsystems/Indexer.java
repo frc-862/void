@@ -9,11 +9,11 @@ import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Indexer extends SubsystemBase {
 
@@ -46,16 +46,16 @@ public class Indexer extends SubsystemBase {
     public int ballCount = 0;
 
     // Enum to determin the color of each ball
-    enum Color {
-        red,
-        blue,
+    public enum BallColor {
+        Red,
+        Blue,
         nothing
     }
 
     // Ball 1 color
-    Color upperBallColor = Color.nothing;
+    BallColor upperBallColor = BallColor.nothing;
     // Ball 2 color
-    Color lowerBallColor = Color.nothing;
+    BallColor lowerBallColor = BallColor.nothing;
 
     private ShuffleboardTab indexerTab = Shuffleboard.getTab("Indexer");
 
@@ -101,26 +101,26 @@ public class Indexer extends SubsystemBase {
         switch(getColorSensorOutputs()) {
             case 0: 
                 if(ballCount == 0) {
-                    upperBallColor = Color.nothing;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.nothing;
+                    lowerBallColor = BallColor.nothing;
                 }
             break;
 
             case 1:
                 if(ballCount == 1) {
-                    upperBallColor = Color.red;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.Red;
+                    lowerBallColor = BallColor.nothing;
                 } else if(ballCount == 2) {
-                    lowerBallColor = Color.red;
+                    lowerBallColor = BallColor.Red;
                 }
             break;
 
             case 2:
                 if(ballCount == 1) {
-                    upperBallColor = Color.blue;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.Blue;
+                    lowerBallColor = BallColor.nothing;
                 } else if(ballCount == 2) {
-                    lowerBallColor = Color.blue;
+                    lowerBallColor = BallColor.Blue;
                 }
             break;
         }
@@ -182,7 +182,14 @@ public class Indexer extends SubsystemBase {
     }
 
     public void stop() {
-        setPower(0);
-    }	
+        setPower(0d);
+    }
 
+	public BallColor getUpperBallColor() {
+        return upperBallColor;
+    }
+
+    public BallColor getLowerBallColor() {
+        return lowerBallColor;
+    }
 }
