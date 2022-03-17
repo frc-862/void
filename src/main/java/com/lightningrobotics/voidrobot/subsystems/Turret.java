@@ -21,9 +21,6 @@ public class Turret extends SubsystemBase {
 	private final TalonSRX turretMotor;
 
 	private final DigitalInput centerSensor = new DigitalInput(2);
-	//variables needed to run the tests
-	private double realX = 0d;
-	private double realY = 0d;
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	// private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
