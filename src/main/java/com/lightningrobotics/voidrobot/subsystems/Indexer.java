@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Indexer extends SubsystemBase {
@@ -79,6 +80,9 @@ public class Indexer extends SubsystemBase {
         lower = getEnterStatus();
         upper = getExitStatus();
 
+        SmartDashboard.putBoolean("lower", lower);
+        SmartDashboard.putBoolean("lower prev", lowerPrev);
+
         collect1 = !lowerPrev && lower; //Rising edge 
         eject1 = !upper && upperPrev; //Falling edge
 
@@ -94,7 +98,6 @@ public class Indexer extends SubsystemBase {
         }
         if (eject1) {
             ballCount--;
-            System.out.println("llajskdfaskdjfhlkasjdfhlkasjdfhlkajsdfhlkjashdflkjadshflkjashdfkjadshfkjhasdklfjhadslkjfhaskljdfhaklsjdhflkjasdhflkjashdflkajh");
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
 

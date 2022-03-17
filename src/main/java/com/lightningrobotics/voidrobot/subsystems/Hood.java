@@ -62,11 +62,14 @@ public class Hood extends SubsystemBase {
 	@Override
 	public void periodic() {	
 		
-		// disableHood = hoodDisable.getBoolean(false);
-		// if (!manualOverride && !disableHood) {
-		// 	PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
-		// 	hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
-		// }
+		disableHood = hoodDisable.getBoolean(false);
+		if (!manualOverride && !disableHood) {
+			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
+		}
+		else if(disableHood) {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		}
 		
 		setSmartDashboardCommands();
 

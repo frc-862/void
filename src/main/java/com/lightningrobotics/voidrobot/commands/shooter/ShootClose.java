@@ -29,7 +29,6 @@ public class ShootClose extends CommandBase {
 	@Override
 	public void initialize() {
 		turret.setAngle(0d);
-		vision.turnOffVisionLight();
 	}
 
 	@Override

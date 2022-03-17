@@ -38,9 +38,6 @@ public class FourBallTerminal extends ParallelCommandGroup {
 			new AutonAutoIndex(indexer),
 
 			new SequentialCommandGroup(
-				
-				// Turn On Lights
-				new InstantCommand(vision::turnOnVisionLight, vision),
 
 				// Set Initial Balls Held To 1
 				new InstantCommand(indexer::initializeBallsHeld, indexer),

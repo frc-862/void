@@ -10,55 +10,55 @@ import com.lightningrobotics.voidrobot.subsystems.Vision;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutonShootCargo extends CommandBase {
+public class AutonShootCargo2 extends CommandBase {
 
 	private Shooter shooter;
 	private Hood hood;
-	private Vision vision;
 	private Indexer indexer;
 	private Turret turret;
 
-	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
+	private double rpm;
+	private double hoodAngle;
+	private double turretAngle;
+	
+
+	public AutonShootCargo2(Shooter shooter, Hood hood, Indexer indexer, Turret turret, double rpm, double hoodAngle, double turretAngle) {
 		this.shooter = shooter;
 		this.indexer = indexer;
-		this.vision = vision;
 		this.turret = turret;
 		this.hood = hood;
+		this.rpm = rpm;
+		this.hoodAngle = hoodAngle;
+		this.turretAngle = turretAngle;
 
-		addRequirements(shooter, hood, indexer, turret);
+		addRequirements(shooter, hood, indexer, turret); // not adding vision or turret as it is read only
 
 	}
 
 	@Override
 	public void execute() {
-		turret.setAngle(vision.getOffsetAngle());
-
-		var distance = vision.getTargetDistance();
-		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
-
-		System.out.println("wanted RPM " + rpm);
-		System.out.println("current RPM " + shooter.getCurrentRPM());
 
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
+		turret.setAngle(turretAngle);
 
-		// were not ending it in autonshootcargo2
-		// if(shooter.onTarget() && turret.onTarget()) { 
-		// 	indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-		// }
+
+		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.stop();
-		indexer.stop();
-		hood.setAngle(0);
+		// shooter.coast();
+		// indexer.stop();
+		// turret.stop();
+		// hood.stop();
 	}
 
 	@Override
 	public boolean isFinished() {
-		return false; // indexer.getBallCount() == 0;
+		return indexer.getEjectedBall();
 	}
 	
 }

@@ -7,45 +7,44 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo2;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class ThreeBallTerminal extends ParallelCommandGroup {
 
-    private static Path start4BallPath = new Path("Start4Ball.path", false);
-    private static Path middle4BallPath = new Path("Middle4Ball.path", false);
+	private static Path mainPath = new Path("3BallTerminal.path", false);
 
-	
-    public ThreeBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
+    public ThreeBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret) throws Exception {
         super(
 			
 			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			new AutonIntake(intake),
 
-            new AimTurret(vision, turret, drivetrain),
-
-            new AutonAutoIndex(indexer),
+			mainPath.getCommand(drivetrain),
 
 			new SequentialCommandGroup(
 				// Set Initial Balls Held To 1
 				new InstantCommand(indexer::initializeBallsHeld, indexer),
+				
+				new AutonShootCargo2(shooter, hood, indexer, turret, 3700d, 0d, 10d),
 
-				start4BallPath.getCommand(drivetrain),
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargo2(shooter, hood, indexer, turret, 4500d, 1.7d, 70d),
 
-				new ParallelCommandGroup(
-					new TimedCommand(new AutonIntake(intake), middle4BallPath.getDuration(drivetrain)+1),
-					middle4BallPath.getCommand(drivetrain)
-				),
+				new AutonShootCargo2(shooter, hood, indexer, turret, 4400d, 2.5d, 40d)
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision)
+				// new InstantCommand(indexer::stop, indexer),
+				// new InstantCommand(shooter::coast, shooter),
+				// new InstantCommand(turret::stop, turret),
+				// new InstantCommand(intake::stop, intake),
+				// new InstantCommand(hood::stop, hood)
 
 			)
-
 		);
-        
-    }
+   }
 }

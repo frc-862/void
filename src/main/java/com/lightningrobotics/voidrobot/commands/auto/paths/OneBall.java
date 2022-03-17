@@ -29,9 +29,6 @@ public class OneBall extends ParallelCommandGroup {
 			// Set Initial Balls Held To 1
 			new InstantCommand(indexer::initializeBallsHeld, indexer),
 
-			// Turn On Lights
-			new InstantCommand(vision::turnOnVisionLight, vision),
-
 			// Deploy Intake
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 

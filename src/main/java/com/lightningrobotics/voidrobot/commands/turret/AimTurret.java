@@ -17,9 +17,9 @@ public class AimTurret extends CommandBase {
 
     private double targetAngle; 
     private double targetOffset;
-    private double lastKnownHeading = 0;
-    private double lastKnownDistance = 1.5; // TODO 
-    private double gryoDistance;
+    private double lastKnownHeading;
+    private double lastKnownDistance = 1.75; // TODO 
+    private double odometerDistance;
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
@@ -44,7 +44,7 @@ public class AimTurret extends CommandBase {
     @Override
     public void execute() {
    
-        if (false) { // vision.hasVision()
+        if (vision.hasVision()) {
             targetOffset = vision.getOffsetAngle();
             lastKnownDistance = vision.getTargetDistance();
             targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
@@ -66,12 +66,11 @@ public class AimTurret extends CommandBase {
             // update rotation data 
             double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-            targetAngle = getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+            targetAngle = getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation); // + targetOffset;
 
-            vision.setGyroDistance(gryoDistance);
+            vision.setGyroDistance(odometerDistance);
 
             turret.setAngle(targetAngle);
-            // TODO: set the distance somewhere so we can maybe shoot without vision
         
         }
 
@@ -90,7 +89,7 @@ public class AimTurret extends CommandBase {
 		double realX = rotateX(relativeX, relativeY, realTargetHeading);
 		double realY = rotateY(relativeX, relativeY, realTargetHeading);
 
-        gryoDistance = lastVisionDistance-realY;
+        odometerDistance = lastVisionDistance-realY;
 		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
         
 	}
