@@ -52,6 +52,7 @@ public class AutonShootCargo extends CommandBase {
 	public void end(boolean interrupted) {
 		shooter.stop();
 		indexer.stop();
+		hood.setAngle(0);
 	}
 
 	@Override
