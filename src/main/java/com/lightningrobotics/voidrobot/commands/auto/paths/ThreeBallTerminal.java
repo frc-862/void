@@ -6,8 +6,8 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo2;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
@@ -32,11 +32,11 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 				// Set Initial Balls Held To 1
 				new InstantCommand(indexer::initializeBallsHeld, indexer),
 				
-				new AutonShootCargo2(shooter, hood, indexer, turret, 3700d, 0d, 10d),
+				new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d),
 
-				new AutonShootCargo2(shooter, hood, indexer, turret, 4500d, 1.7d, 70d),
+				new AutonShootCargo(shooter, hood, indexer, turret, 4500d, 1.7d, 70d),
 
-				new AutonShootCargo2(shooter, hood, indexer, turret, 4400d, 2.5d, 40d)
+				new AutonShootCargo(shooter, hood, indexer, turret, 4400d, 2.5d, 40d)
 
 				// new InstantCommand(indexer::stop, indexer),
 				// new InstantCommand(shooter::coast, shooter),

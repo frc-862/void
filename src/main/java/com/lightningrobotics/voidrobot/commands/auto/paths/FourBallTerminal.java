@@ -8,7 +8,7 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
 import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -45,21 +45,21 @@ public class FourBallTerminal extends ParallelCommandGroup {
 				// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
 				start4BallPath.getCommand(drivetrain),
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), middle4BallPath.getDuration(drivetrain)+1),
 					middle4BallPath.getCommand(drivetrain)
 				),
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), end4BallPath.getDuration(drivetrain)+2),
 					end4BallPath.getCommand(drivetrain)
 				), 
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision)
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
 
 			)
 

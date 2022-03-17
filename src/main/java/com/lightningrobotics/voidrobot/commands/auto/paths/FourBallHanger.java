@@ -5,7 +5,7 @@ import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
@@ -40,14 +40,14 @@ public class FourBallHanger extends ParallelCommandGroup {
 					start3BallHanger.getCommand(drivetrain)
 				),
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), end3BallHanger.getDuration(drivetrain)+1),
 					end3BallHanger.getCommand(drivetrain)
 				), 
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision)
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
 
 			)
 

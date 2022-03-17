@@ -3,8 +3,8 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo2;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -26,12 +26,12 @@ public class ThreeBallTerminalVision extends ParallelCommandGroup {
 
 				new ParallelCommandGroup(
 					start4Ball.getCommand(drivetrain),
-					new AutonShootCargo2(shooter, hood, indexer, turret, 3700d, 0d, 10d)
+					new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d)
 				),
 
 				new ParallelCommandGroup(
 					middle4Ball.getCommand(drivetrain),
-					new AutonShootCargo(shooter, hood, indexer, turret, vision)
+					new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
 				)
 			)
 		);
