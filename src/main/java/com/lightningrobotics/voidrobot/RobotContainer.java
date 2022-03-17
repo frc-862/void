@@ -22,6 +22,7 @@ import com.lightningrobotics.voidrobot.constants.*;
 import com.lightningrobotics.voidrobot.subsystems.*;
 import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -57,6 +58,7 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureAutonomousCommands() {
+
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
@@ -182,5 +184,5 @@ public class RobotContainer extends LightningContainer {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
 	}
-    
+
 }
