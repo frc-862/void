@@ -28,6 +28,8 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry ledMode = visionTable.getEntry("ledMode");
 
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
+	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
+	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
 	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
 
 	// Placeholder Vars for Angle & Distance
@@ -60,7 +62,7 @@ public class Vision extends SubsystemBase {
 		offsetAngle = targetOffsetX.getDouble(offsetAngle);
 		
 		// Update Target Distance
-		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1))) + distanceOffset;
+		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
 
@@ -74,15 +76,18 @@ public class Vision extends SubsystemBase {
 			lastVisionTimestamp = visionTimestamp;
 		}
 
+		visionAngleEntry.setNumber(offsetAngle);
+		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+
 	}
 
 	public double limelightOffsetToDistance(double offset) {
-		double mountHeight = 39;
+		double mountHeight = 37.5;
 		double hubHeight = 104;
-		double mountAngle = 30;
+		double mountAngle = 32;
 		double hubCenterOffset = 24;
 
-		return (hubHeight-mountHeight)/Math.tan(Math.toRadians(mountAngle+Math.abs(offset))) + hubCenterOffset;
+		return (hubHeight-mountHeight)/Math.tan(Math.toRadians(mountAngle+offset)) + hubCenterOffset;
 	}
 
 	private void initLogging() {
