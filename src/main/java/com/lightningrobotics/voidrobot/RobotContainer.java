@@ -61,6 +61,7 @@ public class RobotContainer extends LightningContainer {
 
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
+            Autonomous.register("3ball path planner", new Path("3Ball.json", false).getCommand(drivetrain));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
 			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
@@ -86,8 +87,8 @@ public class RobotContainer extends LightningContainer {
         // COPILOT:
 
         // Collector Controls:
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getRightTriggerAxis())); //RT: run collector in
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> 1)); //B: run collector out
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
 

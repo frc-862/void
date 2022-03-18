@@ -50,9 +50,10 @@ public class AutonShootCargoVision extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.stop();
+		shooter.coast();
 		indexer.stop();
-		hood.setAngle(0);
+		turret.stop();
+		hood.stop();
 	}
 
 	@Override

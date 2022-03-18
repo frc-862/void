@@ -7,7 +7,6 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
-import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;

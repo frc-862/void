@@ -1,12 +1,11 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutonAutoIndex extends CommandBase {
+public class AutonAutoIndex2 extends CommandBase {
 
     // Creates our indexer subsystem
     private final Indexer indexer;
@@ -15,12 +14,13 @@ public class AutonAutoIndex extends CommandBase {
     private double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
     private double startIndexTime = 0d; // Setting a default start time of 0
 
+    private double power = 1; // the power we want the indexer to run at
+
 	private boolean isStopped = false;
 
-    public AutonAutoIndex(Indexer indexer) {
+    public AutonAutoIndex2(Indexer indexer) {
 		this.indexer = indexer;
 
-		// addRequirements(indexer); TODO maybe fix
 	}
 
     @Override
@@ -33,15 +33,22 @@ public class AutonAutoIndex extends CommandBase {
             startIndexTime = Timer.getFPGATimestamp();
         }
 
-        if (indexer.getBallCount() == 0) {
+        if(indexer.getBallCount() == 0) {
             indexer.setPower(0.2);
-        }     
-        else if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
-            indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-        } else {
-            indexer.stop();
-            isStopped = true;
+            isStopped = false;
         }
+        else if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
+            indexer.setPower(power);
+			isStopped = false;
+        } 
+        else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2) { // Checks to see if we have reached the amount of time we want to index, then stops
+            indexer.setPower(power);
+			isStopped = false;
+        } 
+		else if(!isStopped){
+            indexer.setPower(0);
+			isStopped = true;
+        } 
     }
 
     @Override
@@ -51,6 +58,6 @@ public class AutonAutoIndex extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return isStopped;
+        return indexer.getBallCount() == 2 && isStopped;
     }
 }

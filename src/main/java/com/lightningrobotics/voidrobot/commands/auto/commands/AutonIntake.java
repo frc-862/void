@@ -16,7 +16,7 @@ public class AutonIntake extends CommandBase {
 
     @Override
     public void execute() {
-        intake.setPower(-0.75);
+        intake.setPower(0.75);
     }
 
     @Override
