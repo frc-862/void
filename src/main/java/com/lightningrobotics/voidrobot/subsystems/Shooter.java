@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.common.logging.DataLogger;
-import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
