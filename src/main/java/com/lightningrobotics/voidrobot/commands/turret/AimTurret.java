@@ -1,11 +1,8 @@
 package com.lightningrobotics.voidrobot.commands.turret;
 
-import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
-
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -17,14 +14,12 @@ public class AimTurret extends CommandBase {
 
     private double targetAngle; 
     private double targetOffset;
-    private double lastKnownHeading = 0;
-    private double lastKnownDistance = 3; // TODO 
+    private double lastKnownHeading;
+    private double lastKnownDistance = 1.75; // TODO
+    private double odometerDistance;
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
-
-	// private MovingAverageFilter maf = new MovingAverageFilter(3);
-    private MedianFilter mf = new MedianFilter(3);
 
     public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain) {
         this.vision = vision;
@@ -48,7 +43,6 @@ public class AimTurret extends CommandBase {
             lastKnownDistance = vision.getTargetDistance();
             targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
 
-            targetAngle = mf.calculate(targetAngle);
             lastKnownHeading = targetAngle;
 
             turret.setAngle(targetAngle);
@@ -59,22 +53,19 @@ public class AimTurret extends CommandBase {
             double relativeY = drivetrain.getPose().getY() - initialY;
 
             // rotate from odometer-center to robot-center
-            relativeX = turret.rotateX(relativeX, relativeY, initialOdometerGyroReading);
-            relativeY = turret.rotateY(relativeX, relativeY, initialOdometerGyroReading);
+            relativeX = rotateX(relativeX, relativeY, initialOdometerGyroReading);
+            relativeY = rotateY(relativeX, relativeY, initialOdometerGyroReading);
 
             // update rotation data 
             double changeInRotation = drivetrain.getPose().getRotation().getDegrees() - initialOdometerGyroReading;
 
-            targetAngle = turret.getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation) + targetOffset;
+            targetAngle = getTargetNoVision(relativeX, relativeY, lastKnownHeading, lastKnownDistance, changeInRotation); // + targetOffset;
 
-            vision.setGyroDistance(relativeX + lastKnownDistance);
+            vision.setGyroDistance(odometerDistance);
 
             turret.setAngle(targetAngle);
-            // TODO: set the distance somewhere so we can maybe shoot without vision
         
         }
-
-        SmartDashboard.putNumber("set target angle", targetAngle);
     }
 
     public void resetPose(){
@@ -83,6 +74,24 @@ public class AimTurret extends CommandBase {
         initialY = drivetrain.getPose().getY();
         lastKnownHeading = turret.getCurrentAngle().getDegrees();
     }
+
+    public double getTargetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
+		
+		double realX = rotateX(relativeX, relativeY, realTargetHeading);
+		double realY = rotateY(relativeX, relativeY, realTargetHeading);
+
+        odometerDistance = lastVisionDistance-realY;
+		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
+        
+	}
+
+	public double rotateX (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
+	}	
+
+	public double rotateY (double xValue, double yValue, double angleInDegrees){
+		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
+	}
 
     @Override
     public void end(boolean interrupted) {

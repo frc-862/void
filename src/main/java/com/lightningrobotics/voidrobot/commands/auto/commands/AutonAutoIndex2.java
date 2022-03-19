@@ -1,11 +1,11 @@
-package com.lightningrobotics.voidrobot.commands.indexer;
+package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutoIndexCargo extends CommandBase {
+public class AutonAutoIndex2 extends CommandBase {
 
     // Creates our indexer subsystem
     private final Indexer indexer;
@@ -18,10 +18,9 @@ public class AutoIndexCargo extends CommandBase {
 
 	private boolean isStopped = false;
 
-    public AutoIndexCargo(Indexer indexer) {
+    public AutonAutoIndex2(Indexer indexer) {
 		this.indexer = indexer;
 
-		// addRequirements(indexer); TODO maybe fix
 	}
 
     @Override
@@ -34,7 +33,11 @@ public class AutoIndexCargo extends CommandBase {
             startIndexTime = Timer.getFPGATimestamp();
         }
 
-        if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
+        if(indexer.getBallCount() == 0) {
+            indexer.setPower(0.2);
+            isStopped = false;
+        }
+        else if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
             indexer.setPower(power);
 			isStopped = false;
         } 
@@ -55,6 +58,6 @@ public class AutoIndexCargo extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return indexer.getBallCount() == 2 && isStopped;
     }
 }

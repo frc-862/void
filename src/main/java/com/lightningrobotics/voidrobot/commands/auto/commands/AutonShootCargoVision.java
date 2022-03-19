@@ -1,54 +1,59 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
-import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
+import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutonShootCargo extends CommandBase {
+public class AutonShootCargoVision extends CommandBase {
 
 	private Shooter shooter;
 	private Hood hood;
+	private Vision vision;
 	private Indexer indexer;
 	private Turret turret;
 
-	private double rpm;
-	private double hoodAngle;
-	private double turretAngle;
-	
-
-	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, double rpm, double hoodAngle, double turretAngle) {
+	public AutonShootCargoVision(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
 		this.shooter = shooter;
 		this.indexer = indexer;
+		this.vision = vision;
 		this.turret = turret;
 		this.hood = hood;
-		this.rpm = rpm;
-		this.hoodAngle = hoodAngle;
-		this.turretAngle = turretAngle;
 
-		addRequirements(shooter, hood, indexer, turret); // not adding vision or turret as it is read only
+		addRequirements(shooter, hood, indexer, turret);
 
 	}
 
 	@Override
 	public void execute() {
+		turret.setAngle(turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle());
+
+		var distance = vision.getTargetDistance();
+		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+
+		System.out.println("wanted RPM " + rpm);
+		System.out.println("current RPM " + shooter.getCurrentRPM());
 
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
-		turret.setAngle(turretAngle);
 
-		if (shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) { 
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		} else {
+			indexer.setPower(0.3);
 		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		turret.setAngle(50);
+		shooter.coast();
+		indexer.stop();
+		hood.stop();
 	}
 
 	@Override

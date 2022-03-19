@@ -5,7 +5,6 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -15,21 +14,18 @@ public class ShootClose extends CommandBase {
 	private final Hood hood;
 	private final Indexer indexer;
 	private final Turret turret;
-	private final Vision vision;
 
-	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
+	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
 		this.turret = turret;
-		this.vision = vision;
 
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
 	}
 	@Override
 	public void initialize() {
 		turret.setAngle(0d);
-		vision.turnOffVisionLight();
 	}
 
 	@Override

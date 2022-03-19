@@ -6,12 +6,12 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
+import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminalVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
-import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
+import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
-import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBallTest;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
@@ -23,6 +23,7 @@ import com.lightningrobotics.voidrobot.constants.*;
 import com.lightningrobotics.voidrobot.subsystems.*;
 import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -58,16 +59,18 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureAutonomousCommands() {
+
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("test 2 Ball", new TwoBallTest(drivetrain, shooter, hood, turret, indexer, intake, vision));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
-			Autonomous.register("4 Ball Terminal", new FourBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret));
+			Autonomous.register("3 Ball Terminal Vision", new ThreeBallVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
 			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, hood, turret, vision));
+            Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
+            e.printStackTrace();
 		}
 
         if(TESTING) registerTestPaths();        
@@ -79,18 +82,19 @@ public class RobotContainer extends LightningContainer {
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, turret, vision), false); // Auto shoot
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, vision), false); // Auto shoot
-        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, vision), false); // Shoot close no vision
-		(new JoystickButton(driverRight, 3)).whenPressed(new InstantCommand(vision::toggleVisionLights, vision)); // toggle vision LEDs
+        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret), false); // Shoot close no vision
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
 
         // COPILOT:
 
         // Collector Controls:
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> -copilot.getRightTriggerAxis())); //RT: run collector in
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> 1)); //B: run collector out
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
+
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new AutoIndexCargo(indexer));
 
         // Indexer Controls:
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
@@ -105,7 +109,7 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void configureDefaultCommands() {
         //AUTO
-        // indexer.setDefaultCommand(new AutoIndexCargo(indexer, intake));
+        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
@@ -117,7 +121,7 @@ public class RobotContainer extends LightningContainer {
             new runClimb(
                 climber,
                 () -> (
-                    ((-1*climb.getLeftY()) +
+                    ((-1*climb.getLeftY()) + 
                     // I know some people don't like these so I'll document it
                     // If the d-pad up is pressed, add 1 to total power
                     (climb.getPOV() == 0 ? 1 : 0) +
@@ -183,5 +187,5 @@ public class RobotContainer extends LightningContainer {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
 	}
-    
+
 }
