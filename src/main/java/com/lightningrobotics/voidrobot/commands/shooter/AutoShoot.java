@@ -43,7 +43,7 @@ public class AutoShoot extends CommandBase {
     this.shooter = shooter;
     this.hood = hood;
 
-    this.addRequirements(turret, shooter, hood);
+    this.addRequirements(shooter, hood);
   }
 
   @Override
@@ -63,11 +63,12 @@ public class AutoShoot extends CommandBase {
     boolean isDrivingSlow = 
       drivetrainState.getLeftSpeed() <= Constants.MAXIMUM_SPEED_TO_SHOOT 
       && drivetrainState.getRightSpeed() <= Constants.MAXIMUM_SPEED_TO_SHOOT;
+      
 
     //checks if drivetrain, vision, and turret are OK and sets the RPM and hood angle if they are.
     if(indexer.getBallCount() != 0 
     && isDrivingSlow
-    // && vision.hasVision() 
+    && vision.hasVision() 
     && turret.onTarget()
     && !isEnenmyBall) {
 
@@ -78,16 +79,15 @@ public class AutoShoot extends CommandBase {
         distance = maf.get();
       }
       
-      rpm = 3000; //Constants.DISTANCE_RPM_MAP.get(distance);
+      rpm = Constants.DISTANCE_RPM_MAP.get(distance);
       hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-     // shooter.setRPM(rpm);
-      shooter.setRPM(3000);
-      // hood.setAngle(hoodAngle);
+      shooter.setRPM(rpm);
+      hood.setAngle(1);
+      //hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
-      // if(shooter.onTarget() && hood.onTarget()) {
-      if(shooter.onTarget()) {
+      if(shooter.onTarget() && hood.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       }
     }
@@ -95,8 +95,7 @@ public class AutoShoot extends CommandBase {
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
-      // if(shooter.onTarget() && hood.onTarget()) {
-        if(shooter.onTarget()) {
+       if(shooter.onTarget() && hood.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       } 
     }
@@ -107,10 +106,8 @@ public class AutoShoot extends CommandBase {
     }
     SmartDashboard.putBoolean("AS Turret Armed", turret.onTarget());
     SmartDashboard.putBoolean("AS Shooter Armed", shooter.onTarget());
+    SmartDashboard.putBoolean("AS Hood Armed", hood.onTarget());
     SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
-    SmartDashboard.putString("AS Alliance Color", DriverStation.getAlliance().toString());
-    SmartDashboard.putString("AS Ball Color", indexer.getUpperBallColor().toString());
-    SmartDashboard.putNumber("AS current velocity", (drivetrainState.getLeftSpeed() + drivetrainState.getRightSpeed()) / 2);
     // Stop indexer after a while
     
     if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){
