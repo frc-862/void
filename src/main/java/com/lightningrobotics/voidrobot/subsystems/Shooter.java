@@ -84,8 +84,8 @@ public class Shooter extends SubsystemBase {
 		return flywheelMotor.getSelectedSensorVelocity() / 2048 * 600; //converts from revs per second to revs per minute
 	}
 
-	public void setRPM(double targetRPMs) {
-		this.targetRPM = targetRPMs; // + RPMTrimEntry.getDouble(0);
+	public void setRPM(double targetRPM) {
+		this.targetRPM = targetRPM;
 		setVelocity(this.targetRPM / 600 * 2048);
 	}
 

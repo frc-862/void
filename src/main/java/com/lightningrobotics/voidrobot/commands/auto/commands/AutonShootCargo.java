@@ -1,13 +1,12 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
+import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonShootCargo extends CommandBase {
@@ -42,18 +41,14 @@ public class AutonShootCargo extends CommandBase {
 		hood.setAngle(hoodAngle);
 		turret.setAngle(turretAngle);
 
-
-		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+		if (shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		// shooter.coast();
-		// indexer.stop();
-		// turret.stop();
-		// hood.stop();
+		turret.setAngle(50);
 	}
 
 	@Override

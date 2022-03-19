@@ -58,10 +58,10 @@ public class Drivetrain extends DifferentialDrivetrain {
 
         this.withEachMotor((m) -> {
             WPI_TalonFX motor = (WPI_TalonFX)m;
-            motor.setNeutralMode(NeutralMode.Brake);   
-            motor.configOpenloopRamp(0.1); // TODO Tune this number for eric <3         
+            motor.setNeutralMode(NeutralMode.Coast);   
+            motor.configOpenloopRamp(0.15); // TODO Tune this number for eric <3         
         });
-        
+    
         intitLogging();
 
 		CommandScheduler.getInstance().registerSubsystem(this);

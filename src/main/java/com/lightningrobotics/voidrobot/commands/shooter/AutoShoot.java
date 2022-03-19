@@ -83,8 +83,7 @@ public class AutoShoot extends CommandBase {
       hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
       shooter.setRPM(rpm);
-      hood.setAngle(1);
-      //hood.setAngle(hoodAngle);
+      hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
       if(shooter.onTarget() && hood.onTarget()) {
