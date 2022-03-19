@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -23,8 +24,8 @@ public class Turret extends SubsystemBase {
 	private final DigitalInput centerSensor = new DigitalInput(2);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
-	// private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
-	// private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
+	private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
+	private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
 
 	private double targetAngle;
 	private boolean manualOverride = false;
@@ -139,6 +140,11 @@ public class Turret extends SubsystemBase {
         } else {
             motorOutput = Constants.TURRET_PID_FAST.calculate(getCurrentAngle().getDegrees(), constrainedAngle);
         }
+
+		if(Math.abs(motorOutput) > (Constants.TURRET_kP_SLOW/2) && Math.abs(motorOutput) < Constants.MIN_TURRET_PWR) {
+			motorOutput = Math.signum(motorOutput) * Constants.MIN_TURRET_PWR;
+		}
+
 		return motorOutput;
 	}
 

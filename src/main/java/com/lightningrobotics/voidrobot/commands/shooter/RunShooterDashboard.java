@@ -14,10 +14,6 @@ public class RunShooterDashboard extends CommandBase {
     private final Shooter shooter;
     private final Hood hood;
 
-	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
-	private NetworkTableEntry setRPMEntry = shooterTestTab.add("set RPM", 0).getEntry();
-	private NetworkTableEntry setAngleEntry = shooterTestTab.add("set hood angle", 0).getEntry();
-
     public RunShooterDashboard(Shooter shooter, Hood hood) {
         this.shooter = shooter;
         this.hood = hood;
@@ -30,8 +26,8 @@ public class RunShooterDashboard extends CommandBase {
 
     @Override
     public void execute() {		
-        shooter.setRPM(setRPMEntry.getDouble(0));  // shooter.getRPMFromDashboard() // Gets the desired RPM from the dashboard and sets them to the motor
-        hood.setAngle(setAngleEntry.getDouble(0));
+        shooter.setRPM(shooter.getRPMFromDashboard()); // Gets the desired RPM from the dashboard and sets them to the motor
+        hood.setAngle(hood.getAngleFromDashboard());
     }
 
 
