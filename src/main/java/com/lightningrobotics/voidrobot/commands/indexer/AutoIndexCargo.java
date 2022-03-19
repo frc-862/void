@@ -43,6 +43,7 @@ public class AutoIndexCargo extends CommandBase {
 			isStopped = false;
         } 
 		else if(!isStopped){
+            System.out.println("AUTO INDEX STOPPED_____________________________");
             indexer.setPower(0);
 			isStopped = true;
         } 

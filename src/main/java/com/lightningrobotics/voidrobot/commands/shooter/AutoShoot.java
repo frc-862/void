@@ -86,17 +86,15 @@ public class AutoShoot extends CommandBase {
       hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
-      if(shooter.onTarget() && !indexer.getEnterStatusNoDebounce() /* hood.onTarget()*/) {
+      if(shooter.onTarget() /* hood.onTarget()*/) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-
-        System.out.println("_________________IS INDEXING_______________");
       }
     }
     else if(isEnenmyBall) { 
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
-       if(shooter.onTarget() && !indexer.getEnterStatusNoDebounce() /*&& hood.onTarget()*/) {
+       if(shooter.onTarget() /*&& hood.onTarget()*/) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       } 
     }
