@@ -3,9 +3,7 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
-import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -18,10 +16,6 @@ public class OneBall extends ParallelCommandGroup {
 
 	public OneBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, Vision vision) throws Exception {
 		super(
-
-		// Aim Turret
-		new AimTurret(vision, turret, drivetrain),
-
 		new SequentialCommandGroup(
 
 			new InstantCommand(() -> shooter.setPower(0.4)),

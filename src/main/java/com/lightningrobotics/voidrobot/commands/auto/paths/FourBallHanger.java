@@ -24,7 +24,7 @@ public class FourBallHanger extends ParallelCommandGroup {
 			
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
-      new AimTurret(vision, turret, drivetrain),
+      // new AimTurret(vision, turret, drivetrain),
 
 			new AutonAutoIndex(indexer),
 

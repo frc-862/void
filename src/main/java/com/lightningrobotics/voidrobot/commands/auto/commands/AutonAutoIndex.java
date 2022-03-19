@@ -12,7 +12,6 @@ public class AutonAutoIndex extends CommandBase {
     private final Indexer indexer;
 
     private double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
-    private double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
     private double startIndexTime = 0d; // Setting a default start time of 0
 
 	private boolean isStopped = false;

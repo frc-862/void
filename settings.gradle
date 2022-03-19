@@ -26,5 +26,5 @@ pluginManagement {
     }
 }
 
-// include ':lightning'
-// project(':lightning').projectDir = file('../../../lightning')
+include ':lightning'
+project(':lightning').projectDir = file('../lightning')

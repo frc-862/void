@@ -1,17 +1,10 @@
 package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
-import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
-import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -37,12 +30,6 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 				new AutonShootCargo(shooter, hood, indexer, turret, 4500d, 1.7d, 70d),
 
 				new AutonShootCargo(shooter, hood, indexer, turret, 4400d, 2.5d, 40d)
-
-				// new InstantCommand(indexer::stop, indexer),
-				// new InstantCommand(shooter::coast, shooter),
-				// new InstantCommand(turret::stop, turret),
-				// new InstantCommand(intake::stop, intake),
-				// new InstantCommand(hood::stop, hood)
 
 			)
 		);
