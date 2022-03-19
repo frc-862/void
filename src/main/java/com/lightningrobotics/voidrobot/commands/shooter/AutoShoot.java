@@ -110,7 +110,7 @@ public class AutoShoot extends CommandBase {
     SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
     SmartDashboard.putString("AS Alliance Color", DriverStation.getAlliance().toString());
     SmartDashboard.putString("AS Ball Color", indexer.getUpperBallColor().toString());
-          
+    SmartDashboard.putNumber("AS current velocity", (drivetrainState.getLeftSpeed() + drivetrainState.getRightSpeed()) / 2);
     // Stop indexer after a while
     
     if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){

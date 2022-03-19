@@ -86,5 +86,7 @@ public class Drivetrain extends DifferentialDrivetrain {
     public void periodic() {
         super.periodic();
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
+        SmartDashboard.putNumber("left motor vel", leftVelocitySupplier.getAsDouble());
+        SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
     }
 }
