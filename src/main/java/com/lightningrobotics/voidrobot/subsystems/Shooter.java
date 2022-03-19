@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
 
 	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
     private NetworkTableEntry displayRPM = shooterTab.add("RPM-From encoder", 0).getEntry();
-    private NetworkTableEntry setRPMEntry = shooterTestTab.add("set RPM", 0).getEntry();;
+    private NetworkTableEntry setRPMEntry = shooterTab.add("set RPM", 0).getEntry();;
 	private NetworkTableEntry displayTargetRPM = shooterTab.add("target RPM", 0).getEntry();
 
 	// The power point we want the shooter to be at

@@ -18,14 +18,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
 
 	// Network Table for Vision
-	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-	// Entries for Angle & Distance	
-	private final NetworkTableEntry targetAngleEntry = visionTable.getEntry("Target Angle");
-	private final NetworkTableEntry targetDistanceEntry = visionTable.getEntry("Target Distance");
-	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("Target Time");
+	// Entries for Angle & Distance
+	private final NetworkTableEntry targetOffsetX = visionTable.getEntry("tx");
+	private final NetworkTableEntry targetOffsetY = visionTable.getEntry("ty");
+	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("tl");
+	private final NetworkTableEntry targetDetected = visionTable.getEntry("tv");
+	private final NetworkTableEntry ledMode = visionTable.getEntry("ledMode");
 
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
+	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
+	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
 	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
 
 	// Placeholder Vars for Angle & Distance
@@ -53,10 +57,10 @@ public class Vision extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// Update Target Angle
-		offsetAngle = targetAngleEntry.getDouble(offsetAngle);
+		offsetAngle = targetOffsetX.getDouble(offsetAngle);
 		
 		// Update Target Distance
-		targetDistance = Units.inchesToMeters(targetDistanceEntry.getDouble(targetDistance)) + distanceOffset;
+		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
 		visionTimestamp = targetTimeEntry.getDouble(0);
 
@@ -70,6 +74,18 @@ public class Vision extends SubsystemBase {
 			lastVisionTimestamp = visionTimestamp;
 		}
 
+		visionAngleEntry.setNumber(offsetAngle);
+		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+
+	}
+
+	public double limelightOffsetToDistance(double offset) {
+		double mountHeight = 37.5;
+		double hubHeight = 104;
+		double mountAngle = 32;
+		double hubCenterOffset = 24;
+
+		return (hubHeight-mountHeight)/Math.tan(Math.toRadians(mountAngle+offset)) + hubCenterOffset;
 	}
 
 	private void initLogging() {
@@ -94,8 +110,25 @@ public class Vision extends SubsystemBase {
 		return targetDistance;
 	}
 
+	public void turnOnVisionLight(){
+		ledMode.setNumber(3);
+	}
+
+	public void turnOffVisionLight(){
+		ledMode.setNumber(1);
+	}
+
+	public void toggleVisionLights() {
+		if(visionLightsOn()) turnOffVisionLight();
+		else turnOnVisionLight();
+	}
+
+	public boolean visionLightsOn() {
+		return ledMode.getDouble(0) == 3 || ledMode.getDouble(0) == 0;
+	}
+
 	public boolean hasVision(){
-		return targetDistance > 0;
+		return targetDistance > 0 && targetDetected.getDouble(0) == 1;
 	}
 
 	public boolean isNewData() {
