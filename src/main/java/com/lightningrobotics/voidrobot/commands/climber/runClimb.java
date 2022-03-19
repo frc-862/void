@@ -27,7 +27,7 @@ public class runClimb extends CommandBase {
 
     @Override
     public void execute() {
-        climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
+        // climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
         climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
     }
 
