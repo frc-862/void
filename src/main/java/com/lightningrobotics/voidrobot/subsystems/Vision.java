@@ -35,7 +35,7 @@ public class Vision extends SubsystemBase {
 	private double lastVisionTimestamp = 0;
 	private double visionTimestamp = 0;
 
-	private double gyroDistance = 0;
+	private double odometerDistance = 0;
 
 	private static boolean haveData = false;
 
@@ -45,8 +45,6 @@ public class Vision extends SubsystemBase {
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
 	public Vision() {
-		turnOffVisionLight();
-		
 		initLogging();
 
 		CommandScheduler.getInstance().registerSubsystem(this);
@@ -66,7 +64,7 @@ public class Vision extends SubsystemBase {
 
 		if(!hasVision() || lastVisionTimestamp == visionTimestamp) {
 			haveData = false;
-			targetDistance = gyroDistance;
+			targetDistance = odometerDistance;
 		} else {
 			haveData = true;
 			lastVisionTimestamp = visionTimestamp;
@@ -80,8 +78,8 @@ public class Vision extends SubsystemBase {
 		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
 	}
 
-	public void setGyroDistance(double gyroDistance) {
-		this.gyroDistance = gyroDistance;
+	public void setGyroDistance(double odometerDistance) {
+		this.odometerDistance = odometerDistance;
 	}
 
 	public boolean isOnTarget() {
@@ -94,23 +92,6 @@ public class Vision extends SubsystemBase {
 
 	public double getTargetDistance() {
 		return targetDistance;
-	}
-
-	public void turnOnVisionLight(){
-		pdh.setSwitchableChannel(true);
-	}
-
-	public void turnOffVisionLight(){
-		pdh.setSwitchableChannel(false);
-	}
-
-	public void toggleVisionLights() {
-		if(visionLightsOn()) turnOffVisionLight();
-		else turnOnVisionLight();
-	}
-
-	public boolean visionLightsOn() {
-		return pdh.getSwitchableChannel();
 	}
 
 	public boolean hasVision(){

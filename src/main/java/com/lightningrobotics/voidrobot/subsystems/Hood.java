@@ -67,6 +67,9 @@ public class Hood extends SubsystemBase {
 			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
 		}
+		else if(disableHood) {
+			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		}
 		
 		setSmartDashboardCommands();
 

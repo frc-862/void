@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Indexer extends SubsystemBase {
 
@@ -79,6 +81,9 @@ public class Indexer extends SubsystemBase {
         lower = getEnterStatus();
         upper = getExitStatus();
 
+        SmartDashboard.putBoolean("lower", lower);
+        SmartDashboard.putBoolean("lower prev", lowerPrev);
+
         collect1 = !lowerPrev && lower; //Rising edge 
         eject1 = !upper && upperPrev; //Falling edge
 
@@ -96,6 +101,9 @@ public class Indexer extends SubsystemBase {
             ballCount--;
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
+
+        lowerPrev = lower;
+        upperPrev = upper;
 
         // Sets the possible color cases of the ball
         switch(getColorSensorOutputs()) {
@@ -130,6 +138,7 @@ public class Indexer extends SubsystemBase {
         DataLogger.addDataElement("enterSensor", () -> getEnterStatus() ? 1 : 0);
         DataLogger.addDataElement("exitSensor", () -> getExitStatus() ? 1 : 0);
         DataLogger.addDataElement("colorSensor", this::getColorSensorOutputs); // 1 red, 2 blue, 0 nothing 
+        DataLogger.addDataElement("ballCount", this::getBallCount);
     }
 
 	public void initializeBallsHeld() {

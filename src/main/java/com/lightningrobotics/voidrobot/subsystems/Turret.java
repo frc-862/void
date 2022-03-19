@@ -21,9 +21,6 @@ public class Turret extends SubsystemBase {
 	private final TalonSRX turretMotor;
 
 	private final DigitalInput centerSensor = new DigitalInput(2);
-	//variables needed to run the tests
-	private double realX = 0d;
-	private double realY = 0d;
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	// private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
@@ -82,9 +79,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	private void initLogging() {
-		DataLogger.addDataElement("centorSensor", () -> getCenterSensor() ? 1 : 0);
+		DataLogger.addDataElement("centerSensor", () -> getCenterSensor() ? 1 : 0);
 		DataLogger.addDataElement("turretTarget", this::getTarget);
 		DataLogger.addDataElement("turretCurrent", () -> getCurrentAngle().getDegrees());
+		//DataLogger.addDataElement("turretCommand", () -> "foo");
+		// this.getCurrentCommand().getName()
 	}
 
 	public boolean onTarget() {
@@ -102,22 +101,6 @@ public class Turret extends SubsystemBase {
 
 	public double getEncoderRotation() {
 		return turretMotor.getSelectedSensorPosition() / 4096;
-	}
-
-	public double getTargetNoVision(double relativeX, double relativeY, double realTargetHeading, double lastVisionDistance, double changeInRotation){
-		
-		realX = rotateX(relativeX, relativeY, realTargetHeading);
-		realY = rotateY(relativeX, relativeY, realTargetHeading);
-
-		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
-	}
-
-	public double rotateX (double xValue, double yValue, double angleInDegrees){
-		return (xValue * Math.cos(Math.toRadians(angleInDegrees))) - (yValue * Math.sin(Math.toRadians(angleInDegrees)));
-	}	
-
-	public double rotateY (double xValue, double yValue, double angleInDegrees){
-		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
 	}
 
 	public void setAngle(double targetAngle) {

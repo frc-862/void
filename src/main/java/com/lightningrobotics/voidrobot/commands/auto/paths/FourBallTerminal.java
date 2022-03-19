@@ -2,14 +2,14 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.indexer.AutoIndexCargo;
 import com.lightningrobotics.voidrobot.commands.indexer.RunIndexer;
-import com.lightningrobotics.voidrobot.commands.intake.RunIntake;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionAim;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.shooter.RunShooter;
+import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
@@ -32,14 +32,11 @@ public class FourBallTerminal extends ParallelCommandGroup {
 			
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
-			new AutonVisionAim(vision, turret),
+            new AimTurret(vision, turret, drivetrain),
 
-			new AutoIndexCargo(indexer),
+			new AutonAutoIndex(indexer),
 
 			new SequentialCommandGroup(
-				
-				// Turn On Lights
-				new InstantCommand(vision::turnOnVisionLight, vision),
 
 				// Set Initial Balls Held To 1
 				new InstantCommand(indexer::initializeBallsHeld, indexer),
@@ -47,21 +44,21 @@ public class FourBallTerminal extends ParallelCommandGroup {
 				// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
 				start4BallPath.getCommand(drivetrain),
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), middle4BallPath.getDuration(drivetrain)+1),
 					middle4BallPath.getCommand(drivetrain)
 				),
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), end4BallPath.getDuration(drivetrain)+2),
 					end4BallPath.getCommand(drivetrain)
 				), 
 
-				new AutonShootCargo(shooter, hood, indexer, turret, vision)
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
 
 			)
 
