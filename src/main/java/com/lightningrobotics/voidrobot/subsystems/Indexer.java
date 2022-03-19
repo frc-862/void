@@ -97,6 +97,9 @@ public class Indexer extends SubsystemBase {
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
 
+        lowerPrev = lower;
+        upperPrev = upper;
+
         // Sets the possible color cases of the ball
         switch(getColorSensorOutputs()) {
             case 0: 
