@@ -60,7 +60,7 @@ public class AutoShoot extends CommandBase {
     //checks if drivetrain, vision, and turret are OK and sets the RPM and hood angle if they are.
     if(indexer.getBallCount() != 0 
     && isDrivingSlow
-    && vision.hasVision() 
+    // && vision.hasVision() 
     && turret.onTarget()
     && !isEnenmyBall) {
 
