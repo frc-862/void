@@ -33,11 +33,12 @@ public class AutonAutoIndex extends CommandBase {
         }
 
         if (indexer.getBallCount() == 0) {
-            indexer.setPower(0.2);
+            indexer.setPower(0.5);
         }     
         else if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
             indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-        } else {
+        } 
+        else if(!isStopped) {
             indexer.stop();
             isStopped = true;
         }

@@ -28,7 +28,7 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 				new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d),
 
 				new AutonShootCargo(shooter, hood, indexer, turret, 4500d, 1.7d, 70d),
-
+				
 				new AutonShootCargo(shooter, hood, indexer, turret, 4400d, 2.5d, 40d)
 
 			)

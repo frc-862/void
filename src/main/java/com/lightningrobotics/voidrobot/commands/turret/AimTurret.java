@@ -3,8 +3,6 @@ package com.lightningrobotics.voidrobot.commands.turret;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Vision;
-
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -17,14 +15,11 @@ public class AimTurret extends CommandBase {
     private double targetAngle; 
     private double targetOffset;
     private double lastKnownHeading;
-    private double lastKnownDistance = 1.75; // TODO 
+    private double lastKnownDistance = 1.75; // TODO
     private double odometerDistance;
     private double initialOdometerGyroReading = 0d;
     private double initialX = 0d;
     private double initialY = 0d;
-
-	// private MovingAverageFilter maf = new MovingAverageFilter(3);
-    private MedianFilter mf = new MedianFilter(3);
 
     public AimTurret(Vision vision, Turret turret, Drivetrain drivetrain) {
         this.vision = vision;
@@ -48,7 +43,6 @@ public class AimTurret extends CommandBase {
             lastKnownDistance = vision.getTargetDistance();
             targetAngle = turret.getCurrentAngle().getDegrees() + targetOffset;
 
-            targetAngle = mf.calculate(targetAngle);
             lastKnownHeading = targetAngle;
 
             turret.setAngle(targetAngle);
@@ -72,8 +66,6 @@ public class AimTurret extends CommandBase {
             turret.setAngle(targetAngle);
         
         }
-
-        SmartDashboard.putNumber("set target angle", targetAngle);
     }
 
     public void resetPose(){

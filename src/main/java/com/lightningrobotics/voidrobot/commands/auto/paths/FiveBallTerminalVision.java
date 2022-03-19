@@ -9,6 +9,7 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVis
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -28,13 +29,17 @@ public class FiveBallTerminalVision extends ParallelCommandGroup {
 
 			new SequentialCommandGroup(
 
+				new InstantCommand(indexer::initializeBallsHeld),
+
+				new InstantCommand(() -> turret.setAngle(10d)),
+
 				new ParallelCommandGroup(
 					// shoot preload
 					start5Ball.getCommand(drivetrain),
 
 					new SequentialCommandGroup(
 						new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d),
-						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), 3.5) // tune the time here
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), start5Ball.getDuration(drivetrain)) // tune the time here
 					)
 				),
 

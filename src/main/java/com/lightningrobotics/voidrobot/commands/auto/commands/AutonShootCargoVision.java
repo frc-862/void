@@ -30,7 +30,7 @@ public class AutonShootCargoVision extends CommandBase {
 
 	@Override
 	public void execute() {
-		turret.setAngle(vision.getOffsetAngle());
+		turret.setAngle(turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle());
 
 		var distance = vision.getTargetDistance();
 		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
@@ -42,23 +42,23 @@ public class AutonShootCargoVision extends CommandBase {
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
 
-		// were not ending it in autonshootcargo2
-		// if(shooter.onTarget() && turret.onTarget()) { 
-		// 	indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-		// }
+		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) { 
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		} else {
+			indexer.setPower(0.3);
+		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
 		shooter.coast();
 		indexer.stop();
-		turret.stop();
 		hood.stop();
 	}
 
 	@Override
 	public boolean isFinished() {
-		return false; // indexer.getBallCount() == 0;
+		return indexer.getEjectedBall();
 	}
 	
 }

@@ -138,6 +138,7 @@ public class Indexer extends SubsystemBase {
         DataLogger.addDataElement("exitSensor", () -> getExitStatus() ? 1 : 0);
         DataLogger.addDataElement("colorSensor", this::getColorSensorOutputs); // 1 red, 2 blue, 0 nothing 
         DataLogger.addDataElement("ballCount", this::getBallCount);
+        DataLogger.addDataElement("indexPower", indexerMotor::getMotorOutputPercent);
     }
 
 	public void initializeBallsHeld() {
