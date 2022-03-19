@@ -41,6 +41,8 @@ public class AutoShoot extends CommandBase {
     this.indexer = indexer;
     this.shooter = shooter;
     this.hood = hood;
+
+    this.addRequirements(turret, indexer, shooter, hood);
   }
 
   @Override
@@ -73,10 +75,11 @@ public class AutoShoot extends CommandBase {
       hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
       shooter.setRPM(rpm);
-      hood.setAngle(hoodAngle);
+      // hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
-      if(shooter.onTarget() && hood.onTarget()) {
+      // if(shooter.onTarget() && hood.onTarget()) {
+        if(shooter.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       }
     }
@@ -84,7 +87,8 @@ public class AutoShoot extends CommandBase {
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
-      if(shooter.onTarget() && hood.onTarget()) {
+      // if(shooter.onTarget() && hood.onTarget()) {
+        if(shooter.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       } 
     }
