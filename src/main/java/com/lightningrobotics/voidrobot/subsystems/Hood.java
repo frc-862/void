@@ -27,9 +27,13 @@ public class Hood extends SubsystemBase {
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab hoodTab = Shuffleboard.getTab("hood");
+
+	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
+
+	private NetworkTableEntry setHoodAngleEntry = shooterTestTab.add("set hood", 0).getEntry();
 
 	
 	private boolean disableHood = false;
@@ -139,4 +143,8 @@ public class Hood extends SubsystemBase {
 		targetAngle.setDouble(getSetPoint());
 		rawAngle.setDouble(getRawAngle());
 	 }
+
+	 public double getAngleFromDashboard() {
+		return setHoodAngleEntry.getDouble(0);
+	}
 }
