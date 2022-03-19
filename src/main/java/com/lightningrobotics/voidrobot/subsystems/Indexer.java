@@ -167,6 +167,14 @@ public class Indexer extends SubsystemBase {
         return enterDebouncer.calculate(!enterSensor.get());
     }
 
+    public boolean getEnterStatusNoDebounce(){
+        return !enterSensor.get();
+    }
+
+    public boolean getExitStatusNoDebounce(){
+        return !exitSensor.get();
+    }
+
     public boolean getExitStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return exitDebouncer.calculate(!exitSensor.get());

@@ -86,26 +86,29 @@ public class AutoShoot extends CommandBase {
       hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
-      if(shooter.onTarget() && hood.onTarget()) {
+      if(shooter.onTarget() && !indexer.getEnterStatusNoDebounce() /* hood.onTarget()*/) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+
+        System.out.println("_________________IS INDEXING_______________");
       }
     }
     else if(isEnenmyBall) { 
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
-       if(shooter.onTarget() && hood.onTarget()) {
+       if(shooter.onTarget() && !indexer.getEnterStatusNoDebounce() /*&& hood.onTarget()*/) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       } 
     }
 
     // Start time when ball hit top sensor
-    if(indexer.getExitStatus()){
+    if(indexer.getExitStatusNoDebounce()){
       startTime = Timer.getFPGATimestamp();
     }
     SmartDashboard.putBoolean("AS Turret Armed", turret.onTarget());
     SmartDashboard.putBoolean("AS Shooter Armed", shooter.onTarget());
     SmartDashboard.putBoolean("AS Hood Armed", hood.onTarget());
+    SmartDashboard.putBoolean("AS Vision", vision.hasVision());
     SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
     // Stop indexer after a while
     
