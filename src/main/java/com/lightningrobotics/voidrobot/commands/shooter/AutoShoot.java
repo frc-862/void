@@ -17,6 +17,7 @@ import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutoShoot extends CommandBase {
@@ -42,14 +43,20 @@ public class AutoShoot extends CommandBase {
     this.shooter = shooter;
     this.hood = hood;
 
-    this.addRequirements(turret, indexer, shooter, hood);
+    this.addRequirements(turret, shooter, hood);
   }
 
   @Override
   public void initialize() {
 
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+
     //check if the current ball is not the same color as the alliance
-    boolean isEnenmyBall = DriverStation.getAlliance().toString() != indexer.getUpperBallColor().toString() && indexer.getUpperBallColor() != BallColor.nothing;
+    boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
     
     // check if drive speed is slow enough
     DifferentialDrivetrainState drivetrainState = ((DifferentialDrivetrainState)drivetrain.getDriveState());
@@ -71,15 +78,16 @@ public class AutoShoot extends CommandBase {
         distance = maf.get();
       }
       
-      rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+      rpm = 3000; //Constants.DISTANCE_RPM_MAP.get(distance);
       hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
-      shooter.setRPM(rpm);
+     // shooter.setRPM(rpm);
+      shooter.setRPM(3000);
       // hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
       // if(shooter.onTarget() && hood.onTarget()) {
-        if(shooter.onTarget()) {
+      if(shooter.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       }
     }
@@ -97,18 +105,20 @@ public class AutoShoot extends CommandBase {
     if(indexer.getExitStatus()){
       startTime = Timer.getFPGATimestamp();
     }
+    SmartDashboard.putBoolean("AS Turret Armed", turret.onTarget());
+    SmartDashboard.putBoolean("AS Shooter Armed", shooter.onTarget());
+    SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
+    SmartDashboard.putString("AS Alliance Color", DriverStation.getAlliance().toString());
+    SmartDashboard.putString("AS Ball Color", indexer.getUpperBallColor().toString());
           
     // Stop indexer after a while
+    
     if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){
       indexer.setPower(0);
       shooter.coast();
       hood.setAngle(0);
     }
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
