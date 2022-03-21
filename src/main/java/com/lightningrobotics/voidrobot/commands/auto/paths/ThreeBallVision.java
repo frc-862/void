@@ -27,18 +27,20 @@ public class ThreeBallVision extends ParallelCommandGroup {
 
 			new SequentialCommandGroup(
 
-				new ParallelDeadlineGroup(
+				new ParallelCommandGroup(
 					start3Ball.getCommand(drivetrain),
-					new SequentialCommandGroup(
-						new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d),
-						new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
-					)
+					new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d)
 				),
 
-				new ParallelCommandGroup(
-					end3Ball.getCommand(drivetrain), 
-					new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
-				)
+				new InstantCommand(() -> System.out.println("about to shoot ball two ----------------------------------------")),
+
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
+
+				end3Ball.getCommand(drivetrain), 
+				
+				new InstantCommand(() -> System.out.println("about to shoot ball three ----------------------------------------")),
+
+				new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
 			)
 		);
 		

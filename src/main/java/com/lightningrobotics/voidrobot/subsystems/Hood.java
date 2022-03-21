@@ -27,6 +27,11 @@ public class Hood extends SubsystemBase {
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab hoodTab = Shuffleboard.getTab("hood");
+	
+	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
+	
+	private NetworkTableEntry setHoodAngleTuneEntry = tuneTab.add("set hood tune", 0).getEntry();
+
 
 	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
@@ -40,6 +45,8 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
 	
 	private double hoodOffset;
+
+	private boolean tuning = true;
 
 	// The power point we want the shooter to be at
 	private double PowerSetPoint;
@@ -66,6 +73,10 @@ public class Hood extends SubsystemBase {
 	@Override
 	public void periodic() {	
 		
+		if (tuning) {
+			setAngle(setHoodAngleTuneEntry.getDouble(0));
+		}
+
 		disableHood = hoodDisable.getBoolean(false);
 		if (!manualOverride && !disableHood) {
 			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);

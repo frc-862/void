@@ -103,36 +103,52 @@ public final class Constants {
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
-			put(0d, 0d);
-			put(2.3368d, 3550d);
-            put(2.7432d, 3550d);
-			put(3.3782d, 3700d);
-			put(3.429d, 3700d);
-			put(4.0123d, 3850d);
-			put(4.318d, 3800d);
-			put(4.572d, 4000d);
-			put(5.207d, 4100d);
-			put(6.0452d, 4400d);
-			put(7.0358d, 4600d);
-			put(8.382d, 5100d);
+            put(2.5273, 3500d);
+            put(2.9972, 3650d);
+            put(3.4798, 3800d);
+            put(3.937, 3850d);
+            put(4.3688, 3950d);
+            put(4.826, 4150d);
+            put(5.5626, 4550d);            
+
+			// put(0d, 0d);
+			// put(2.3368d, 3550d);
+            // put(2.7432d, 3550d);
+			// put(3.3782d, 3700d);
+			// put(3.429d, 3700d);
+			// put(4.0123d, 3850d);
+			// put(4.318d, 3800d);
+			// put(4.572d, 4000d);
+			// put(5.207d, 4100d);
+			// put(6.0452d, 4400d);
+			// put(7.0358d, 4600d);
+			// put(8.382d, 5100d);
         }
     };
 
     //distance in meters, angle in degrees
     public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
-            put(0d, 0d);
-			put(2.3368d, 0d);
-            put(2.7432d, 0d);
-			put(3.3782d, 0d);
-			put(3.429d, 0d);
-			put(4.0123d, 0.5d);
-			put(4.318d, 0d);
-			put(4.572d, 1d);
-			put(5.207d, 1.5d);
-			put(6.0452d, 1.75d);
-			put(7.0358d, 2d);
-			put(8.382d, 2d);
+            put(2.5273, 0d);
+            put(2.9972, 0d);
+            put(3.4798, 0.8d);
+            put(3.937, 0.9d);
+            put(4.3688, 1d);
+            put(4.826, 1.1d);
+            put(5.5626, 1.4d);
+            
+            // put(0d, 0d);
+			// put(2.3368d, 0d);
+            // put(2.7432d, 0d);
+			// put(3.3782d, 0d);
+			// put(3.429d, 0d);
+			// put(4.0123d, 0.5d);
+			// put(4.318d, 0d);
+			// put(4.572d, 1d);
+			// put(5.207d, 1.5d);
+			// put(6.0452d, 1.75d);
+			// put(7.0358d, 2d);
+			// put(8.382d, 2d);
         }
     };
 

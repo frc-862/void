@@ -49,6 +49,8 @@ public class AutonShootCargo extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		turret.setAngle(50);
+		indexer.stop();;
+		shooter.coast();
 	}
 
 	@Override
