@@ -159,6 +159,7 @@ public class Indexer extends SubsystemBase {
     }
 
     public void setPower(double power) {
+        SmartDashboard.putNumber("INDEXER POWER", power);
         indexerMotor.set(VictorSPXControlMode.PercentOutput, power);
     }
 

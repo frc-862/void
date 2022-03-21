@@ -61,9 +61,10 @@ public class AutoShoot extends CommandBase {
     // check if drive speed is slow enough
     DifferentialDrivetrainState drivetrainState = ((DifferentialDrivetrainState)drivetrain.getDriveState());
     boolean isDrivingSlow = 
-      drivetrainState.getLeftSpeed() <= Constants.MAXIMUM_SPEED_TO_SHOOT 
-      && drivetrainState.getRightSpeed() <= Constants.MAXIMUM_SPEED_TO_SHOOT;
-      
+      drivetrainState.getLeftSpeed() <= Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT 
+      && drivetrainState.getRightSpeed() <= Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT
+      && Math.abs(drivetrainState.getLeftSpeed() - drivetrainState.getRightSpeed()) <= Constants.MAXIMUM_ANGULAR_SPEED_TO_SHOOT;
+    
 
     //checks if drivetrain, vision, and turret are OK and sets the RPM and hood angle if they are.
     if(indexer.getBallCount() != 0 

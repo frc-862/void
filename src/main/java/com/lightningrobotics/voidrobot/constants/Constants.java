@@ -43,7 +43,9 @@ public final class Constants {
         new FeedForwardController(Constants.KS, Constants.KV, Constants.KA)
     );
 
-    public static final double MAXIMUM_SPEED_TO_SHOOT = 0.5; //TODO: tune. also in meters per second.
+    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.5; //TODO: tune. also in meters per second.
+
+    public static final double MAXIMUM_ANGULAR_SPEED_TO_SHOOT = 1; //TODO: tune. also in meters per second.
 
     // Turret
 	public static final PIDFController TURRET_PID_SLOW = new PIDFController(Constants.TURRET_kP_SLOW, Constants.TURRET_kI_SLOW, Constants.TURRET_kD_SLOW);
