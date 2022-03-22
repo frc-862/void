@@ -45,7 +45,7 @@ public class AutonShootCargoVision extends CommandBase {
 		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) { 
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		} else {
-			indexer.setPower(0.3);
+			indexer.setPower(0.4);
 		}
 	}
 

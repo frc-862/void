@@ -37,6 +37,11 @@ public class Vision extends SubsystemBase {
 	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
 	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
 
+	
+	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
+	private final NetworkTableEntry visionDistanceTuneEntry = tuneTab.add("Vision Distance Tune", 0).getEntry();
+	private final NetworkTableEntry visionAngleTuneEntry = tuneTab.add("Vision Angle Tune", 0).getEntry();
+
 	// Placeholder Vars for Angle & Distance
 	private static double targetDistance = -1d;
     private static double offsetAngle = 0d;
@@ -73,6 +78,9 @@ public class Vision extends SubsystemBase {
 
 		visionAngleEntry.setNumber(offsetAngle);
 		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+
+		visionAngleTuneEntry.setNumber(offsetAngle);
+		visionDistanceTuneEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
 		if (DriverStation.isEnabled()) {
 			if (Timer.getFPGATimestamp() - lastVisionSnapshot > 0.5) {
