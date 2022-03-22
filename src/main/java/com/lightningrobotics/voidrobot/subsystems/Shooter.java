@@ -30,9 +30,6 @@ public class Shooter extends SubsystemBase {
 	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
 	private NetworkTableEntry setRPMAngleTuneEntry = tuneTab.add("set RPM tune", 0).getEntry();
 
-	private boolean tuning = true;
-
-
 	// The power point we want the shooter to be at
 	private double targetRPM;
 
@@ -55,7 +52,7 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {	
 
-		if (tuning) {
+		if (Constants.SHOT_TUNING) {
 			setRPM(setRPMAngleTuneEntry.getDouble(0));
 		}
 

@@ -152,6 +152,8 @@ public final class Constants {
         }
     };
 
+    public static final boolean SHOT_TUNING = false; // use this when making a new interpolation
+
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;

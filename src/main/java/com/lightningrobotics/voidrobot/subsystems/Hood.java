@@ -46,8 +46,6 @@ public class Hood extends SubsystemBase {
 	
 	private double hoodOffset;
 
-	private boolean tuning = true;
-
 	// The power point we want the shooter to be at
 	private double PowerSetPoint;
 	private double angle;
@@ -73,7 +71,7 @@ public class Hood extends SubsystemBase {
 	@Override
 	public void periodic() {	
 		
-		if (tuning) {
+		if (Constants.SHOT_TUNING) {
 			setAngle(setHoodAngleTuneEntry.getDouble(0));
 		}
 
