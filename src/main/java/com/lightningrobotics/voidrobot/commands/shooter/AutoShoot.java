@@ -33,6 +33,8 @@ public class AutoShoot extends CommandBase {
 	private double hoodAngle;
   private double startTime;
 
+  boolean hasShot = false;
+
   private MovingAverageFilter maf = new MovingAverageFilter(10);
 
   public AutoShoot(Drivetrain drivetrain, Vision vision, Turret turret, Indexer indexer, Shooter shooter, Hood hood) {
@@ -102,6 +104,7 @@ public class AutoShoot extends CommandBase {
 
     // Start time when ball hit top sensor
     if(indexer.getExitStatusNoDebounce()){
+      hasShot = true;
       startTime = Timer.getFPGATimestamp();
     }
     SmartDashboard.putBoolean("AS Turret Armed", turret.onTarget());
@@ -111,10 +114,11 @@ public class AutoShoot extends CommandBase {
     SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
     // Stop indexer after a while
     
-    if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){
+    if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0 && hasShot){
       indexer.setPower(0);
-      shooter.coast();
-      //hood.setAngle(0);
+      shooter.coast();  
+      hood.setAngle(0);
+      hasShot = false;
     }
   }
 

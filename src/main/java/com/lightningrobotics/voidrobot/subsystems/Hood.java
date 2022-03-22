@@ -37,7 +37,7 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
 
-	private NetworkTableEntry setHoodAngleEntry = hoodTab.add("set hood", 0).getEntry();
+	private NetworkTableEntry setHoodAngleEntry = shooterTestTab.add("set hood", 0).getEntry();
 
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("hood", Constants.HOOD_PID);
 
@@ -81,6 +81,10 @@ public class Hood extends SubsystemBase {
 		}
 		else if(disableHood) {
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		}
+
+		if(resetHoodSensorTriggered()){
+			hoodOffset = getRawAngle();
 		}
 		
 		setSmartDashboardCommands();
