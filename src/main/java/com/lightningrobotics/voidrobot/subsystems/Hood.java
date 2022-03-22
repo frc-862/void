@@ -77,7 +77,7 @@ public class Hood extends SubsystemBase {
 
 		disableHood = hoodDisable.getBoolean(false);
 		if (!manualOverride && !disableHood) {
-			if (angle == 0) {
+			if (angle <= 0) {
 				hoodMotor.set(TalonSRXControlMode.PercentOutput, Constants.HOOD_ZERO_SPEED);
 				zero();
 			} else { 
@@ -91,7 +91,7 @@ public class Hood extends SubsystemBase {
 		
 		setSmartDashboardCommands();
 
-		SmartDashboard.putBoolean("hood limit switch ", hoodMotor.isFwdLimitSwitchClosed() == 1);
+		SmartDashboard.putBoolean("hood limit switch ", getLimitSwitch());
 
 	}
 
@@ -105,9 +105,13 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void zero() {
-		if (hoodMotor.isFwdLimitSwitchClosed() == 1) { // TODO change this to forward and reversed
+		if (getLimitSwitch()) {
 			hoodOffset = getRawAngle();
 		}	
+	}
+
+	public boolean getLimitSwitch() {
+		return hoodMotor.isRevLimitSwitchClosed() == 1;  // TODO change this to forward and reversed
 	}
 
 	public double getSetPoint() {
