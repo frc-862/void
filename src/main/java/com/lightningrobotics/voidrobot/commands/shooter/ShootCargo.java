@@ -44,7 +44,7 @@ public class ShootCargo extends CommandBase {
 			distance = maf.get();
 		}
 		
-		rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		rpm = Constants.DISTANCE_RPM_MAP.get(distance) + Constants.ANGLE_POWER_MAP.get(turret.getCurrentAngle().getDegrees());
 		hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 		shooter.setRPM(rpm);
