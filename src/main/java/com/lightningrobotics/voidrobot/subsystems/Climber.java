@@ -41,7 +41,7 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry kD_load = climbTab.add("kD with load", 0).getEntry();
 	private NetworkTableEntry kF_load = climbTab.add("kF with load", 0).getEntry();
 	
-	private NetworkTableEntry kP_noLoad = climbTab.add("kP without load", 0).getEntry();
+	private NetworkTableEntry kP_noLoad = climbTab.add("kP without load", 0.07).getEntry();
 	private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
 	private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
 
@@ -150,7 +150,7 @@ public class Climber extends SubsystemBase {
 			resetWinchEncoders();
 		}
 
-		setWinchPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
+		setWinchPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
 
 	}
 

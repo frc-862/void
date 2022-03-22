@@ -141,4 +141,7 @@ public final class Constants {
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
+
+    //Climber
+    public static final double MID_RUNG_VALUE = 257000;
 }
