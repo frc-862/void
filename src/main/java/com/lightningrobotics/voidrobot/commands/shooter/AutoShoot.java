@@ -87,15 +87,15 @@ public class AutoShoot extends CommandBase {
       hood.setAngle(hoodAngle);
 
       //if shooter and hood have reached the target, index the ball
-      if(shooter.onTarget() /* hood.onTarget()*/) {
+      if(shooter.onTarget() && hood.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       }
     }
-    else if(isEnenmyBall) { 
+    else if(indexer.getBallCount() != 0 && isEnenmyBall){ 
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
 
-       if(shooter.onTarget() /*&& hood.onTarget()*/) {
+       if(shooter.onTarget() && hood.onTarget()) {
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
       } 
     }
@@ -114,7 +114,7 @@ public class AutoShoot extends CommandBase {
     if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0){
       indexer.setPower(0);
       shooter.coast();
-      hood.setAngle(0);
+      //hood.setAngle(0);
     }
   }
 
