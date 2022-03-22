@@ -4,11 +4,14 @@ import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,11 +24,13 @@ public class Vision extends SubsystemBase {
 	private final NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("limelight");
 
 	// Entries for Angle & Distance
+	private final NetworkTableEntry targetArea = visionTable.getEntry("ta");
 	private final NetworkTableEntry targetOffsetX = visionTable.getEntry("tx");
 	private final NetworkTableEntry targetOffsetY = visionTable.getEntry("ty");
 	private final NetworkTableEntry targetTimeEntry = visionTable.getEntry("tl");
 	private final NetworkTableEntry targetDetected = visionTable.getEntry("tv");
 	private final NetworkTableEntry ledMode = visionTable.getEntry("ledMode");
+	private final NetworkTableEntry snapShot = visionTable.getEntry("snapshot");
 
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
 	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
@@ -36,12 +41,9 @@ public class Vision extends SubsystemBase {
 	private static double targetDistance = -1d;
     private static double offsetAngle = 0d;
 
-	private double lastVisionTimestamp = 0;
-	private double visionTimestamp = 0;
-
-	private double gyroDistance = 0;
-
-	private static boolean haveData = false;
+	private double lastVisionSnapshot = 0;
+	private MedianFilter mf = new MedianFilter(5);
+	private double odometerDistance = 0;
 
 	private double distanceOffset = 0;
 
@@ -49,9 +51,8 @@ public class Vision extends SubsystemBase {
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
 
 	public Vision() {
-		turnOffVisionLight();
-		
 		initLogging();
+		snapShot.setNumber(0);
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
@@ -59,26 +60,27 @@ public class Vision extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// Update Target Angle
-		offsetAngle = targetOffsetX.getDouble(offsetAngle);
+		offsetAngle = mf.calculate(targetOffsetX.getDouble(offsetAngle));
 		
 		// Update Target Distance
 		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
-		visionTimestamp = targetTimeEntry.getDouble(0);
-
 		bias.setDouble(distanceOffset);
 
-		if(!hasVision() || lastVisionTimestamp == visionTimestamp) {
-			haveData = false;
-			targetDistance = gyroDistance;
-		} else {
-			haveData = true;
-			lastVisionTimestamp = visionTimestamp;
+		if(!hasVision()) {
+			targetDistance = odometerDistance;
 		}
 
 		visionAngleEntry.setNumber(offsetAngle);
 		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
+		if (DriverStation.isEnabled()) {
+			if (Timer.getFPGATimestamp() - lastVisionSnapshot > 0.5) {
+				lastVisionSnapshot	= Timer.getFPGATimestamp();
+				snapShot.setNumber(1);
+				System.out.println("Snapshot?");
+			}
+		}
 	}
 
 	public double limelightOffsetToDistance(double offset) {
@@ -94,10 +96,13 @@ public class Vision extends SubsystemBase {
 		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
 		DataLogger.addDataElement("targetDistance", () -> targetDistance);
 		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
+		DataLogger.addDataElement("targetArea", () -> targetArea.getDouble(-1));
+		DataLogger.addDataElement("targetX", () -> targetOffsetX.getDouble(-1));
+		DataLogger.addDataElement("targetY", () -> targetOffsetY.getDouble(-1));
 	}
 
-	public void setGyroDistance(double gyroDistance) {
-		this.gyroDistance = gyroDistance;
+	public void setGyroDistance(double odometerDistance) {
+		this.odometerDistance = odometerDistance;
 	}
 
 	public boolean isOnTarget() {
@@ -129,12 +134,8 @@ public class Vision extends SubsystemBase {
 		return ledMode.getDouble(0) == 3 || ledMode.getDouble(0) == 0;
 	}
 
-	public boolean hasVision(){
+	public boolean hasVision() {
 		return targetDistance > 0 && targetDetected.getDouble(0) == 1;
-	}
-
-	public boolean isNewData() {
-		return haveData;
 	}
 
 	public void adjustBias(double delta) {

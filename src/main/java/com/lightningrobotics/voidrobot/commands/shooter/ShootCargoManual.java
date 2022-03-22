@@ -28,7 +28,10 @@ public class ShootCargoManual extends CommandBase {
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_TARMAC_RPM);	
 		hood.setAngle(Constants.SHOOT_TARMAC_ANGLE);
-		indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		
+		if(shooter.onTarget() && hood.onTarget()){
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		}
 	}
 
 	@Override
