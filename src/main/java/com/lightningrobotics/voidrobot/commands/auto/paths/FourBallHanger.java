@@ -2,7 +2,6 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
@@ -25,7 +24,7 @@ public class FourBallHanger extends ParallelCommandGroup {
 
       // new AimTurret(vision, turret, drivetrain),
 
-			new AutonAutoIndex(indexer),
+			// new AutonAutoIndex(indexer),
 
 			new SequentialCommandGroup(
 
