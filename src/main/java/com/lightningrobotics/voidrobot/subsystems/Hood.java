@@ -17,6 +17,7 @@ import com.lightningrobotics.voidrobot.constants.Constants;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -32,7 +33,6 @@ public class Hood extends SubsystemBase {
 	
 	private NetworkTableEntry setHoodAngleTuneEntry = tuneTab.add("set hood tune", 0).getEntry();
 
-
 	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
@@ -44,10 +44,10 @@ public class Hood extends SubsystemBase {
 	private boolean disableHood = false;
 	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
 	
-	private double hoodOffset;
+	private double hoodOffset; 
 
 	// The power point we want the shooter to be at
-	private double PowerSetPoint;
+	private double pwrSetpoint;
 	private double angle;
 	private boolean manualOverride = false;
 
@@ -60,7 +60,7 @@ public class Hood extends SubsystemBase {
 
 		hoodMotor.setSensorPhase(true);
 
-		readZero();
+		zero();
 
 		initLogging();
 
@@ -77,14 +77,21 @@ public class Hood extends SubsystemBase {
 
 		disableHood = hoodDisable.getBoolean(false);
 		if (!manualOverride && !disableHood) {
-			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
-			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
+			if (angle == 0) {
+				hoodMotor.set(TalonSRXControlMode.PercentOutput, Constants.HOOD_ZERO_SPEED);
+				zero();
+			} else { 
+				pwrSetpoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
+				hoodMotor.set(TalonSRXControlMode.PercentOutput, pwrSetpoint);
+			}
 		}
 		else if(disableHood) {
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
 		}
 		
 		setSmartDashboardCommands();
+
+		SmartDashboard.putBoolean("hood limit switch ", hoodMotor.isFwdLimitSwitchClosed() == 1);
 
 	}
 
@@ -97,26 +104,10 @@ public class Hood extends SubsystemBase {
 		return Math.abs(angle - getAngle()) < Constants.HOOD_TOLERANCE;
 	}
 
-	public void readZero() {
-		Scanner sc = null;
-		File robotConstantsFile = Paths.get("/home/lvuser/robot_constants/", "robot_constants.txt").toFile();
-		try {
-			sc = new Scanner(robotConstantsFile);
-			sc.useDelimiter(":");
-
-			if((Files.exists(Paths.get("/home/lvuser/robot_constants")))) { 
-				if (sc.next().equals("hoodOffset")) {				
-					hoodOffset = Double.parseDouble(sc.next());
-				}
-			}
-		} catch (Exception e) {
-			System.err.println("Failed to see robot_constants file" + e.getMessage());
-		} finally {
-			if (sc != null) {
-				sc.close();
-
-			}
-		}
+	public void zero() {
+		if (hoodMotor.isFwdLimitSwitchClosed() == 1) { // TODO change this to forward and reversed
+			hoodOffset = getRawAngle();
+		}	
 	}
 
 	public double getSetPoint() {
@@ -133,7 +124,7 @@ public class Hood extends SubsystemBase {
 
 	public void setAngle(double hoodAngle) {
 		manualOverride = false;
-		this.angle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+		this.angle = hoodAngle;
 	}
 
 	public void setPower(double power) {

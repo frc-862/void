@@ -89,9 +89,7 @@ public final class Constants {
     public static final double HOOD_KD = 0d;
 	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
-
-    public static final double MAX_HOOD_ANGLE = 5.5; // TODO get these soft limit values that we want
-    public static final double MIN_HOOD_ANGLE = 0.3;
+    public static final double HOOD_ZERO_SPEED = -0.1d;
 
     public static final double SHOOT_LOW_RPM = 1750;  // 4100 TODO tune these
     public static final double SHOOT_LOW_ANGLE = 3.0;
@@ -152,7 +150,7 @@ public final class Constants {
         }
     };
 
-    public static final boolean SHOT_TUNING = false; // use this when making a new interpolation
+    public static final boolean SHOT_TUNING = true; // use this when making a new interpolation
 
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;
