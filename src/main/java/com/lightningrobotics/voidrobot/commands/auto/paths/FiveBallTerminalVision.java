@@ -2,8 +2,6 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex2;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
@@ -24,7 +22,7 @@ public class FiveBallTerminalVision extends ParallelCommandGroup {
 
 			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
-			new TimedCommand(new AutonAutoIndex(indexer), start5Ball.getDuration(drivetrain) + middle5Ball.getDuration(drivetrain)),
+			// new TimedCommand(new AutonAutoIndex(indexer), start5Ball.getDuration(drivetrain) + middle5Ball.getDuration(drivetrain)),
 			new AutonIntake(intake),
 
 			new SequentialCommandGroup(
@@ -46,7 +44,7 @@ public class FiveBallTerminalVision extends ParallelCommandGroup {
 				middle5Ball.getCommand(drivetrain),
 
 				// collect ball 4 and 5
-				new TimedCommand(new AutonAutoIndex2(indexer), 2), // tune the time here
+				// new TimedCommand(new AutonAutoIndex2(indexer), 2), // tune the time here
 
 				end5Ball.getCommand(drivetrain),
 

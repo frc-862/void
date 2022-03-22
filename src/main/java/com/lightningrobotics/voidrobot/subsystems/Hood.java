@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -31,6 +32,10 @@ public class Hood extends SubsystemBase {
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab hoodTab = Shuffleboard.getTab("hood");
+	
+	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
+	
+	private NetworkTableEntry setHoodAngleTuneEntry = tuneTab.add("set hood tune", 0).getEntry();
 
 	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
@@ -45,10 +50,10 @@ public class Hood extends SubsystemBase {
 	private boolean disableHood = false;
 	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
 	
-	private double hoodOffset;
+	private double hoodOffset; 
 
 	// The power point we want the shooter to be at
-	private double PowerSetPoint;
+	private double pwrSetpoint;
 	private double angle;
 	private boolean manualOverride = false;
 
@@ -61,9 +66,7 @@ public class Hood extends SubsystemBase {
 
 		hoodMotor.setSensorPhase(true);
 
-		resetHoodSensor = new DigitalInput(RobotMap.HOOD_LIMIT_SWITCH_ID);
-
-		readZero();
+		zero();
 
 		initLogging();
 
@@ -73,22 +76,27 @@ public class Hood extends SubsystemBase {
 
 	@Override
 	public void periodic() {	
-		
+		if (Constants.SHOT_TUNING) {
+			setAngle(setHoodAngleTuneEntry.getDouble(0));
+		}
+
 		disableHood = hoodDisable.getBoolean(false);
 		if (!manualOverride && !disableHood) {
-			PowerSetPoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
-			hoodMotor.set(TalonSRXControlMode.PercentOutput, PowerSetPoint);
+			if (angle <= 0) {
+				hoodMotor.set(TalonSRXControlMode.PercentOutput, Constants.HOOD_ZERO_SPEED);
+				zero();
+			} else { 
+				pwrSetpoint = Constants.HOOD_PID.calculate(getAngle(), this.angle);
+				hoodMotor.set(TalonSRXControlMode.PercentOutput, pwrSetpoint);
+			}
 		}
 		else if(disableHood) {
 			hoodMotor.set(TalonSRXControlMode.PercentOutput, 0);
 		}
-
-		if(resetHoodSensorTriggered()){
-			hoodOffset = getRawAngle();
-		}
 		
 		setSmartDashboardCommands();
 
+		SmartDashboard.putBoolean("hood limit switch ", getLimitSwitch());
 	}
 
 	private void initLogging() {
@@ -101,26 +109,14 @@ public class Hood extends SubsystemBase {
 		return Math.abs(angle - getAngle()) < Constants.HOOD_TOLERANCE;
 	}
 
-	public void readZero() {
-		Scanner sc = null;
-		File robotConstantsFile = Paths.get("/home/lvuser/robot_constants/", "robot_constants.txt").toFile();
-		try {
-			sc = new Scanner(robotConstantsFile);
-			sc.useDelimiter(":");
+	public void zero() {
+		if (getLimitSwitch()) {
+			hoodOffset = getRawAngle();
+		}	
+	}
 
-			if((Files.exists(Paths.get("/home/lvuser/robot_constants")))) { 
-				if (sc.next().equals("hoodOffset")) {				
-					hoodOffset = Double.parseDouble(sc.next());
-				}
-			}
-		} catch (Exception e) {
-			System.err.println("Failed to see robot_constants file" + e.getMessage());
-		} finally {
-			if (sc != null) {
-				sc.close();
-
-			}
-		}
+	public boolean getLimitSwitch() {
+		return hoodMotor.isRevLimitSwitchClosed() == 1;  // TODO change this to forward and reversed
 	}
 
 	public double getSetPoint() {
@@ -137,7 +133,7 @@ public class Hood extends SubsystemBase {
 
 	public void setAngle(double hoodAngle) {
 		manualOverride = false;
-		this.angle = LightningMath.constrain(hoodAngle, Constants.MIN_HOOD_ANGLE, Constants.MAX_HOOD_ANGLE);
+		this.angle = hoodAngle;
 	}
 
 	public void setPower(double power) {
@@ -160,9 +156,4 @@ public class Hood extends SubsystemBase {
 	 public double getAngleFromDashboard() {
 		return setHoodAngleEntry.getDouble(0);
 	}
-
-	public boolean resetHoodSensorTriggered() {
-		return !resetHoodSensor.get();
-	}
-
 }

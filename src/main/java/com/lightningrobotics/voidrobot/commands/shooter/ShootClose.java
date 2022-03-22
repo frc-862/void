@@ -21,7 +21,7 @@ public class ShootClose extends CommandBase {
 		this.indexer = indexer;
 		this.turret = turret;
 
-		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
+		addRequirements(shooter, indexer, turret); // not adding vision or turret as it is read onl
 	}
 	@Override
 	public void initialize() {
@@ -32,6 +32,7 @@ public class ShootClose extends CommandBase {
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_LOW_RPM);
 		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
+		turret.setAngle(0d);
 		
 		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);

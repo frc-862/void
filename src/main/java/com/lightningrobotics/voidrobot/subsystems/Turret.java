@@ -21,7 +21,7 @@ public class Turret extends SubsystemBase {
 	// Creating turret motor, encoder, and PID controller
 	private final TalonSRX turretMotor;
 
-	private final DigitalInput centerSensor = new DigitalInput(2);
+	private final DigitalInput centerSensor = new DigitalInput(RobotMap.CENTER_SENSOR_ID);
 
 	// A PID tuner that displays to a tab on the dashboard (values dont save, rember what you typed)
 	private final PIDFDashboardTuner tunerSlow = new PIDFDashboardTuner("Turret slow", Constants.TURRET_PID_SLOW);
