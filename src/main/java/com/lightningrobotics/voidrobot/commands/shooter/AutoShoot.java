@@ -50,13 +50,14 @@ public class AutoShoot extends CommandBase {
 
   @Override
   public void initialize() {
-
+    // toggles boolean on Shuffleboard whether autoshooting is on
+    shooter.toggleAutoShootingDisplay();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
+    System.out.println("AUTO SHOOT RUNNING +++++++++++++++++++++++++++++++++++++++++++++++++");
     //check if the current ball is not the same color as the alliance
     boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
     
@@ -67,6 +68,26 @@ public class AutoShoot extends CommandBase {
       && drivetrainState.getRightSpeed() <= Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT
       && Math.abs(drivetrainState.getLeftSpeed() - drivetrainState.getRightSpeed()) <= Constants.MAXIMUM_ANGULAR_SPEED_TO_SHOOT;
     
+    // if we have our own ball and vision sees things, move flywheel and hood
+    if(!isEnenmyBall && vision.hasVision()){
+      distance = vision.getTargetDistance();
+      if (distance > 0) {
+        distance = maf.filter(distance);
+      } else {
+        distance = maf.get();
+      }
+
+      // If too close then shoot low
+      if(distance > 2.4d){
+        rpm = Constants.DISTANCE_RPM_MAP.get(distance) + Constants.ANGLE_POWER_MAP.get(distance);
+        hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
+      } else{
+        // rpm = Constants.SHOOT_LOW_RPM;
+        // hoodAngle = Constants.SHOOT_LOW_ANGLE;
+      }
+
+      shooter.setRPM(rpm);
+    }
 
     //checks if drivetrain, vision, and turret are OK and sets the RPM and hood angle if they are.
     if(indexer.getBallCount() != 0 
@@ -75,56 +96,42 @@ public class AutoShoot extends CommandBase {
     && turret.onTarget()
     && !isEnenmyBall) {
 
-      distance = vision.getTargetDistance();
-      if (distance > 0) {
-        distance = maf.filter(distance);
-      } else {
-        distance = maf.get();
-      }
-      
-      rpm = Constants.DISTANCE_RPM_MAP.get(distance);
-      hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
-
-      shooter.setRPM(rpm);
       hood.setAngle(hoodAngle);
-
-      //if shooter and hood have reached the target, index the ball
-      if(shooter.onTarget() && hood.onTarget()) {
-        indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-      }
+      indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
     }
+    // If we have enemy ball, shoot out
     else if(indexer.getBallCount() != 0 && isEnenmyBall){ 
       shooter.setRPM(Constants.EJECT_BALL_RPM);
       hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE);
-
-       if(shooter.onTarget() && hood.onTarget()) {
-        indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-      } 
+      indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
     }
 
     // Start time when ball hit top sensor
+    
     if(indexer.getExitStatusNoDebounce()){
       hasShot = true;
       startTime = Timer.getFPGATimestamp();
     }
+    // Stop indexer after a while
+    if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0 && hasShot){
+      indexer.setPower(0);
+      hood.setAngle(0);
+      hasShot = false;
+    }
+
     SmartDashboard.putBoolean("AS Turret Armed", turret.onTarget());
     SmartDashboard.putBoolean("AS Shooter Armed", shooter.onTarget());
     SmartDashboard.putBoolean("AS Hood Armed", hood.onTarget());
     SmartDashboard.putBoolean("AS Vision", vision.hasVision());
     SmartDashboard.putBoolean("AS IS Dirving Slow", isDrivingSlow);
-    // Stop indexer after a while
-    
-    if(Timer.getFPGATimestamp() - startTime > 0.5 && indexer.getBallCount() == 0 && hasShot){
-      indexer.setPower(0);
-      shooter.coast();  
-      hood.setAngle(0);
-      hasShot = false;
-    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+     // toggles boolean on Shuffleboard whether autoshooting is on
+     shooter.toggleAutoShootingDisplay();
+  }
 
   // Returns true when the command should end.
   @Override

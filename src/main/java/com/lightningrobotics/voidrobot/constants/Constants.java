@@ -43,7 +43,7 @@ public final class Constants {
         new FeedForwardController(Constants.KS, Constants.KV, Constants.KA)
     );
 
-    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.5; //TODO: tune. also in meters per second.
+    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.25; //TODO: tune. also in meters per second.
 
     public static final double MAXIMUM_ANGULAR_SPEED_TO_SHOOT = 1; //TODO: tune. also in meters per second.
 
@@ -61,8 +61,8 @@ public final class Constants {
     public static final double TURRET_kI_FAST = 0.00; 
     public static final double TURRET_kD_FAST = 0.001; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 90d;
-    public static final double MIN_TURRET_ANGLE = -90d;
+    public static final double MAX_TURRET_ANGLE = 110d;
+    public static final double MIN_TURRET_ANGLE = -110d;
     public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
     public static final double READ_VISION_TIME = 1; //seconds
@@ -70,12 +70,12 @@ public final class Constants {
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
-    public static final double RED_THRESHOLD = 0.295;
-    public static final double BLUE_THRESHOLD = 0.25;
+    public static final double RED_THRESHOLD = 0.4;
+    public static final double BLUE_THRESHOLD = 0.35;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
+    public static final double SHOOTER_KP = 0.35; // 0.00023742; // tune
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
@@ -106,54 +106,44 @@ public final class Constants {
     public static final double EJECT_BALL_HOOD_ANGLE = 5; //TODO: tune
 
     //distance in meters, power in RPMs 
+    public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
+        {
+			put(-135d, 150d);
+			put(-90d, 150d);
+			put(-45d, 150d);
+			put(-15d, 0d);
+			put(15d, 0d);
+			put(45d, 150d);
+			put(90d, 150d);
+			put(135d, 150d);
+        }
+    };
+
+    //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
-            put(2.5273, 3500d);
-            put(2.9972, 3650d);
-            put(3.4798, 3800d);
-            put(3.937, 3850d);
-            put(4.3688, 3950d);
-            put(4.826, 4150d);
-            put(5.5626, 4550d);            
-
-			// put(0d, 0d);
-			// put(2.3368d, 3550d);
-            // put(2.7432d, 3550d);
-			// put(3.3782d, 3700d);
-			// put(3.429d, 3700d);
-			// put(4.0123d, 3850d);
-			// put(4.318d, 3800d);
-			// put(4.572d, 4000d);
-			// put(5.207d, 4100d);
-			// put(6.0452d, 4400d);
-			// put(7.0358d, 4600d);
-			// put(8.382d, 5100d);
+			put(0d,0d);
+			put(2.46d, 3550d);
+			put(3.07d, 3650d);
+			put(3.56d, 3850d);
+			put(4.24d, 3950d);
+			put(5.13d, 4250d);
+			put(6.02d, 4550d);
+			put(7.11d, 5000d);
         }
     };
 
     //distance in meters, angle in degrees
     public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
-            put(2.5273, 0d);
-            put(2.9972, 0d);
-            put(3.4798, 0.8d);
-            put(3.937, 0.9d);
-            put(4.3688, 1d);
-            put(4.826, 1.1d);
-            put(5.5626, 1.4d);
-            
-            // put(0d, 0d);
-			// put(2.3368d, 0d);
-            // put(2.7432d, 0d);
-			// put(3.3782d, 0d);
-			// put(3.429d, 0d);
-			// put(4.0123d, 0.5d);
-			// put(4.318d, 0d);
-			// put(4.572d, 1d);
-			// put(5.207d, 1.5d);
-			// put(6.0452d, 1.75d);
-			// put(7.0358d, 2d);
-			// put(8.382d, 2d);
+			put(0d, 0d);
+			put(2.46d, 0d);
+			put(3.07d, 0d);
+			put(3.56d, 0.2d);
+			put(4.24d, 0.4d);
+			put(5.13d, 0.8d);
+			put(6.02d, 1.1d);
+			put(7.11d, 2.4d);
         }
     };
 

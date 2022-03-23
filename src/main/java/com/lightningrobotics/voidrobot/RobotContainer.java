@@ -86,6 +86,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret), false); // Shoot close no vision
 		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
+        (new JoystickButton(driverRight, 3)).toggleWhenPressed(new AutoShoot(drivetrain, vision, turret, indexer, shooter, hood));
 
         // COPILOT:
 
@@ -101,7 +102,6 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
-
 		//Climb Control:
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
 
@@ -114,7 +114,7 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        shooter.setDefaultCommand(new AutoShoot(drivetrain, vision, turret, indexer, shooter, hood));
+        // shooter.setDefaultCommand(new AutoShoot(drivetrain, vision, turret, indexer, shooter, hood));
        // leds.setDefaultCommand(new StatusLightNull());
 	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
 
