@@ -1,6 +1,5 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -31,6 +30,6 @@ private final Indexer indexer;
 
     @Override
     public boolean isFinished() {
-        return indexer.getColorSensorOutputs() != 0;
+        return indexer.getColorSensor().getProximity() > 350; // return indexer.getColorSensorOutputs() != 0;
     }
 }
