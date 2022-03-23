@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
-	public static final boolean TESTING = true;
+	public static final boolean TESTING = false;
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();

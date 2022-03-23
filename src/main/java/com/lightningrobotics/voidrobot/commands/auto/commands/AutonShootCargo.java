@@ -19,7 +19,6 @@ public class AutonShootCargo extends CommandBase {
 	private double rpm;
 	private double hoodAngle;
 	private double turretAngle;
-	
 
 	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, double rpm, double hoodAngle, double turretAngle) {
 		this.shooter = shooter;
@@ -48,7 +47,6 @@ public class AutonShootCargo extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		turret.setAngle(50);
 		indexer.stop();;
 		shooter.coast();
 	}
