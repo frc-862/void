@@ -172,12 +172,12 @@ public class Climber extends SubsystemBase {
 			resetArmEncoders();
 		}
 
-		if(!disableClimb.getBoolean(false)) {
-			leftArm.set(TalonFXControlMode.Position, armsTarget);
-			rightArm.set(TalonFXControlMode.Position, armsTarget);
-		} else {
+		if(disableClimb.getBoolean(false)) {
 			leftArm.set(TalonFXControlMode.PercentOutput, 0);
 			rightArm.set(TalonFXControlMode.PercentOutput, 0);
+		} else {
+			leftArm.set(TalonFXControlMode.Position, armsTarget);
+			rightArm.set(TalonFXControlMode.Position, armsTarget);
 		}
 
 		setArmPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
