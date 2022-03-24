@@ -93,11 +93,11 @@ public class Climber extends SubsystemBase {
 	}
 
 	public void pivotToHold() {
-		setPivotPower(-1); //limit switch will stop it
+		setPivotPower(-Constants.DEFAULT_PIVOT_POWER); //limit switch will stop it
 	}
 
 	public void pivotToReach() {
-		setPivotPower(1); //limit switch will stop it
+		setPivotPower(Constants.DEFAULT_PIVOT_POWER); //limit switch will stop it
 	}
 
 	public void resetArmEncoders() {

@@ -150,6 +150,7 @@ public final class Constants {
     public static final double DEFAULT_WINCH_POWER = 1;
 
     //Climber
+    public static final double DEFAULT_PIVOT_POWER = 1;
     public static final double MID_RUNG_VALUE = 257000;
     public static final double MAX_ARM_VALUE = 270000;
 
