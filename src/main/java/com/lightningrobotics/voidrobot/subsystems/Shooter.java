@@ -21,11 +21,11 @@ public class Shooter extends SubsystemBase {
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter");
 
-	// private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
+	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
     private NetworkTableEntry displayRPM = shooterTab.add("RPM-From encoder", 0).getEntry();
-    private NetworkTableEntry setRPMEntry = shooterTab.add("set RPM", 0).getEntry();;
+    private NetworkTableEntry setRPMEntry = shooterTestTab.add("set RPM", 0).getEntry();;
 	private NetworkTableEntry displayTargetRPM = shooterTab.add("target RPM", 0).getEntry();
-
+	private NetworkTableEntry isAutoShootingEntry = shooterTab.add("Is Autoshooting", false).getEntry();
 	
 	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
 	private NetworkTableEntry setRPMAngleTuneEntry = tuneTab.add("set RPM tune", 0).getEntry();
@@ -115,4 +115,7 @@ public class Shooter extends SubsystemBase {
 		return setRPMEntry.getDouble(0);
 	}
 
+	public void toggleAutoShootingDisplay(){
+		isAutoShootingEntry.setBoolean(!isAutoShootingEntry.getBoolean(false));
+	}
 }

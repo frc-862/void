@@ -37,9 +37,9 @@ public class ShootClose extends CommandBase {
 		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
 		turret.setAngle(0d);
 		
-		if(targeting.onTarget()) {
-			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-		}
+		// TODO work with onTarget
+		indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		
 	}
 
 	@Override

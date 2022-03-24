@@ -293,7 +293,7 @@ public class HubTargeting extends SubsystemBase {
 		return visionLEDEntry.getDouble(0) == 3 || visionLEDEntry.getDouble(0) == 0;
 	}
 
-	private boolean hasVision() {
+	public boolean hasVision() {
 		return hubDistance > 0 && visionTargetDetectedEntry.getDouble(0) == 1;
 	}
 
