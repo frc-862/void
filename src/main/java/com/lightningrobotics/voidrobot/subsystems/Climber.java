@@ -176,7 +176,7 @@ public class Climber extends SubsystemBase {
 		leftArm.config_kP(1, kP_load);
 		leftArm.config_kI(1, kI_load);
 		leftArm.config_kD(1, kD_load);
-		rightArm.config_kF(1, kF_load);
+		leftArm.config_kF(1, kF_load);
 
 		rightArm.config_kP(1, kP_load);
 		rightArm.config_kI(1, kI_load);
