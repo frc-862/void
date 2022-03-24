@@ -80,7 +80,7 @@ public class AimTurret extends CommandBase {
 		double realX = rotateX(relativeX, relativeY, realTargetHeading);
 		double realY = rotateY(relativeX, relativeY, realTargetHeading);
 
-        odometerDistance = lastVisionDistance-realY;
+        odometerDistance = lastVisionDistance - realY;
 		return realTargetHeading + (Math.toDegrees(Math.atan2(realX,(lastVisionDistance-realY)))-(changeInRotation));
         
 	}

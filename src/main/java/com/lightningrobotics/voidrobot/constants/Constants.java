@@ -96,6 +96,12 @@ public final class Constants {
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
+	// Limelight
+	public static final double MOUNT_HEIGHT = 37.5;
+	public static final double HUB_HEIGHT = 104;
+	public static final double MOUNT_ANGLE = 32;
+	public static final double HUB_CENTER_OFFSET = 24;
+	public static final double SNAPSHOT_DELAY = 0.5;
 
     //distance in meters, power in RPMs 
     public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
@@ -146,4 +152,5 @@ public final class Constants {
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
+
 }
