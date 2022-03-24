@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -35,6 +36,10 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry visionSnapshotEntry = limelightTab.getEntry("snapshot");
 	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
 	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
+	private final NetworkTableEntry biasAngleEntry = visionTab.add("Bias Angle", 0).getEntry();
+	private final NetworkTableEntry biasDistanceEntry = visionTab.add("Bias Distnace", 0).getEntry();
+	private final NetworkTableEntry hasVisionEntry = visionTab.add("Has Vision", false).getEntry();
+	private final NetworkTableEntry onTargetEntry = visionTab.add("On Target", false).getEntry();
 
 	// Moving Average Filter
 	private MovingAverageFilter maf = new MovingAverageFilter(Constants.DISTANCE_MOVING_AVG_ELEMENTS);
@@ -51,8 +56,8 @@ public class HubTargeting extends SubsystemBase {
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
-	private double lastKnownDistance = 0d;
-	private double lastKnownOffset = 0d;
+	private double lastKnownDistance = 7d;
+	private double lastKnownHeading = 0d;
 	private double initX = 0d;
     private double initY = 0d;
     private double initRot = 0d;
@@ -120,17 +125,13 @@ public class HubTargeting extends SubsystemBase {
 		if(!hasVision()) {
 			calcHubGyro();
 		} else {
-			resetOdometer();
+			resetForGyro();
+			targetTurretAngle = calcTurretAngle();
 		}
 
-		// Filter Distance
 		filterDistance();
 
-		// Calculate Nominal Turret Angle
-		targetTurretAngle = calcTurretAngle();
-		// Calculate Nominal Flywheel RPM
 		targetFlywheelRPM = calcFlywheelRPM();
-		// Calculate Nominal Hood Angle
 		targetHoodAngle = calcHoodAngle();
 
 		updateDashboard();
@@ -168,6 +169,11 @@ public class HubTargeting extends SubsystemBase {
 		// Vision Dashboard Data
 		visionDistanceEntry.setDouble(hubDistance);
 		visionAngleEntry.setDouble(hubAngleOffset);
+		biasAngleEntry.setDouble(angleBias);
+		biasDistanceEntry.setDouble(distanceBias);
+		hasVisionEntry.setBoolean(hasVision());
+		onTargetEntry.setBoolean(onTarget());
+		
 
 	}
 
@@ -198,8 +204,7 @@ public class HubTargeting extends SubsystemBase {
 	private double calcHubAngleOffset() {
 		var offsetFromCenter = visionTargetXOffsetEntry.getDouble(hubAngleOffset); // get limelight angle degrees
 		var processedAngleOffset = offsetFromCenter + angleBias; // add biases/on-the-fly offsets, etc.
-		lastKnownOffset = processedAngleOffset;
-		return processedAngleOffset;
+		return -processedAngleOffset;
 	}
 
 	private void calcHubGyro() {
@@ -215,16 +220,18 @@ public class HubTargeting extends SubsystemBase {
 		var changeInRotation = currentPoseSupplier.get().getRotation().getDegrees() - initRot;	
 		
 		// calc new pos
-		var lastKnownHeading = targetTurretAngle;
+		// var lastKnownHeading = targetTurretAngle; // currentTurretAngleSupplier.get().getDegrees() + lastKnownOffset;
 		var realX = rotateX(relativeX, relativeY, lastKnownHeading);
 		var realY = rotateY(relativeX, relativeY, lastKnownHeading);
 	
 		// extract back to a distance and angle
 		var processedDistance = lastKnownDistance - realY;
-		var processedOffsetAngle = ((lastKnownHeading) - (lastKnownHeading - lastKnownOffset)) + (Math.toDegrees(Math.atan2(realX,(lastKnownDistance-realY)))-(changeInRotation));
+		var turretTarget = (lastKnownHeading) + (Math.toDegrees(Math.atan2(realX,(lastKnownDistance-realY)))-(changeInRotation));
 			
 		hubDistance = processedDistance;
-		hubAngleOffset = processedOffsetAngle;
+		SmartDashboard.putNumber("Turret Angle Gyro", turretTarget);
+		targetTurretAngle = turretTarget;
+		// hubAngleOffset =  currentTurretAngleSupplier.get().getDegrees() + processedOffsetAngle;
 
 	}
 
@@ -258,11 +265,13 @@ public class HubTargeting extends SubsystemBase {
 		}
 	}
 
-	private void resetOdometer() {
+	private void resetForGyro() {
 		var rot = currentPoseSupplier.get();
 		initRot = rot.getRotation().getDegrees();
         initX = rot.getX();
         initY = rot.getY();
+		lastKnownHeading = targetTurretAngle;
+
 	}
 
 	// Limelight Util Functions
