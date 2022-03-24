@@ -4,15 +4,25 @@
 
 package com.lightningrobotics.voidrobot.commands.climber;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
+import com.lightningrobotics.voidrobot.subsystems.Climber.pivotTarget;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 public class AutoClimb extends CommandBase {
   Climber climber;
   Drivetrain drivetrain;
 
+  private enum currentRung {
+    mid,
+    high,
+    traversal,
+    climbing
+  }
   
   public AutoClimb(Climber climber, Drivetrain drivetrain) {
     this.climber = climber;
@@ -28,19 +38,19 @@ public class AutoClimb extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //setpoint to almost climb
-    //pivot back a bit
-    //climb rest of the way
-    //pivot forward 
-    //climb down a bit (to engage passive)
-    //pivot back all the way
-    //extend winch
-    //pivot forward until engaged
-    //climb 
-    //wait till settled
+    new ParallelCommandGroup(
+      new InstantCommand(() -> climber.setPivotTarget(pivotTarget.reach)),
+      new InstantCommand(() -> climber.setWinchTarget(Constants.REACH_HEIGHT))
+    );
 
-    //rinse and repeat
+    //check if at target
 
+    new ParallelCommandGroup(
+      new InstantCommand(() -> climber.setPivotTarget(pivotTarget.hold)),
+      new InstantCommand(() -> climber.setWinchTarget(Constants.HOLD_HEIGHT))
+    );
+
+    //then repeat
   }
 
   // Called once the command ends or is interrupted.

@@ -44,4 +44,8 @@ public final class RobotMap {
     public static final int  SHOOTER_ENCODER_A = 9;
     public static final int  SHOOTER_ENCODER_B = 8;
 
+    // Climber
+    public static final int VERTICAL_PIVOT_SENSOR_ID = 3;
+    public static final int REACHING_PIVOT_SENSOR_ID = 4; //TODO: Check this
+
 }
