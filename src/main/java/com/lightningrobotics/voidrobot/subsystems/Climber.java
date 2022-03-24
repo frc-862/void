@@ -92,12 +92,27 @@ public class Climber extends SubsystemBase {
 		rightPivot.set(TalonSRXControlMode.PercentOutput, power);
 	}
 
-	public void pivotToHold() {
-		setPivotPower(-Constants.DEFAULT_PIVOT_POWER); //limit switch will stop it
+	/**
+	 * @param armTarget desired set point, in encoder ticks
+	 * @param climbMode 0 for unloaded PID, 1 for loaded
+	 */
+	public void setArmsTarget(double armTarget, int climbMode) {
+		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
+		rightArm.selectProfileSlot(climbMode, climbMode);
 	}
 
+	/**
+	 * run the pivots towards collector until they hit the limit switch
+	 */
+	public void pivotToHold() {
+		setPivotPower(-Constants.DEFAULT_PIVOT_POWER);
+	}
+
+	/**
+	 * run the pivots away from collector until they hit the limit switch
+	 */
 	public void pivotToReach() {
-		setPivotPower(Constants.DEFAULT_PIVOT_POWER); //limit switch will stop it
+		setPivotPower(Constants.DEFAULT_PIVOT_POWER);
 	}
 
 	public void resetArmEncoders() {
@@ -105,10 +120,16 @@ public class Climber extends SubsystemBase {
 		rightArm.setSelectedSensorPosition(0);
 	}
 
+	/**
+	 * @return true if the pivot is at its far limit from the collector
+	 */
 	public boolean getReachSensor() {
 		return leftPivot.isRevLimitSwitchClosed() == 1;
 	}
 
+	/**
+	 * @return true if the pivot is at its near limit to the collector
+	 */
 	public boolean getHoldSensor() {
 		return leftPivot.isFwdLimitSwitchClosed() == 1;
 	}
@@ -117,6 +138,9 @@ public class Climber extends SubsystemBase {
 		return true; //TODO: implement gyro
 	}
 
+	/**
+	 * @return true if the pivot is triggering the appropriate sensor
+	 */
 	public boolean pivotOnTarget() {
 		if(rightPivot.getMotorOutputPercent() == -1) {
 			return getHoldSensor();
@@ -125,20 +149,19 @@ public class Climber extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * @return true if the arms are within a given threshhold
+	 */
 	public boolean armsOnTarget() {
 		return Math.abs(leftArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD && 
 			   Math.abs(rightArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD;
 	}
 
+	/**
+	 * @return true if both the arms and pivots are on target
+	 */
 	public boolean onTarget() {
 		return pivotOnTarget() && armsOnTarget();
-	}
-
-											//0 for without load, 1 for with
-	public void setArmsTarget(double armTarget, int climbMode) {
-		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
-
-		rightArm.selectProfileSlot(climbMode, climbMode);
 	}
 
 	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
