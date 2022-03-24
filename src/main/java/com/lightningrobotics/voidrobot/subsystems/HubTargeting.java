@@ -1,5 +1,6 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.lightningrobotics.common.logging.DataLogger;
@@ -36,7 +37,7 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
 
 	// Moving Average Filter
-	private MovingAverageFilter maf = new MovingAverageFilter(10);
+	private MovingAverageFilter maf = new MovingAverageFilter(Constants.DISTANCE_MOVING_AVG_ELEMENTS);
 
 	// Vision Input Variables
 	private double hubDistance = -1d;
@@ -45,6 +46,8 @@ public class HubTargeting extends SubsystemBase {
 	// Subsystem Input Variables
 	private Supplier<Pose2d> currentPoseSupplier;
 	private Supplier<Rotation2d> currentTurretAngleSupplier;
+	private DoubleSupplier currentHoodAngleSupplier;
+	private DoubleSupplier currentFlywheelRPMSupplier;
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
@@ -77,12 +80,27 @@ public class HubTargeting extends SubsystemBase {
 		return targetHoodAngle;
 	}
 
+	public boolean onTarget() {
+
+		var currTurret = currentTurretAngleSupplier.get().getDegrees();
+		var currHood = currentHoodAngleSupplier.getAsDouble();
+		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
+
+		return 
+			(Math.abs(targetFlywheelRPM - currRPM) < Constants.SHOOTER_TOLERANCE) &&
+			(Math.abs(targetTurretAngle - currTurret) < Constants.TURRET_TOLERANCE) &&
+			(Math.abs(targetHoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+
+	}
+
 	// Set Up Hub Targeting
-  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<Rotation2d> currentTurretAngleSupplier) {
+  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
 
 		// Setup Value Suppliers
 		this.currentPoseSupplier = currentPoseSupplier;
 		this.currentTurretAngleSupplier = currentTurretAngleSupplier;
+		this.currentHoodAngleSupplier = currentHoodAngleSupplier;
+		this.currentFlywheelRPMSupplier = currentFlywheelRPMSupplier;
 
 		// Setup Subsystem
 		initLogging();
@@ -140,6 +158,9 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("distanceBias", () -> distanceBias);
 		DataLogger.addDataElement("angleBias", () -> angleBias);
 
+		// Log On Target
+		DataLogger.addDataElement("onTarget", () -> onTarget() ? 1 : 0);
+
 	}
 
 	private void updateDashboard() {
@@ -169,14 +190,14 @@ public class HubTargeting extends SubsystemBase {
 			(Constants.HUB_HEIGHT-Constants.MOUNT_HEIGHT) / 
 			Math.tan(Math.toRadians(Constants.MOUNT_ANGLE + theta)) + 
 			Constants.HUB_CENTER_OFFSET; 
-		var processedDistance = Units.inchesToMeters(rawDistanceInches) + distanceBias; // TODO add biases/on-the-fly offsets, etc.
+		var processedDistance = Units.inchesToMeters(rawDistanceInches) + distanceBias; // add biases/on-the-fly offsets, etc.
 		lastKnownDistance = processedDistance;
 		return processedDistance;
 	}
 
 	private double calcHubAngleOffset() {
 		var offsetFromCenter = visionTargetXOffsetEntry.getDouble(hubAngleOffset); // get limelight angle degrees
-		var processedAngleOffset = offsetFromCenter + angleBias; // TODO add biases/on-the-fly offsets, etc.
+		var processedAngleOffset = offsetFromCenter + angleBias; // add biases/on-the-fly offsets, etc.
 		lastKnownOffset = processedAngleOffset;
 		return processedAngleOffset;
 	}

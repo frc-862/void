@@ -59,7 +59,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         this.withEachMotor((m) -> {
             WPI_TalonFX motor = (WPI_TalonFX)m;
             motor.setNeutralMode(NeutralMode.Coast);   
-            motor.configOpenloopRamp(0.15); // TODO Tune this number for eric <3         
+            motor.configOpenloopRamp(0.15);
         });
     
         intitLogging();

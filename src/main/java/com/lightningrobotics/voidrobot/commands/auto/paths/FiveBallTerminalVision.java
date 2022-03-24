@@ -22,7 +22,7 @@ public class FiveBallTerminalVision extends ParallelCommandGroup {
 			terminal5Ball.getCommand(drivetrain),
 
 			new SequentialCommandGroup(
-				new AutonShootCargo(shooter, hood, indexer, turret, 4000d, 0d, 20d)
+				new AutonShootCargo(shooter, hood, indexer, turret, targeting, 4000d, 0d, 20d)
 
 				// new AutonVisionShooting(shooter, hood, indexer, turret, vision)
 			)

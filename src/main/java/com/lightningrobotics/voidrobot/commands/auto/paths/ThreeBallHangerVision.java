@@ -37,7 +37,7 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
 				new ParallelDeadlineGroup(
 					start3Ball.getCommand(drivetrain),
 					new SequentialCommandGroup(
-						new AutonShootCargo(shooter, hood, indexer, turret, 4200d, 0d, -35d), // Tune this shot
+						new AutonShootCargo(shooter, hood, indexer, turret, targeting, 4200d, 0d, -35d), // Tune this shot
 						new ParallelDeadlineGroup(
 							new AutonIndexeCargo(indexer),
 							new AimTurret(turret, targeting)
@@ -51,7 +51,7 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
 					new SequentialCommandGroup(
 						new InstantCommand(() -> System.out.println("about to shoot ball two ----------------------------------------")),
 
-						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, targeting), 2),
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, targeting), 2),
 
 						new ParallelDeadlineGroup(
 							end3Ball.getCommand(drivetrain),
@@ -60,7 +60,7 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
 						
 						new InstantCommand(() -> System.out.println("about to shoot ball three ----------------------------------------")),
 
-						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, targeting), 2),
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, targeting), 2),
 
 						new InstantCommand(() -> System.out.println("we have ended ----------------------------------------------------")) // This line was written by Enoch 
 					)

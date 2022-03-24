@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
+import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -13,11 +14,13 @@ public class ShootCargoManual extends CommandBase {
 	private final Shooter shooter;
 	private final Indexer indexer;
 	private final Hood hood;
+	private final HubTargeting targeting;
 
-	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret) {
+	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.hood = hood;
+		this.targeting = targeting;
 
 		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
 
@@ -28,7 +31,7 @@ public class ShootCargoManual extends CommandBase {
 		shooter.setRPM(Constants.SHOOT_TARMAC_RPM);	
 		hood.setAngle(Constants.SHOOT_TARMAC_ANGLE);
 		
-		if(shooter.onTarget() && hood.onTarget()){
+		if(targeting.onTarget()){
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}

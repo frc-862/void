@@ -5,7 +5,6 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -14,14 +13,12 @@ public class ShootCargo extends CommandBase {
 	private final Shooter shooter;
 	private final Hood hood;
 	private final Indexer indexer;
-	private final Turret turret;
 	private final HubTargeting targeting;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
+	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
-		this.turret = turret;
 		this.targeting = targeting;
 
 		addRequirements(shooter, hood, indexer);
@@ -36,7 +33,7 @@ public class ShootCargo extends CommandBase {
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
 			
-		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+		if(targeting.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 		

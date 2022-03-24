@@ -35,7 +35,7 @@ public class TwoBall extends ParallelCommandGroup {
 			),
 
 			// Shoot 2 (Preload & Collected)
-			new AutonShootCargoVision(shooter, hood, indexer, turret, targeting)
+			new AutonShootCargoVision(shooter, hood, indexer, targeting)
 
 		));
 	}

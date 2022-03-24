@@ -21,7 +21,7 @@ public class AutoIndexCargo extends CommandBase {
     public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
 
-		// addRequirements(indexer); TODO maybe fix
+		// addRequirements(indexer);
 	}
 
     @Override

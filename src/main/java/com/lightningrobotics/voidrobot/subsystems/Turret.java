@@ -86,10 +86,6 @@ public class Turret extends SubsystemBase {
 		// this.getCurrentCommand().getName()
 	}
 
-	public boolean onTarget() {
-		return Math.abs(targetAngle - getCurrentAngle().getDegrees()) < Constants.TURRET_TOLERANCE;
-	}
-
 	public void stop() {
 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 		manualOverride = true;
@@ -124,7 +120,7 @@ public class Turret extends SubsystemBase {
 	}
 
 	public boolean getCenterSensor() {
-		return !centerSensor.get(); // TODO: check if it's inverted
+		return !centerSensor.get();
 	}
 
 	public void setPower(double power) {

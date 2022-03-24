@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
+import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -14,12 +15,14 @@ public class ShootClose extends CommandBase {
 	private final Hood hood;
 	private final Indexer indexer;
 	private final Turret turret;
+	private final HubTargeting targeting;
 
-	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret) {
+	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
 		this.turret = turret;
+		this.targeting = targeting;
 
 		addRequirements(shooter, indexer, turret); // not adding vision or turret as it is read onl
 	}
@@ -34,7 +37,7 @@ public class ShootClose extends CommandBase {
 		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
 		turret.setAngle(0d);
 		
-		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+		if(targeting.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 	}

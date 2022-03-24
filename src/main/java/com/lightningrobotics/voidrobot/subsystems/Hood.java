@@ -94,10 +94,6 @@ public class Hood extends SubsystemBase {
 		DataLogger.addDataElement("hoodSetPoint", this::getSetPoint);
 	}
 
-	public boolean onTarget() {
-		return Math.abs(angle - getAngle()) < Constants.HOOD_TOLERANCE;
-	}
-
 	public void zero() {
 		if (getLimitSwitch()) {
 			hoodOffset = getRawAngle();
@@ -105,7 +101,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public boolean getLimitSwitch() {
-		return hoodMotor.isRevLimitSwitchClosed() == 1;  // TODO change this to forward and reversed
+		return hoodMotor.isRevLimitSwitchClosed() == 1;
 	}
 
 	public double getSetPoint() {

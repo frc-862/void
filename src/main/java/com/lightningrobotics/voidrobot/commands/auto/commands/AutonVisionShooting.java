@@ -52,7 +52,7 @@ public class AutonVisionShooting extends CommandBase {
 		hood.setAngle(hoodAngle);
 		turret.setAngle(turretAngle);
 
-		if ((shooter.onTarget() && hood.onTarget() && turret.onTarget()) || shooting) {
+		if ((targeting.onTarget()) || shooting) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			shooting = true;
 		}

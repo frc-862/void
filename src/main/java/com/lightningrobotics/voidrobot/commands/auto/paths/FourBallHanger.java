@@ -38,14 +38,14 @@ public class FourBallHanger extends ParallelCommandGroup {
 					start3BallHanger.getCommand(drivetrain)
 				),
 
-				new AutonShootCargoVision(shooter, hood, indexer, turret, targeting),
+				new AutonShootCargoVision(shooter, hood, indexer, targeting),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), end3BallHanger.getDuration(drivetrain)+1),
 					end3BallHanger.getCommand(drivetrain)
 				), 
 
-				new AutonShootCargoVision(shooter, hood, indexer, turret, targeting)
+				new AutonShootCargoVision(shooter, hood, indexer, targeting)
 
 			)
 

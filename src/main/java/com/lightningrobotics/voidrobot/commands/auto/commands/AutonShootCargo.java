@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
+import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
@@ -14,12 +15,13 @@ public class AutonShootCargo extends CommandBase {
 	private Hood hood;
 	private Indexer indexer;
 	private Turret turret;
+	private HubTargeting targeting;
 
 	private double rpm;
 	private double hoodAngle;
 	private double turretAngle;
 
-	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, double rpm, double hoodAngle, double turretAngle) {
+	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting, double rpm, double hoodAngle, double turretAngle) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.turret = turret;
@@ -39,7 +41,7 @@ public class AutonShootCargo extends CommandBase {
 		hood.setAngle(hoodAngle);
 		turret.setAngle(turretAngle);
 
-		if (shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
+		if (targeting.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			System.out.println("on target -------------------------------------------");
 			

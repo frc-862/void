@@ -102,6 +102,7 @@ public final class Constants {
 	public static final double MOUNT_ANGLE = 32;
 	public static final double HUB_CENTER_OFFSET = 24;
 	public static final double SNAPSHOT_DELAY = 0.5;
+	public static final int DISTANCE_MOVING_AVG_ELEMENTS = 3;
 
     //distance in meters, power in RPMs 
     public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
