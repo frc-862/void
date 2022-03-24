@@ -17,18 +17,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
-
-	// create some empty talonfx objects
 	private TalonFX leftArm;
 	private TalonFX rightArm;
 
 	private TalonSRX leftPivot;
 	private TalonSRX rightPivot;
 
+	//initialize set point for arm height
 	private double armsTarget = 0;
 
-	private boolean goingToHold = false;
-
+	//pid tuning stuff, will be removed later
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
 	private NetworkTableEntry resetClimb = climbTab.add("reset climb", false).getEntry();
 	private NetworkTableEntry disableClimb = climbTab.add("disable climb", false).getEntry();
@@ -96,12 +94,10 @@ public class Climber extends SubsystemBase {
 
 	public void pivotToHold() {
 		setPivotPower(-1); //limit switch will stop it
-		goingToHold = true;
 	}
 
 	public void pivotToReach() {
 		setPivotPower(1); //limit switch will stop it
-		goingToHold = false;
 	}
 
 	public void resetArmEncoders() {
@@ -122,7 +118,7 @@ public class Climber extends SubsystemBase {
 	}
 
 	public boolean pivotOnTarget() {
-		if(goingToHold) {
+		if(rightPivot.getMotorOutputPercent() == -1) {
 			return getHoldSensor();
 		} else {
 			return getReachSensor();
