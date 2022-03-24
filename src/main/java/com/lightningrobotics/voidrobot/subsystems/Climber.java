@@ -5,14 +5,12 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,27 +19,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
 
 	// create some empty talonfx objects
-	private TalonFX leftElevator;
-	private TalonFX rightElevator;
+	private TalonFX leftArm;
+	private TalonFX rightArm;
 
-	private TalonSRX leftClimbPivot;
-	private TalonSRX rightClimbPivot;
-
-	private DigitalInput pivotVerticalSensor;
-	private DigitalInput pivotReachSensor;
-
-	private PIDFController pivotPID = new PIDFController(1, 1, 1);
+	private TalonSRX leftPivot;
+	private TalonSRX rightPivot;
 
 	private int climbMode = 0;
-	private double winchTarget = 0;
+	private double armsTarget = 0;
 
-	private double pivotMotorOutput = 0;
+	private boolean goingToHold = false;
 
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
 	private NetworkTableEntry resetClimb = climbTab.add("reset climb", false).getEntry();
 	private NetworkTableEntry disableClimb = climbTab.add("disable climb", false).getEntry();
-	private NetworkTableEntry leftWinchPos = climbTab.add("left winch", 100).getEntry();
-	private NetworkTableEntry rightWinchPos = climbTab.add("right winch", 100).getEntry();
+	private NetworkTableEntry leftArmPos = climbTab.add("left arm", 100).getEntry();
+	private NetworkTableEntry rightArmPos = climbTab.add("right arm", 100).getEntry();
 	private NetworkTableEntry targetClimb = climbTab.add("target climb", 0).getEntry();
 	private NetworkTableEntry loaded = climbTab.add("has load", 0).getEntry();
 
@@ -54,47 +47,37 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
 	private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
 
-
-	public enum pivotTarget {
-		reach,
-		hold,
-		stowed
-	}
-
 	private enum state {
 		hold, // either traversal or main climber engaged
 		reach, // reaching for a rung
 		settling
 	  }
 
-	private pivotTarget currentPivotTarget = pivotTarget.stowed;
-	private pivotTarget previousPivotTarget = pivotTarget.stowed;
-
   	public Climber() {
-		// Sets the IDs of our winch motors
-		leftElevator = new TalonFX(RobotMap.LEFT_CLIMB);
-		rightElevator = new TalonFX(RobotMap.RIGHT_CLIMB);
+		// Sets the IDs of our arm motors
+		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
+		rightArm = new TalonFX(RobotMap.RIGHT_CLIMB);
 
 		// Sets the IDs of the pivot motors
-		leftClimbPivot = new TalonSRX(RobotMap.LEFT_PIVOT);
-		rightClimbPivot = new TalonSRX(RobotMap.RIGHT_PIVOT);
+		leftPivot = new TalonSRX(RobotMap.LEFT_PIVOT);
+		rightPivot = new TalonSRX(RobotMap.RIGHT_PIVOT);
 
 		//climb motors need to be in brake mode to hold climb up
-		leftElevator.setNeutralMode(NeutralMode.Brake);
-		rightElevator.setNeutralMode(NeutralMode.Brake);
+		leftArm.setNeutralMode(NeutralMode.Brake);
+		rightArm.setNeutralMode(NeutralMode.Brake);
 
 		//pivot motors need to be in brake mode to hold pivot in place
-		leftClimbPivot.setNeutralMode(NeutralMode.Brake);
-		rightClimbPivot.setNeutralMode(NeutralMode.Brake);
+		leftPivot.setNeutralMode(NeutralMode.Brake);
+		rightPivot.setNeutralMode(NeutralMode.Brake);
 
-		leftElevator.setInverted(false);
-		rightElevator.setInverted(true);
+		leftArm.setInverted(false);
+		rightArm.setInverted(true);
 
-		leftClimbPivot.setInverted(false);
-		rightClimbPivot.setInverted(true);
+		leftPivot.setInverted(false);
+		rightPivot.setInverted(true);
 
-		pivotVerticalSensor = new DigitalInput(RobotMap.VERTICAL_PIVOT_SENSOR_ID);
-		pivotReachSensor = new DigitalInput(RobotMap.REACHING_PIVOT_SENSOR_ID); //TODO: make limit switch
+		//set pivot motors to follow each other
+		leftPivot.follow(rightPivot);
 
 		initLogging();
 
@@ -102,116 +85,130 @@ public class Climber extends SubsystemBase {
 	}
 
 	private void initLogging() {
-		DataLogger.addDataElement("leftClimbPosition", () -> leftElevator.getSelectedSensorPosition());
-		DataLogger.addDataElement("rightClimbPosition", () -> rightElevator.getSelectedSensorPosition());
+		DataLogger.addDataElement("leftClimbPosition", () -> leftArm.getSelectedSensorPosition());
+		DataLogger.addDataElement("rightClimbPosition", () -> rightArm.getSelectedSensorPosition());
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {
-		leftElevator.set(TalonFXControlMode.PercentOutput, leftPower);
-		rightElevator.set(TalonFXControlMode.PercentOutput, rightPower);
+		leftArm.set(TalonFXControlMode.PercentOutput, leftPower);
+		rightArm.set(TalonFXControlMode.PercentOutput, rightPower);
 	}
 
-	public void setPivotPower(double leftPower, double rightPower) {
-		leftClimbPivot.set(TalonSRXControlMode.PercentOutput, leftPower);
-		rightClimbPivot.set(TalonSRXControlMode.PercentOutput, rightPower);
+	public void setPivotPower(double power) {
+		//only set one as the left motor is set to follow the right
+		rightPivot.set(TalonSRXControlMode.PercentOutput, power);
 	}
 
-	public void stop() {
-		setClimbPower(0, 0);
-		setPivotPower(0, 0);
-	}
-											//0 for without load, 1 for with
-	public void climbSetPoint(double winchTarget, int climbMode) {
-		this.winchTarget = LightningMath.constrain(winchTarget, 0, Constants.MAX_ELEVATOR_VALUE);
-		this.climbMode = climbMode;
-
-		rightElevator.selectProfileSlot(climbMode, climbMode);
-	}
-	public void setWinchTarget(double target) {
-		winchTarget = target;
-	}
-	public void resetWinchEncoders() {
-		leftElevator.setSelectedSensorPosition(0);
-		rightElevator.setSelectedSensorPosition(0);
-	}
-	private void setWinchPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
-		leftElevator.config_kP(0, kP_noLoad);
-		leftElevator.config_kI(0, kI_noLoad);
-		leftElevator.config_kD(0, kD_noLoad);
-
-		rightElevator.config_kP(0, kP_noLoad);
-		rightElevator.config_kI(0, kI_noLoad);
-		rightElevator.config_kD(0, kD_noLoad);
-
-		leftElevator.config_kP(1, kP_load);
-		leftElevator.config_kI(1, kI_load);
-		leftElevator.config_kD(1, kD_load);
-		rightElevator.config_kF(1, kF_load);
-
-		rightElevator.config_kP(1, kP_load);
-		rightElevator.config_kI(1, kI_load);
-		rightElevator.config_kD(1, kD_load);
-		rightElevator.config_kF(1, kF_load);
+	public void pivotToHold() {
+		setPivotPower(-1); //limit switch will stop it
+		goingToHold = true;
 	}
 
-	public boolean isWinchOnTarget() {
-		return leftElevator.getSelectedSensorPosition() - winchTarget < Constants.WINCH_TARGET_THRESHOLD && rightElevator.getSelectedSensorPosition() - winchTarget < Constants.WINCH_TARGET_THRESHOLD;
+	public void pivotToReach() {
+		setPivotPower(1); //limit switch will stop it
+		goingToHold = false;
+	}
+
+	public void resetArmEncoders() {
+		leftArm.setSelectedSensorPosition(0);
+		rightArm.setSelectedSensorPosition(0);
+	}
+
+	public boolean getReachSensor() {
+		return leftPivot.isRevLimitSwitchClosed() == 1;
+	}
+
+	public boolean getHoldSensor() {
+		return leftPivot.isFwdLimitSwitchClosed() == 1;
 	}
 
 	public boolean isSettled() {
 		return true; //TODO: implement gyro
 	}
 
-	public void setPivotTarget(pivotTarget target) {
-		currentPivotTarget = target;
+	public boolean pivotOnTarget() {
+		if(goingToHold) {
+			return getHoldSensor();
+		} else {
+			return getReachSensor();
+		}
+	}
+
+	public boolean armsOnTarget() {
+		return Math.abs(leftArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD && 
+			   Math.abs(rightArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD;
+	}
+
+	public boolean onTarget() {
+		return pivotOnTarget() && armsOnTarget();
+	}
+
+											//0 for without load, 1 for with
+	public void climbSetPoint(double armTarget, int climbMode) {
+		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
+		this.climbMode = climbMode;
+
+		rightArm.selectProfileSlot(climbMode, climbMode);
+	}
+
+	public void setArmsTarget(double target) {
+		armsTarget = target;
+	}
+
+	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
+		leftArm.config_kP(0, kP_noLoad);
+		leftArm.config_kI(0, kI_noLoad);
+		leftArm.config_kD(0, kD_noLoad);
+
+		rightArm.config_kP(0, kP_noLoad);
+		rightArm.config_kI(0, kI_noLoad);
+		rightArm.config_kD(0, kD_noLoad);
+
+		leftArm.config_kP(1, kP_load);
+		leftArm.config_kI(1, kI_load);
+		leftArm.config_kD(1, kD_load);
+		rightArm.config_kF(1, kF_load);
+
+		rightArm.config_kP(1, kP_load);
+		rightArm.config_kI(1, kI_load);
+		rightArm.config_kD(1, kD_load);
+		rightArm.config_kF(1, kF_load);
 	}
 
 	@Override
 	public void periodic() {
-		switch(currentPivotTarget) {
-			case stowed:
-				pivotMotorOutput = 0;
-				previousPivotTarget = pivotTarget.stowed;
-			break;
-			case hold:
-				if(previousPivotTarget == pivotTarget.stowed) {
-					pivotMotorOutput = 1;
-				} else if(previousPivotTarget == pivotTarget.reach) {
-					pivotMotorOutput = -1;
-				}
-
-				if(pivotVerticalSensor.get()) {
-					pivotMotorOutput = 0;
-				}
-			break;
-			case reach:
-				pivotMotorOutput = 1;
-				previousPivotTarget = pivotTarget.reach;
-				//limit switch will take care of this
-			break;
-		}
-
-		// setPivotPower(pivotMotorOutput, pivotMotorOutput); //TODO: implement pivot
-
 		climbSetPoint(targetClimb.getDouble(100), (int)loaded.getDouble(0));
 
-		leftWinchPos.setNumber(leftElevator.getSelectedSensorPosition());
-		rightWinchPos.setNumber(rightElevator.getSelectedSensorPosition());
+		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
+		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
 
 		if(resetClimb.getBoolean(false)) {
-			resetWinchEncoders();
+			resetArmEncoders();
 		}
 
 		if(!disableClimb.getBoolean(false)) {
-			leftElevator.set(TalonFXControlMode.Position, winchTarget);
-			rightElevator.set(TalonFXControlMode.Position, winchTarget);
+			leftArm.set(TalonFXControlMode.Position, armsTarget);
+			rightArm.set(TalonFXControlMode.Position, armsTarget);
 		} else {
-			leftElevator.set(TalonFXControlMode.PercentOutput, 0);
-			rightElevator.set(TalonFXControlMode.PercentOutput, 0);
+			leftArm.set(TalonFXControlMode.PercentOutput, 0);
+			rightArm.set(TalonFXControlMode.PercentOutput, 0);
 		}
 
-		setWinchPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
+		setArmPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
 
+	}
+
+	public void stopPivot() {
+		setPivotPower(0);
+	}
+
+	public void stopArms() {
+		setClimbPower(0, 0);
+	}
+
+	public void stop() {
+		stopArms();
+		stopPivot();
 	}
 
 }

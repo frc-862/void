@@ -12,23 +12,21 @@ public class runClimb extends CommandBase {
 
     private DoubleSupplier leftClimbPower;
     private DoubleSupplier rightClimbPower;
-    private DoubleSupplier leftPivotPower;
     private DoubleSupplier rightPivotPower;
 
-    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
+    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier pivotPower) {
         this.climber = climber;
         this.leftClimbPower = leftClimbPower;
         this.rightClimbPower = rightClimbPower;
-        this.leftPivotPower = leftPivotPower;
-        this.rightPivotPower = rightPivotPower;
+        this.rightPivotPower = pivotPower;
 
         addRequirements(climber);
     }
 
     @Override
     public void execute() {
-        // climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
-        climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
+        climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
+        climber.setPivotPower(rightPivotPower.getAsDouble());
     }
 
     @Override
