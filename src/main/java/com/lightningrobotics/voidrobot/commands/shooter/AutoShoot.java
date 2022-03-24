@@ -56,10 +56,9 @@ public class AutoShoot extends CommandBase {
 
   @Override
   public void execute() {
-
-    System.out.println("AUTO SHOOT RUNNING +++++++++++++++++++++++++++++++++++++++++++++++++");
     //check if the current ball is not the same color as the alliance
-    boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+    //TODO: currently always our balls
+    boolean isEnenmyBall = false; //!DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
     
     // check if drive speed is slow enough
     DifferentialDrivetrainState drivetrainState = ((DifferentialDrivetrainState)drivetrain.getDriveState());
@@ -78,7 +77,7 @@ public class AutoShoot extends CommandBase {
       }
 
       // If too close then shoot low
-      if(distance > 2.4d){
+      if(distance > 2.0d){
         rpm = Constants.DISTANCE_RPM_MAP.get(distance) + Constants.ANGLE_POWER_MAP.get(distance);
         hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
       } else{
@@ -87,6 +86,7 @@ public class AutoShoot extends CommandBase {
       }
 
       shooter.setRPM(rpm);
+      hood.setAngle(hoodAngle);
     }
 
     //checks if drivetrain, vision, and turret are OK and sets the RPM and hood angle if they are.
@@ -96,7 +96,6 @@ public class AutoShoot extends CommandBase {
     && turret.onTarget()
     && !isEnenmyBall) {
 
-      hood.setAngle(hoodAngle);
       indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
     }
     // If we have enemy ball, shoot out

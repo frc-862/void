@@ -47,6 +47,7 @@ public class Vision extends SubsystemBase {
     private static double offsetAngle = 0d;
 
 	private double lastVisionSnapshot = 0;
+	private boolean snapshotEnabled = false;
 	private MedianFilter mf = new MedianFilter(5);
 	private double odometerDistance = 0;
 
@@ -83,7 +84,11 @@ public class Vision extends SubsystemBase {
 		visionDistanceTuneEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
 
 		if (DriverStation.isEnabled()) {
-			if (Timer.getFPGATimestamp() - lastVisionSnapshot > 0.5) {
+			if(!snapshotEnabled){
+				snapShot.setNumber(0);
+				snapshotEnabled = true;
+			}
+			else if (Timer.getFPGATimestamp() - lastVisionSnapshot > 0.5) {
 				lastVisionSnapshot	= Timer.getFPGATimestamp();
 				snapShot.setNumber(1);
 				System.out.println("Snapshot?");

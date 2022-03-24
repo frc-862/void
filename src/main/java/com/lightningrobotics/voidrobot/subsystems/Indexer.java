@@ -71,13 +71,8 @@ public class Indexer extends SubsystemBase {
         initLogging();
 
         indexerTab.addString("upper ball color", () -> upperBallColor.toString());
-        indexerTab.addNumber("color sensor red", () -> intakeColorSensor.getColor().red);
-        indexerTab.addNumber("color sensor green", () -> intakeColorSensor.getColor().red);
-        indexerTab.addNumber("color sensor blue", () -> intakeColorSensor.getColor().red);
         indexerTab.addString("llower ball color", () -> lowerBallColor.toString());
         indexerTab.addNumber("ball count", () -> ballCount);
-        indexerTab.addNumber("red value", () -> intakeColorSensor.getColor().red);
-        indexerTab.addNumber("blue value", () -> intakeColorSensor.getColor().blue);
 
 		CommandScheduler.getInstance().registerSubsystem(this);
     }
