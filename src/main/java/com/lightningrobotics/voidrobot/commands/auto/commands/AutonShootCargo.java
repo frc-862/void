@@ -42,13 +42,25 @@ public class AutonShootCargo extends CommandBase {
 
 		if (shooter.onTarget() && turret.onTarget() && hood.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+			System.out.println("on target -------------------------------------------");
+			
+		} else {
+			System.out.println("not on target -------------------------------------------");
+			System.out.println("target RPM: " + rpm);
+			System.out.println("current RPM: " + shooter.getCurrentRPM());
+			System.out.println("target Hood: " + hoodAngle);
+			System.out.println("Current hood: " + hood.getAngle());
+			System.out.println("target Turret: " + turretAngle);
+			System.out.println("curent turret: " + turret.getCurrentAngle().getDegrees());
+			System.out.println("hood limit switch" + hood.getLimitSwitch());
+
 		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		indexer.stop();;
-		shooter.coast();
+		// indexer.stop();
+		// shooter.coast();
 	}
 
 	@Override

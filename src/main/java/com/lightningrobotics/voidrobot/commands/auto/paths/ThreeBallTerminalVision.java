@@ -16,24 +16,33 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class FiveBallTerminalVision extends ParallelCommandGroup {
+public class ThreeBallTerminalVision extends ParallelCommandGroup {
 
-	private static Path terminal5Ball = new Path("4-5BallTerminal.path", false);
+	private static Path terminal3Ball = new Path("3BallTerminal.path", false);
 
-    public FiveBallTerminalVision(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
+    public ThreeBallTerminalVision(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
 		super(
+
 			new AutonIntake(intake),
 			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 			new InstantCommand(indexer::initializeBallsHeld),
+			new InstantCommand(hood::zero),
 
-			terminal5Ball.getCommand(drivetrain),
+			terminal3Ball.getCommand(drivetrain),
 
 			new SequentialCommandGroup(
-				new AutonShootCargo(shooter, hood, indexer, turret, 4000d, 0d, 20d)
+				new AutonShootCargo(shooter, hood, indexer, turret, 4000d, 0d, 20d),
 
-				// new AutonVisionShooting(shooter, hood, indexer, turret, vision)
+				new AutonVisionShooting(shooter, hood, indexer, turret, vision, 20d, 0d), 
+				new AutonVisionShooting(shooter, hood, indexer, turret, vision, 15d, 0.5d)
+				
+				// new SequentialCommandGroup(
+				// 	new InstantCommand(indexer::stop),
+				// 	new InstantCommand(shooter::coast),
+				// 	new InstantCommand(hood::stop),
+				// 	new InstantCommand(turret::stop)
+				// )
 			)
-
 		);
    }
 }

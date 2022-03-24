@@ -7,10 +7,9 @@ import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminalVision;
-import com.lightningrobotics.voidrobot.commands.auto.paths.FourBallHanger;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
-import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallVision;
+import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminalVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
@@ -64,9 +63,8 @@ public class RobotContainer extends LightningContainer {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret));
-			Autonomous.register("3 Ball Terminal Vision", new ThreeBallVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
-			Autonomous.register("4 Ball Hanger", new FourBallHanger(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
             Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");

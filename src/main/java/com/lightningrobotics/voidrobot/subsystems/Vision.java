@@ -35,7 +35,8 @@ public class Vision extends SubsystemBase {
 	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
 	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
 	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
-	private final NetworkTableEntry bias = visionTab.add("Bias", 0).getEntry();
+	private final NetworkTableEntry distanceBiasEntry = visionTab.add("Distance Bias", 0).getEntry();
+	private final NetworkTableEntry angleBiasEntry = visionTab.add("Angle Bias", 0).getEntry();
 
 	
 	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
@@ -50,7 +51,8 @@ public class Vision extends SubsystemBase {
 	private MedianFilter mf = new MedianFilter(5);
 	private double odometerDistance = 0;
 
-	private double distanceOffset = 0;
+	private double distanceBias = 0;
+	private double angleBias = 0;
 
 	// PDH
 	PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, ModuleType.kRev);
@@ -65,22 +67,23 @@ public class Vision extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// Update Target Angle
-		offsetAngle = mf.calculate(targetOffsetX.getDouble(offsetAngle));
+		offsetAngle = targetOffsetX.getDouble(offsetAngle) + angleBias; // mf.calculate(targetOffsetX.getDouble(offsetAngle)) + angleBias;
 		
 		// Update Target Distance
-		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+		targetDistance = Units.inchesToMeters(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceBias);
 
-		bias.setDouble(distanceOffset);
+		distanceBiasEntry.setDouble(distanceBias);
+		angleBiasEntry.setDouble(angleBias);
 
 		if(!hasVision()) {
 			targetDistance = odometerDistance;
 		}
 
 		visionAngleEntry.setNumber(offsetAngle);
-		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+		visionDistanceEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceBias);
 
 		visionAngleTuneEntry.setNumber(offsetAngle);
-		visionDistanceTuneEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceOffset);
+		visionDistanceTuneEntry.setNumber(limelightOffsetToDistance(targetOffsetY.getDouble(-1)) + distanceBias);
 
 		if (DriverStation.isEnabled()) {
 			if (Timer.getFPGATimestamp() - lastVisionSnapshot > 0.5) {
@@ -101,9 +104,10 @@ public class Vision extends SubsystemBase {
 	}
 
 	private void initLogging() {
-		DataLogger.addDataElement("visionAngle", () -> offsetAngle);
+		DataLogger.addDataElement("visionAngle", () -> getOffsetAngle());
 		DataLogger.addDataElement("targetDistance", () -> targetDistance);
-		DataLogger.addDataElement("distanceOffset", () -> distanceOffset);
+		DataLogger.addDataElement("distanceBias", () -> distanceBias);
+		DataLogger.addDataElement("angleBias", () -> angleBias);
 		DataLogger.addDataElement("targetArea", () -> targetArea.getDouble(-1));
 		DataLogger.addDataElement("targetX", () -> targetOffsetX.getDouble(-1));
 		DataLogger.addDataElement("targetY", () -> targetOffsetY.getDouble(-1));
@@ -146,11 +150,16 @@ public class Vision extends SubsystemBase {
 		return targetDistance > 0 && targetDetected.getDouble(0) == 1;
 	}
 
-	public void adjustBias(double delta) {
-		distanceOffset += delta;
+	public void adjustBiasDistance(double delta) {
+		distanceBias += delta;
+	}
+	
+	public void adjustBiasAngle(double delta) {
+		angleBias += delta;
 	}
 
 	public void zeroBias() {
-		distanceOffset = 0;
+		distanceBias = 0;
+		angleBias = 0;
 	}
 }

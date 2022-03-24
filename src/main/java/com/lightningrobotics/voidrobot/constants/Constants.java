@@ -28,7 +28,7 @@ public final class Constants {
 
     public static final double MAX_SPEED = 2.2;
     public static final double MAX_ACCELERATION = 0.75;
-    public static final double TRACK_WIDTH = 0.75616; // 0.6565; 
+    public static final double TRACK_WIDTH = 0.75616; 
 	public static final double WHEEL_DIAMETER = 4.0725;
 	public static final double GEAR_REDUCTION = 6.7d;
 	public static final double TICKS_PER_REV_FALCON = 2048d;
@@ -61,23 +61,21 @@ public final class Constants {
     public static final double MIN_TURRET_ANGLE = -110d;
     public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
-    public static final double READ_VISION_TIME = 1; //seconds
-    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
-    public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
+    public static final double DEFAULT_INDEXER_POWER = 1.0;
     public static final double RED_THRESHOLD = 0.295;
     public static final double BLUE_THRESHOLD = 0.25;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.25; // 0.00023742; // tune
+    public static final double SHOOTER_KP = 0.25;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
-    public static final double SHOOTER_KS = 0; //0.58093;//-.81807;
-    public static final double SHOOTER_KF = 0.0455;//2.1597;
-    public static final double SHOOTER_KA = 0; //0.02415;//2.3746;
+    public static final double SHOOTER_KS = 0;
+    public static final double SHOOTER_KF = 0.0455;
+    public static final double SHOOTER_KA = 0;
 
     public static final double SHOOTER_COOLDOWN = 1;
 
@@ -91,7 +89,7 @@ public final class Constants {
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
     public static final double HOOD_ZERO_SPEED = -0.4d;
 
-    public static final double SHOOT_LOW_RPM = 1750;  // 4100 TODO tune these
+    public static final double SHOOT_LOW_RPM = 1750;
     public static final double SHOOT_LOW_ANGLE = 3.0;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 

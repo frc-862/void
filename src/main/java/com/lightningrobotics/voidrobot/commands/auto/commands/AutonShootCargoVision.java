@@ -33,7 +33,6 @@ public class AutonShootCargoVision extends CommandBase {
 	
 	@Override
 	public void execute() {
-		// turret.setAngle(turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle());
 
 		var distance = vision.getTargetDistance();
 		var rpm = Constants.DISTANCE_RPM_MAP.get(distance) + Constants.ANGLE_POWER_MAP.get(turret.getCurrentAngle().getDegrees());

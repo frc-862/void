@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
@@ -15,13 +19,14 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class ThreeBallTerminal extends ParallelCommandGroup {
 
-	private static Path start3Ball = new Path("Start3Ball.path", false);
-	private static Path end3Ball = new Path("End3Ball.path", false);
+public class ThreeBallHangerVision extends ParallelCommandGroup {
+   
+    private static Path start3Ball = new Path("Start3BallHanger.path", false);
+	private static Path end3Ball = new Path("End3BallHanger.path", false);
 
-    public ThreeBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
-		super(
+    public ThreeBallHangerVision(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
+        super(
 
 			new AutonIntake(intake),
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
@@ -32,7 +37,7 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 				new ParallelDeadlineGroup(
 					start3Ball.getCommand(drivetrain),
 					new SequentialCommandGroup(
-						new AutonShootCargo(shooter, hood, indexer, turret, 4000d, 0d, 20d),
+						new AutonShootCargo(shooter, hood, indexer, turret, 4200d, 0d, -35d), // Tune this shot
 						new ParallelDeadlineGroup(
 							new AutonIndexeCargo(indexer),
 							new AimTurret(vision, turret, drivetrain)
@@ -62,5 +67,5 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 				)
 			)
 		);
-   }
+    }
 }

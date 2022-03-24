@@ -25,14 +25,22 @@ public class AdjustBias extends CommandBase {
   @Override
   public void initialize() {}
 
+
+  // TOOD add angle bias control
   @Override
   public void execute() {
 	switch(POV.getAsInt()) {
 		case 0: 
-			vision.adjustBias(0.05);
+			vision.adjustBiasDistance(0.05);
 		break;
 		case 180: 
-			vision.adjustBias(-0.05);
+			vision.adjustBiasDistance(-0.05);
+		break;
+		case 270: 
+			vision.adjustBiasAngle(-0.05);
+		break;
+		case 90: 
+			vision.adjustBiasAngle(0.05);
 		break;
 	}
 
