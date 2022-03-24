@@ -154,8 +154,8 @@ public final class Constants {
     public static final double MAX_ARM_VALUE = 270000;
 
     //TODO: tune these values
-    public static final double HOLD_HEIGHT = 0; //height to engage the traversal hooks
-    public static final double REACH_HEIGHT = 0; //height climber reaches to when pivoting back
+    public static final double HOLD_HEIGHT = 500; //height to engage the traversal hooks
+    public static final double REACH_HEIGHT = 270000; //height climber reaches to when pivoting back
     public static final double GYRO_SETTLE_THRESHOLD = 0;
     public static final double ARM_TARGET_THRESHOLD = 1000;
 
