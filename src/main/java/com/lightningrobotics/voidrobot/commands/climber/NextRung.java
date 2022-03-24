@@ -39,7 +39,7 @@ public class NextRung extends CommandBase {
     public void execute() {
         new ParallelCommandGroup(
             new InstantCommand(() -> climber.pivotToReach()),
-            new InstantCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT))
+            new InstantCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT, 0))
         );
 
         //TODO: check if at target
@@ -47,7 +47,7 @@ public class NextRung extends CommandBase {
 
         new ParallelCommandGroup(
             new InstantCommand(() -> climber.pivotToHold()),
-            new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT))
+            new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT, 1))
         );
 
         //repeat for each rung

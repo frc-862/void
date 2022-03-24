@@ -25,7 +25,6 @@ public class Climber extends SubsystemBase {
 	private TalonSRX leftPivot;
 	private TalonSRX rightPivot;
 
-	private int climbMode = 0;
 	private double armsTarget = 0;
 
 	private boolean goingToHold = false;
@@ -47,12 +46,6 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
 	private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
 
-	private enum state {
-		hold, // either traversal or main climber engaged
-		reach, // reaching for a rung
-		settling
-	  }
-
   	public Climber() {
 		// Sets the IDs of our arm motors
 		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
@@ -70,9 +63,11 @@ public class Climber extends SubsystemBase {
 		leftPivot.setNeutralMode(NeutralMode.Brake);
 		rightPivot.setNeutralMode(NeutralMode.Brake);
 
+		//set arm inverts
 		leftArm.setInverted(false);
 		rightArm.setInverted(true);
 
+		//set pivot inverts
 		leftPivot.setInverted(false);
 		rightPivot.setInverted(true);
 
@@ -144,15 +139,10 @@ public class Climber extends SubsystemBase {
 	}
 
 											//0 for without load, 1 for with
-	public void climbSetPoint(double armTarget, int climbMode) {
+	public void setArmsTarget(double armTarget, int climbMode) {
 		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
-		this.climbMode = climbMode;
 
 		rightArm.selectProfileSlot(climbMode, climbMode);
-	}
-
-	public void setArmsTarget(double target) {
-		armsTarget = target;
 	}
 
 	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
@@ -177,7 +167,7 @@ public class Climber extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		climbSetPoint(targetClimb.getDouble(100), (int)loaded.getDouble(0));
+		setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
 
 		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
 		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
