@@ -2,8 +2,7 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonAutoIndex2;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargoVision;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
@@ -27,17 +26,37 @@ public class ThreeBallVision extends ParallelCommandGroup {
 
 			new SequentialCommandGroup(
 
+				// shoots the first ball
 				new ParallelDeadlineGroup(
 					start3Ball.getCommand(drivetrain),
 					new SequentialCommandGroup(
-						new AutonShootCargo(shooter, hood, indexer, turret, 3700d, 0d, 10d),
-						new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
+						new AutonShootCargo(shooter, hood, indexer, turret, 4000d, 0d, 20d),
+						new ParallelDeadlineGroup(
+							new AutonIndexeCargo(indexer),
+							new AimTurret(vision, turret, drivetrain)
+						)
 					)
 				),
 
 				new ParallelCommandGroup(
-					end3Ball.getCommand(drivetrain), 
-					new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
+					new AimTurret(vision, turret, drivetrain),
+
+					new SequentialCommandGroup(
+						new InstantCommand(() -> System.out.println("about to shoot ball two ----------------------------------------")),
+
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), 2),
+
+						new ParallelDeadlineGroup(
+							end3Ball.getCommand(drivetrain),
+							new AutonIndexeCargo(indexer)
+						),
+						
+						new InstantCommand(() -> System.out.println("about to shoot ball three ----------------------------------------")),
+
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), 2),
+
+						new InstantCommand(() -> System.out.println("we have ended ----------------------------------------------------")) // This line was written by Enoch 
+					)
 				)
 			)
 		);

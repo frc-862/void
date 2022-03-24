@@ -26,6 +26,10 @@ public class Shooter extends SubsystemBase {
     private NetworkTableEntry setRPMEntry = shooterTab.add("set RPM", 0).getEntry();;
 	private NetworkTableEntry displayTargetRPM = shooterTab.add("target RPM", 0).getEntry();
 
+	
+	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
+	private NetworkTableEntry setRPMAngleTuneEntry = tuneTab.add("set RPM tune", 0).getEntry();
+
 	// The power point we want the shooter to be at
 	private double targetRPM;
 
@@ -47,6 +51,11 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {	
+
+		if (Constants.SHOT_TUNING) {
+			setRPM(setRPMAngleTuneEntry.getDouble(0));
+		}
+
 		setSmartDashboardCommands();
 
 	}

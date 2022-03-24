@@ -24,16 +24,19 @@ public class AutonShootCargoVision extends CommandBase {
 		this.turret = turret;
 		this.hood = hood;
 
-		addRequirements(shooter, hood, indexer, turret);
+		addRequirements(shooter, hood, indexer);
 
 	}
 
 	@Override
+	public void initialize() {}
+	
+	@Override
 	public void execute() {
-		turret.setAngle(turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle());
+		// turret.setAngle(turret.getCurrentAngle().getDegrees() + vision.getOffsetAngle());
 
 		var distance = vision.getTargetDistance();
-		var rpm = Constants.DISTANCE_RPM_MAP.get(distance);
+		var rpm = Constants.DISTANCE_RPM_MAP.get(distance) + Constants.ANGLE_POWER_MAP.get(turret.getCurrentAngle().getDegrees());
 		var hoodAngle = Constants.HOOD_ANGLE_MAP.get(distance);
 
 		System.out.println("wanted RPM " + rpm);
@@ -44,8 +47,6 @@ public class AutonShootCargoVision extends CommandBase {
 
 		if(shooter.onTarget() && turret.onTarget() && hood.onTarget()) { 
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-		} else {
-			indexer.setPower(0.3);
 		}
 	}
 

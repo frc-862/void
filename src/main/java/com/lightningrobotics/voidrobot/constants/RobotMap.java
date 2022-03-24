@@ -29,7 +29,7 @@ public final class RobotMap {
     public static final int TURRET_MOTOR_ID = 12;
     public static final int LIMIT_SWITCH_NEGATIVE_ID = 2; 
     public static final int LIMIT_SWITCH_POSITIVE_ID = 3; 
-    public static final int CENTER_SENSOR_ID = 69420;
+    public static final int CENTER_SENSOR_ID = 2;
 
 
     // Indexer 
@@ -38,9 +38,11 @@ public final class RobotMap {
     public static final int EXIT_BEAM_BREAK = 0;
     public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
     
+    // Hood
+    public static final int HOOD_MOTOR_ID = 13;
+
     // Shooter
     public static final int FLYWHEEL_MOTOR_ID = 11;
-    public static final int HOOD_MOTOR_ID = 13;
     public static final int  SHOOTER_ENCODER_A = 9;
     public static final int  SHOOTER_ENCODER_B = 8;
 

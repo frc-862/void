@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
-	public static final boolean TESTING = true;
+	public static final boolean TESTING = false;
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
@@ -114,7 +114,7 @@ public class RobotContainer extends LightningContainer {
         turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
 		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 
-	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
+	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
 
         //CLIMB
         climber.setDefaultCommand(
@@ -164,9 +164,9 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void initializeDashboardCommands() { 
-		 var tab = Shuffleboard.getTab("hood");
+		var tab = Shuffleboard.getTab("hood");
 		// var compTab = Shuffleboard.getTab("Competition");
-		 tab.add(new ResetHood(hood));
+		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 	}
 	
