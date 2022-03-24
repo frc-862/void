@@ -34,13 +34,13 @@ public class Drivetrain extends DifferentialDrivetrain {
 
 	// This function only deals wit ticks to a distance, so the *10 handles the per second operation needed
 	private static final DoubleSupplier leftVelocitySupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier rightVelocitySupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[1]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier leftPositionSupplier =  
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier rightPositionSupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[1]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
     
     public Drivetrain(LightningIMU imu) {
         super(
@@ -86,5 +86,7 @@ public class Drivetrain extends DifferentialDrivetrain {
     public void periodic() {
         super.periodic();
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
+        SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
+        SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
     }
 }
