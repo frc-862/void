@@ -25,7 +25,7 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
     private static Path start3Ball = new Path("Start3BallHanger.path", false);
 	private static Path end3Ball = new Path("End3BallHanger.path", false);
 
-    public ThreeBallHangerVision(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception {
+    public ThreeBallHangerVision(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception {
         super(
 
 			new AutonIntake(intake),
@@ -40,18 +40,18 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
 						new AutonShootCargo(shooter, hood, indexer, turret, 4200d, 0d, -35d), // Tune this shot
 						new ParallelDeadlineGroup(
 							new AutonIndexeCargo(indexer),
-							new AimTurret(vision, turret, drivetrain)
+							new AimTurret(turret, targeting)
 						)
 					)
 				),
 
 				new ParallelCommandGroup(
-					new AimTurret(vision, turret, drivetrain),
+					new AimTurret(turret, targeting),
 
 					new SequentialCommandGroup(
 						new InstantCommand(() -> System.out.println("about to shoot ball two ----------------------------------------")),
 
-						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), 2),
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, targeting), 2),
 
 						new ParallelDeadlineGroup(
 							end3Ball.getCommand(drivetrain),
@@ -60,7 +60,7 @@ public class ThreeBallHangerVision extends ParallelCommandGroup {
 						
 						new InstantCommand(() -> System.out.println("about to shoot ball three ----------------------------------------")),
 
-						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, vision), 2),
+						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, turret, targeting), 2),
 
 						new InstantCommand(() -> System.out.println("we have ended ----------------------------------------------------")) // This line was written by Enoch 
 					)

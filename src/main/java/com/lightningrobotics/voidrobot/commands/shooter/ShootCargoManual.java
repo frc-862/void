@@ -5,7 +5,6 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -15,7 +14,7 @@ public class ShootCargoManual extends CommandBase {
 	private final Indexer indexer;
 	private final Hood hood;
 
-	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret, Vision vision) {
+	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.hood = hood;

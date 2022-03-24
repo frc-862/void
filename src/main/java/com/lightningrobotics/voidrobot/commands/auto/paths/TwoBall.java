@@ -15,7 +15,7 @@ public class TwoBall extends ParallelCommandGroup {
 
 	private static Path path = new Path("1-2Ball.path", false);
 
-	public TwoBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, Vision vision) throws Exception {
+	public TwoBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, HubTargeting targeting) throws Exception {
 		super(
 
 		new SequentialCommandGroup(
@@ -35,7 +35,7 @@ public class TwoBall extends ParallelCommandGroup {
 			),
 
 			// Shoot 2 (Preload & Collected)
-			new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
+			new AutonShootCargoVision(shooter, hood, indexer, turret, targeting)
 
 		));
 	}

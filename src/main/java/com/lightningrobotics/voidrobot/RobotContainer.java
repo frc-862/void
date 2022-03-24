@@ -42,9 +42,8 @@ public class RobotContainer extends LightningContainer {
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
-    private static final Vision vision = new Vision();
     private static final Hood hood = new Hood();
-	private static final LEDs leds = new LEDs();
+	// private static final LEDs leds = new LEDs();
 	
 	// Joysticks
 	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
@@ -54,18 +53,20 @@ public class RobotContainer extends LightningContainer {
 
 	// Joystick Filters
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
-    private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
+    // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
+
+	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, turret::getCurrentAngle);
 
     @Override
     protected void configureAutonomousCommands() {
 
         try {
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
-			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, vision));
-			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, vision));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, vision));
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
+			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
+			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+            Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();
@@ -78,43 +79,32 @@ public class RobotContainer extends LightningContainer {
     protected void configureButtonBindings() {
 
         // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, turret, vision), false); // Auto shoot
-        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, vision), false); // Auto shoot
+        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, turret, targeting), false); // Auto shoot
+        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret), false); // Shoot close no vision
-		// (new JoystickButton(driverLeft, 2)).whenPressed(new InstantCommand(() -> vision.toggleDisableVision()));
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
 
-        // COPILOT:
-
-        // Collector Controls:
+        // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
         (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
-
         (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new AutoIndexCargo(indexer));
-
-        // Indexer Controls:
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whenActive(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis())); //LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
 
-		//Climb Control:
+		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
 
     }
 
     @Override
-    protected void configureDefaultCommands() {
-        //AUTO
-        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+    protected void configureDefaultCommands() {        
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(vision, turret, drivetrain));
-		vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-
+        turret.setDefaultCommand(new AimTurret(turret, targeting));
+		// vision.setDefaultCommand(new AdjustBias(vision, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
-
-        //CLIMB
         climber.setDefaultCommand(
             new runClimb(
                 climber,

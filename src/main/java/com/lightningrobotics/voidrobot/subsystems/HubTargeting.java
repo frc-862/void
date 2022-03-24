@@ -3,6 +3,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 import java.util.function.Supplier;
 
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,6 +35,9 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
 	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
 
+	// Moving Average Filter
+	private MovingAverageFilter maf = new MovingAverageFilter(10);
+
 	// Vision Input Variables
 	private double hubDistance = -1d;
     private double hubAngleOffset = 0d;
@@ -49,6 +53,10 @@ public class HubTargeting extends SubsystemBase {
 	private double initX = 0d;
     private double initY = 0d;
     private double initRot = 0d;
+
+	// Bias Vars
+	private double distanceBias = 0d;
+	private double angleBias = 0d;
 
 	// Main Output Variables
 	private double targetTurretAngle;
@@ -97,6 +105,9 @@ public class HubTargeting extends SubsystemBase {
 			resetOdometer();
 		}
 
+		// Filter Distance
+		filterDistance();
+
 		// Calculate Nominal Turret Angle
 		targetTurretAngle = calcTurretAngle();
 		// Calculate Nominal Flywheel RPM
@@ -124,6 +135,10 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("targetTurretAngle", () -> targetTurretAngle);
 		DataLogger.addDataElement("targetFlywheelRPM", () -> targetFlywheelRPM);
 		DataLogger.addDataElement("targetHoodAngle", () -> targetHoodAngle);
+
+		// Log Biases
+		DataLogger.addDataElement("distanceBias", () -> distanceBias);
+		DataLogger.addDataElement("angleBias", () -> angleBias);
 
 	}
 
@@ -154,14 +169,14 @@ public class HubTargeting extends SubsystemBase {
 			(Constants.HUB_HEIGHT-Constants.MOUNT_HEIGHT) / 
 			Math.tan(Math.toRadians(Constants.MOUNT_ANGLE + theta)) + 
 			Constants.HUB_CENTER_OFFSET; 
-		var processedDistance = Units.inchesToMeters(rawDistanceInches); // TODO add biases/on-the-fly offsets, etc.
+		var processedDistance = Units.inchesToMeters(rawDistanceInches) + distanceBias; // TODO add biases/on-the-fly offsets, etc.
 		lastKnownDistance = processedDistance;
 		return processedDistance;
 	}
 
 	private double calcHubAngleOffset() {
 		var offsetFromCenter = visionTargetXOffsetEntry.getDouble(hubAngleOffset); // get limelight angle degrees
-		var processedAngleOffset = offsetFromCenter; // TODO add biases/on-the-fly offsets, etc.
+		var processedAngleOffset = offsetFromCenter + angleBias; // TODO add biases/on-the-fly offsets, etc.
 		lastKnownOffset = processedAngleOffset;
 		return processedAngleOffset;
 	}
@@ -214,8 +229,19 @@ public class HubTargeting extends SubsystemBase {
 		return (xValue * Math.sin(Math.toRadians(angleInDegrees))) + (yValue * Math.cos(Math.toRadians(angleInDegrees)));
 	}
 
-	private void resetOdometer() {
+	private void filterDistance() {
+		if (hubDistance > 0) {
+			hubDistance = maf.filter(hubDistance);
+		} else {
+			hubDistance = maf.get();
+		}
+	}
 
+	private void resetOdometer() {
+		var rot = currentPoseSupplier.get();
+		initRot = rot.getRotation().getDegrees();
+        initX = rot.getX();
+        initY = rot.getY();
 	}
 
 	// Limelight Util Functions
@@ -239,6 +265,21 @@ public class HubTargeting extends SubsystemBase {
 
 	private boolean hasVision() {
 		return hubDistance > 0 && visionTargetDetectedEntry.getDouble(0) == 1;
+	}
+
+	// Bias Util
+
+	public void adjustBiasDistance(double delta) {
+		distanceBias += delta;
+	}
+	
+	public void adjustBiasAngle(double delta) {
+		angleBias += delta;
+	}
+
+	public void zeroBias() {
+		distanceBias = 0;
+		angleBias = 0;
 	}
 
 }

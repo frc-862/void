@@ -21,7 +21,7 @@ public class Shooter extends SubsystemBase {
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter");
 
-	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
+	// private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
     private NetworkTableEntry displayRPM = shooterTab.add("RPM-From encoder", 0).getEntry();
     private NetworkTableEntry setRPMEntry = shooterTab.add("set RPM", 0).getEntry();;
 	private NetworkTableEntry displayTargetRPM = shooterTab.add("target RPM", 0).getEntry();

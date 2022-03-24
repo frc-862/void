@@ -1,16 +1,10 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Scanner;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.logging.DataLogger;
-import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
@@ -33,7 +27,7 @@ public class Hood extends SubsystemBase {
 	
 	private NetworkTableEntry setHoodAngleTuneEntry = tuneTab.add("set hood tune", 0).getEntry();
 
-	private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
+	// private ShuffleboardTab shooterTestTab = Shuffleboard.getTab("shooter test");
 	private NetworkTableEntry targetAngle = hoodTab.add("target hood angle", 0).getEntry();
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
