@@ -28,7 +28,7 @@ public final class Constants {
 
     public static final double MAX_SPEED = 2.2;
     public static final double MAX_ACCELERATION = 0.75;
-    public static final double TRACK_WIDTH = 0.75616; // 0.6565; 
+    public static final double TRACK_WIDTH = 0.75616; 
 	public static final double WHEEL_DIAMETER = 4.0725;
 	public static final double GEAR_REDUCTION = 6.7d;
 	public static final double TICKS_PER_REV_FALCON = 2048d;
@@ -65,8 +65,6 @@ public final class Constants {
     public static final double MIN_TURRET_ANGLE = -110d;
     public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
-    public static final double READ_VISION_TIME = 1; //seconds
-    public static final double TURRET_MANUAL_SPEED_MULTIPLIER = 0.25d;
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
@@ -79,9 +77,9 @@ public final class Constants {
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
-    public static final double SHOOTER_KS = 0; //0.58093;//-.81807;
-    public static final double SHOOTER_KF = 0.0455;//2.1597;
-    public static final double SHOOTER_KA = 0; //0.02415;//2.3746;
+    public static final double SHOOTER_KS = 0;
+    public static final double SHOOTER_KF = 0.0455;
+    public static final double SHOOTER_KA = 0;
 
     public static final double SHOOTER_COOLDOWN = 1;
 
@@ -95,13 +93,22 @@ public final class Constants {
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
     public static final double HOOD_ZERO_SPEED = -0.4d;
 
-    public static final double SHOOT_LOW_RPM = 1750;  // 4100 TODO tune these
+    public static final double SHOOT_LOW_RPM = 1750;
     public static final double SHOOT_LOW_ANGLE = 3.0;
     public static final double AUTO_SHOOT_COOLDOWN = 1.0;
 
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
+	// Limelight
+	public static final double MOUNT_HEIGHT = 37.5;
+	public static final double HUB_HEIGHT = 104;
+	public static final double MOUNT_ANGLE = 32;
+	public static final double HUB_CENTER_OFFSET = 24;
+	public static final double SNAPSHOT_DELAY = 0.5;
+	public static final int DISTANCE_MOVING_AVG_ELEMENTS = 3;
+
+    // Auto Shoot
     public static final double EJECT_BALL_RPM = 1500;
     public static final double EJECT_BALL_HOOD_ANGLE = 5; //TODO: tune
 
@@ -154,4 +161,5 @@ public final class Constants {
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
+
 }

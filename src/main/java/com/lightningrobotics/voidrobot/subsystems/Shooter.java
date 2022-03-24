@@ -65,10 +65,6 @@ public class Shooter extends SubsystemBase {
 		DataLogger.addDataElement("targetShooterRPM", () -> targetRPM);
 	}
 
-	public boolean onTarget() {
-		return Math.abs(targetRPM - getCurrentRPM()) < Constants.SHOOTER_TOLERANCE;
-	}
-
 	public void setPower(double power) {
 		flywheelMotor.set(TalonFXControlMode.PercentOutput, power); 
 	}

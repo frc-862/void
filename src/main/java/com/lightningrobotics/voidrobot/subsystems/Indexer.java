@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.xml.crypto.Data;
-
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.logging.DataLogger;

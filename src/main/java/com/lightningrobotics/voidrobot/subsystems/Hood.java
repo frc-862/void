@@ -1,10 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Scanner;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
@@ -45,7 +40,6 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry setHoodAngleEntry = shooterTestTab.add("set hood", 0).getEntry();
 
 	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("hood", Constants.HOOD_PID);
-
 	
 	private boolean disableHood = false;
 	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
@@ -104,11 +98,6 @@ public class Hood extends SubsystemBase {
 		DataLogger.addDataElement("hoodSetPoint", this::getSetPoint);
 	}
 
-	public boolean onTarget() {
-		//return true; //TODO: TEMP HOOD NOT WORKING!!!
-		return Math.abs(angle - getAngle()) < Constants.HOOD_TOLERANCE;
-	}
-
 	public void zero() {
 		if (getLimitSwitch()) {
 			hoodOffset = getRawAngle();
@@ -116,7 +105,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public boolean getLimitSwitch() {
-		return hoodMotor.isRevLimitSwitchClosed() == 1;  // TODO change this to forward and reversed
+		return hoodMotor.isRevLimitSwitchClosed() == 1;
 	}
 
 	public double getSetPoint() {
