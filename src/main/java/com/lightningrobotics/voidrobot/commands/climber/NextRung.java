@@ -6,7 +6,6 @@ package com.lightningrobotics.voidrobot.commands.climber;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Climber;
-import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class NextRung extends CommandBase {
     Climber climber;
-    Drivetrain drivetrain;
 
     private enum currentRung {
         mid,
@@ -25,20 +23,15 @@ public class NextRung extends CommandBase {
         climbing
     }
 
-    public NextRung(Climber climber, Drivetrain drivetrain) {
+    public NextRung(Climber climber) {
         this.climber = climber;
-        this.drivetrain = drivetrain;
 
         addRequirements(climber);
     }
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {}
-
-    // Called every time the scheduler runs while the command is scheduled.
-    @Override
-    public void execute() {
+    public void initialize() {
         new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new RunCommand(climber::pivotToReach),
@@ -49,8 +42,6 @@ public class NextRung extends CommandBase {
                 new InstantCommand(climber::pivotToHold),
                 new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT, 1))
             ).until(climber::onTarget)
-
-            
         );
 
         //repeat for each rung
@@ -58,7 +49,10 @@ public class NextRung extends CommandBase {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        climber.stop();
+        super.end(interrupted);
+    }
 
     // Returns true when the command should end.
     @Override

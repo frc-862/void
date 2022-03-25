@@ -11,6 +11,7 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminalVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
+import com.lightningrobotics.voidrobot.commands.climber.NextRung;
 import com.lightningrobotics.voidrobot.commands.climber.runClimb;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
@@ -28,7 +29,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
@@ -97,8 +97,9 @@ public class RobotContainer extends LightningContainer {
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
-        (new Trigger(() -> climb.getRightTriggerAxis() > 0.3)).whileActiveContinuous(new InstantCommand(climber::pivotToHold));
-        (new Trigger(() -> climb.getRightTriggerAxis() > 0.3)).whileActiveContinuous(new InstantCommand(climber::pivotToHold));
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new InstantCommand(climber::pivotToHold));
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new InstantCommand(climber::pivotToReach));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenPressed(new NextRung(climber), false);
 
     }
 

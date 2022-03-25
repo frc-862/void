@@ -199,6 +199,28 @@ public class Climber extends SubsystemBase {
 		return pivotOnTarget() && armsOnTarget();
 	}
 
+	private void checkPivotState() {
+		if(getHoldSensor()) {
+			pivotState = pivotPosition.hold;
+		} else if(getReachSensor()) {
+			pivotState = pivotPosition.reach;
+		} else {
+			pivotState = pivotPosition.moving;
+		}
+	}
+
+	private void checkIfSettled() {
+		if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) < Constants.GYRO_SETTLE_THRESHOLD) {
+			startTime = Timer.getFPGATimestamp();
+		}
+
+		if(startTime - Timer.getFPGATimestamp() > Constants.GYRO_SETTLE_TIME) {
+			isSettled = true;
+		} else {
+			isSettled = false;
+		}
+	}
+
 	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
 		leftArm.config_kP(0, kP_noLoad);
 		leftArm.config_kI(0, kI_noLoad);
@@ -243,28 +265,6 @@ public class Climber extends SubsystemBase {
 		checkIfSettled();
 
 		checkPivotState();
-	}
-
-	private void checkPivotState() {
-		if(getHoldSensor()) {
-			pivotState = pivotPosition.hold;
-		} else if(getReachSensor()) {
-			pivotState = pivotPosition.reach;
-		} else {
-			pivotState = pivotPosition.moving;
-		}
-	}
-
-	private void checkIfSettled() {
-		if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) < Constants.GYRO_SETTLE_THRESHOLD) {
-			startTime = Timer.getFPGATimestamp();
-		}
-
-		if(startTime - Timer.getFPGATimestamp() > Constants.GYRO_SETTLE_TIME) {
-			isSettled = true;
-		} else {
-			isSettled = false;
-		}
 	}
 
 	public void stopPivot() {
