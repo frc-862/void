@@ -6,11 +6,13 @@ import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,17 +25,34 @@ public class Climber extends SubsystemBase {
 	private TalonSRX leftPivot;
 	private TalonSRX rightPivot;
 
+	LightningIMU imu;
+
 	//initialize set point for arm height
 	private double armsTarget = 0;
+	private double leftArmPower;
+	private double rightArmPower;
+
+	private double startTime;
+
+	private boolean isSettled = false;
+
+	private enum pivotPosition {
+		hold,
+		reach,
+		moving
+	}
+
+	private pivotPosition pivotState = pivotPosition.reach;
 
 	//pid tuning stuff, will be removed later
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
 	private NetworkTableEntry resetClimb = climbTab.add("reset climb", false).getEntry();
-	private NetworkTableEntry disableClimb = climbTab.add("disable climb", false).getEntry();
+	private NetworkTableEntry useManual = climbTab.add("use manual", false).getEntry();
 	private NetworkTableEntry leftArmPos = climbTab.add("left arm", 100).getEntry();
 	private NetworkTableEntry rightArmPos = climbTab.add("right arm", 100).getEntry();
 	private NetworkTableEntry targetClimb = climbTab.add("target climb", 0).getEntry();
 	private NetworkTableEntry loaded = climbTab.add("has load", 0).getEntry();
+	private NetworkTableEntry gyroPitch = climbTab.add("pitch", 0).getEntry();
 
 	private NetworkTableEntry kP_load = climbTab.add("kP with load", 0).getEntry();
 	private NetworkTableEntry kI_load = climbTab.add("kI with load", 0).getEntry();
@@ -44,7 +63,7 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
 	private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
 
-  	public Climber() {
+  	public Climber(LightningIMU imu) {
 		// Sets the IDs of our arm motors
 		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
 		rightArm = new TalonFX(RobotMap.RIGHT_CLIMB);
@@ -52,6 +71,8 @@ public class Climber extends SubsystemBase {
 		// Sets the IDs of the pivot motors
 		leftPivot = new TalonSRX(RobotMap.LEFT_PIVOT);
 		rightPivot = new TalonSRX(RobotMap.RIGHT_PIVOT);
+
+		this.imu = imu;
 
 		//climb motors need to be in brake mode to hold climb up
 		leftArm.setNeutralMode(NeutralMode.Brake);
@@ -69,27 +90,41 @@ public class Climber extends SubsystemBase {
 		leftPivot.setInverted(false);
 		rightPivot.setInverted(true);
 
-		//set pivot motors to follow each other
-		leftPivot.follow(rightPivot);
-
 		initLogging();
+
+		startTime = Timer.getFPGATimestamp();
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
 
 	private void initLogging() {
-		DataLogger.addDataElement("leftClimbPosition", () -> leftArm.getSelectedSensorPosition());
-		DataLogger.addDataElement("rightClimbPosition", () -> rightArm.getSelectedSensorPosition());
+		DataLogger.addDataElement("leftArmPosition", () -> leftArm.getSelectedSensorPosition());
+		DataLogger.addDataElement("rightArmPosition", () -> rightArm.getSelectedSensorPosition());
+		DataLogger.addDataElement("armsTarget", () -> armsTarget);
+		DataLogger.addDataElement("pivot position", () -> pivotState.toString());
+		DataLogger.addDataElement("pivot power", () -> rightPivot.getMotorOutputPercent());
+		DataLogger.addDataElement("gyro pitch", () -> imu.getPitch().getDegrees());
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {
-		leftArm.set(TalonFXControlMode.PercentOutput, leftPower);
-		rightArm.set(TalonFXControlMode.PercentOutput, rightPower);
+		leftArmPower = leftPower;
+		rightArmPower = rightPower;
 	}
 
-	public void setPivotPower(double power) {
+	private void moveArms() {
+		if(useManual.getBoolean(false)) {
+			leftArm.set(TalonFXControlMode.PercentOutput, leftArmPower);
+			rightArm.set(TalonFXControlMode.PercentOutput, rightArmPower);
+		} else {
+			leftArm.set(TalonFXControlMode.Position, armsTarget);
+			rightArm.set(TalonFXControlMode.Position, armsTarget);
+		}
+	}
+ 
+	public void setPivotPower(double leftPower, double rightPower) {
 		//only set one as the left motor is set to follow the right
-		rightPivot.set(TalonSRXControlMode.PercentOutput, power);
+		rightPivot.set(TalonSRXControlMode.PercentOutput, rightPower);
+		leftPivot.set(TalonSRXControlMode.PercentOutput, leftPower);
 	}
 
 	/**
@@ -105,14 +140,14 @@ public class Climber extends SubsystemBase {
 	 * run the pivots towards collector until they hit the limit switch
 	 */
 	public void pivotToHold() {
-		setPivotPower(-Constants.DEFAULT_PIVOT_POWER);
+		setPivotPower(Constants.DEFAULT_PIVOT_POWER, Constants.DEFAULT_PIVOT_POWER);
 	}
 
 	/**
 	 * run the pivots away from collector until they hit the limit switch
 	 */
 	public void pivotToReach() {
-		setPivotPower(Constants.DEFAULT_PIVOT_POWER);
+		setPivotPower(-Constants.DEFAULT_PIVOT_POWER, -Constants.DEFAULT_PIVOT_POWER);
 	}
 
 	public void resetArmEncoders() {
@@ -135,7 +170,7 @@ public class Climber extends SubsystemBase {
 	}
 
 	public boolean isSettled() {
-		return true; //TODO: implement gyro
+		return isSettled;
 	}
 
 	/**
@@ -186,29 +221,54 @@ public class Climber extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		//temporary, while we're testing
+		
 		setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
-
-		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
-		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
 
 		if(resetClimb.getBoolean(false)) {
 			resetArmEncoders();
 		}
 
-		if(disableClimb.getBoolean(false)) {
-			leftArm.set(TalonFXControlMode.PercentOutput, 0);
-			rightArm.set(TalonFXControlMode.PercentOutput, 0);
-		} else {
-			leftArm.set(TalonFXControlMode.Position, armsTarget);
-			rightArm.set(TalonFXControlMode.Position, armsTarget);
-		}
+		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
+		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
 
+		gyroPitch.setNumber(imu.getPitch().getDegrees());
+		
 		setArmPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
 
+		//end of temporary, while we're testing
+		
+		moveArms();
+
+		checkIfSettled();
+
+		checkPivotState();
+	}
+
+	private void checkPivotState() {
+		if(getHoldSensor()) {
+			pivotState = pivotPosition.hold;
+		} else if(getReachSensor()) {
+			pivotState = pivotPosition.reach;
+		} else {
+			pivotState = pivotPosition.moving;
+		}
+	}
+
+	private void checkIfSettled() {
+		if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) < Constants.GYRO_SETTLE_THRESHOLD) {
+			startTime = Timer.getFPGATimestamp();
+		}
+
+		if(startTime - Timer.getFPGATimestamp() > Constants.GYRO_SETTLE_TIME) {
+			isSettled = true;
+		} else {
+			isSettled = false;
+		}
 	}
 
 	public void stopPivot() {
-		setPivotPower(0);
+		setPivotPower(0, 0);
 	}
 
 	public void stopArms() {

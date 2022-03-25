@@ -37,7 +37,7 @@ public class RobotContainer extends LightningContainer {
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final Climber climber = new Climber();
+    private static final Climber climber = new Climber(imu);
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
@@ -103,6 +103,8 @@ public class RobotContainer extends LightningContainer {
 
 		//Climb Control:
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
+        (new Trigger(() -> climb.getRightTriggerAxis() > 0.3)).whileActiveContinuous(new InstantCommand(climber::pivotToHold));
+        (new Trigger(() -> climb.getRightTriggerAxis() > 0.3)).whileActiveContinuous(new InstantCommand(climber::pivotToHold));
 
     }
 
@@ -119,26 +121,42 @@ public class RobotContainer extends LightningContainer {
         //CLIMB
         climber.setDefaultCommand(
             new runClimb(
-                climber,
+            //     climber,
+            //     () -> (
+            //         (-1*climb.getLeftY()) +
+            //         // I know some people don't like these so I'll document it
+            //         // If the d-pad up is pressed, add 1 to total power
+            //         (climb.getPOV() == 0 ? 1 : 0) +
+            //         // If the d-pad down is pressed, add -1 to total power
+            //         (climb.getPOV() == 180 ? -1 : 0)
+            //     ),
+            //     () -> (
+            //         (-1*climb.getRightY()) +
+            //         // same thing as above, if it's up add 1
+            //         (climb.getPOV() == 0 ? 1 : 0) +
+            //         // if it's down add -1
+            //         (climb.getPOV() == 180 ? -1 : 0)
+            //     ),
+            //     //set left and right pivot powers
+            //     () -> (
+            //         climb.getRightTriggerAxis() - //RT: pivot forwards
+            //         climb.getLeftTriggerAxis() //LT: pivot backwards
+            //     )
+            climber,
                 () -> (
-                    (-1*climb.getLeftY()) +
+                    ((-1*climb.getLeftY()) + 
                     // I know some people don't like these so I'll document it
                     // If the d-pad up is pressed, add 1 to total power
                     (climb.getPOV() == 0 ? 1 : 0) +
                     // If the d-pad down is pressed, add -1 to total power
-                    (climb.getPOV() == 180 ? -1 : 0)
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
                 ),
                 () -> (
-                    (-1*climb.getRightY()) +
+                    ((-1*climb.getRightY()) +
                     // same thing as above, if it's up add 1
                     (climb.getPOV() == 0 ? 1 : 0) +
                     // if it's down add -1
-                    (climb.getPOV() == 180 ? -1 : 0)
-                ),
-                //set left and right pivot powers
-                () -> (
-                    climb.getRightTriggerAxis() - //RT: pivot forwards
-                    climb.getLeftTriggerAxis() //LT: pivot backwards
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
                 )
             )
         );

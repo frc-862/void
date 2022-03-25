@@ -11,6 +11,8 @@ import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class NextRung extends CommandBase {
     Climber climber;
@@ -37,17 +39,18 @@ public class NextRung extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        new ParallelCommandGroup(
-            new InstantCommand(() -> climber.pivotToReach()),
-            new InstantCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT, 0))
-        );
+        new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new RunCommand(climber::pivotToReach),
+                new RunCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT, 0))
+            ).until(climber::onTarget),
 
-        //TODO: check if at target
-        
+            new ParallelCommandGroup(
+                new InstantCommand(climber::pivotToHold),
+                new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT, 1))
+            ).until(climber::onTarget)
 
-        new ParallelCommandGroup(
-            new InstantCommand(() -> climber.pivotToHold()),
-            new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT, 1))
+            
         );
 
         //repeat for each rung
