@@ -64,11 +64,6 @@ public class RobotContainer extends LightningContainer {
 
 	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
 
-    public RobotContainer() {
-        super();
-        System.out.println("WHAT IS GOING ONNNNNNNNNN");
-    }
-
     @Override
     protected void configureAutonomousCommands() {
 
