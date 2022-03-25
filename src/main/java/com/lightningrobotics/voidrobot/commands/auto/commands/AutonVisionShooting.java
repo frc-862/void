@@ -22,14 +22,14 @@ public class AutonVisionShooting extends CommandBase {
 
 	private boolean shooting = false;
 
-	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting, double visionOffset, double distanceOffset) {
+	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting, double visionBias, double distanceBias) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.turret = turret;
 		this.hood = hood;
 		this.targeting = targeting;
-		this.visionOffset = visionOffset;
-		this.distanceOffset = distanceOffset;
+		this.visionOffset = visionBias;
+		this.distanceOffset = distanceBias;
 
 		addRequirements(shooter, hood, indexer, turret);
 

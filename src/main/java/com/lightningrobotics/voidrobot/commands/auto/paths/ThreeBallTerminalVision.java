@@ -25,10 +25,10 @@ public class ThreeBallTerminalVision extends ParallelCommandGroup {
 			terminal3Ball.getCommand(drivetrain),
 
 			new SequentialCommandGroup(
-				new AutonShootCargo(shooter, hood, indexer, turret, targeting, 4000d, 0d, 20d),
+				new AutonShootCargo(shooter, hood, indexer, turret, targeting, 3800d, 0d, 8d),
 
-				new AutonVisionShooting(shooter, hood, indexer, turret, targeting, 20d, 0d), 
-				new AutonVisionShooting(shooter, hood, indexer, turret, targeting, 15d, 0.5d),
+				new AutonVisionShooting(shooter, hood, indexer, turret, targeting, 20d, 0.8d), 
+				new AutonVisionShooting(shooter, hood, indexer, turret, targeting, 10d, 1.2d),
 				
 				new SequentialCommandGroup(
 					new InstantCommand(indexer::stop),

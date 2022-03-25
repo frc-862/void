@@ -109,40 +109,40 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {        
-		// drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        // turret.setDefaultCommand(new AimTurret(turret, targeting));
-		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+        turret.setDefaultCommand(new AimTurret(turret, targeting));
+		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-        // climber.setDefaultCommand(
-        //     new runClimb(
-        //         climber,
-        //         () -> (
-        //             ((-1*climb.getLeftY()) + 
-        //             // I know some people don't like these so I'll document it
-        //             // If the d-pad up is pressed, add 1 to total power
-        //             (climb.getPOV() == 0 ? 1 : 0) +
-        //             // If the d-pad down is pressed, add -1 to total power
-        //             (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-        //         ),
-        //         () -> (
-        //             ((-1*climb.getRightY()) +
-        //             // same thing as above, if it's up add 1
-        //             (climb.getPOV() == 0 ? 1 : 0) +
-        //             // if it's down add -1
-        //             (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-        //         ),
-        //         //set left and right pivot powers
-        //         () -> (
-        //             climb.getLeftTriggerAxis() - //LT: pivot forwards
-        //             (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
-        //         ),
-        //         () -> (
-        //             climb.getRightTriggerAxis() - //RT: pivot forwards
-        //             (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
-        //         )
-        //     )
-        // );
+        climber.setDefaultCommand(
+            new runClimb(
+                climber,
+                () -> (
+                    ((-1*climb.getLeftY()) + 
+                    // I know some people don't like these so I'll document it
+                    // If the d-pad up is pressed, add 1 to total power
+                    (climb.getPOV() == 0 ? 1 : 0) +
+                    // If the d-pad down is pressed, add -1 to total power
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                ),
+                () -> (
+                    ((-1*climb.getRightY()) +
+                    // same thing as above, if it's up add 1
+                    (climb.getPOV() == 0 ? 1 : 0) +
+                    // if it's down add -1
+                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                ),
+                //set left and right pivot powers
+                () -> (
+                    climb.getLeftTriggerAxis() - //LT: pivot forwards
+                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
+                ),
+                () -> (
+                    climb.getRightTriggerAxis() - //RT: pivot forwards
+                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
+                )
+            )
+        );
 	}
 
     @Override
