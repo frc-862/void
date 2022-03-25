@@ -17,12 +17,12 @@ public class FourBallHanger extends ParallelCommandGroup {
     private static Path start3BallHanger = new Path("Start3BallHanger.path", false);
     private static Path end3BallHanger = new Path("End3BallHanger.path", false);  
 
-    public FourBallHanger(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Vision vision) throws Exception{
+    public FourBallHanger(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception{
 		super(
 			
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
-      // new AimTurret(vision, turret, drivetrain),
+      		// new AimTurret(vision, turret, drivetrain),
 
 			// new AutonAutoIndex(indexer),
 
@@ -38,14 +38,14 @@ public class FourBallHanger extends ParallelCommandGroup {
 					start3BallHanger.getCommand(drivetrain)
 				),
 
-				new AutonShootCargoVision(shooter, hood, indexer, turret, vision),
+				new AutonShootCargoVision(shooter, hood, indexer, targeting),
 
 				new ParallelCommandGroup(
 					new TimedCommand(new AutonIntake(intake), end3BallHanger.getDuration(drivetrain)+1),
 					end3BallHanger.getCommand(drivetrain)
 				), 
 
-				new AutonShootCargoVision(shooter, hood, indexer, turret, vision)
+				new AutonShootCargoVision(shooter, hood, indexer, targeting)
 
 			)
 

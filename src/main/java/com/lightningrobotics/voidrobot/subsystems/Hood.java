@@ -1,20 +1,18 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Scanner;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.subsystem.drivetrain.PIDFDashboardTuner;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,6 +23,7 @@ public class Hood extends SubsystemBase {
 
 	// Creates the flywheel motor and hood motors
 	private TalonSRX hoodMotor;
+	private DigitalInput resetHoodSensor;
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab hoodTab = Shuffleboard.getTab("hood");
@@ -38,8 +37,9 @@ public class Hood extends SubsystemBase {
 	private NetworkTableEntry currentAngle = hoodTab.add("current hood angle", 0).getEntry();;
 	private NetworkTableEntry rawAngle = hoodTab.add("raw hood angle", 0).getEntry();
 
-	private NetworkTableEntry setHoodAngleEntry = hoodTab.add("set hood", 0).getEntry();
+	private NetworkTableEntry setHoodAngleEntry = shooterTestTab.add("set hood", 0).getEntry();
 
+	private final PIDFDashboardTuner tuner = new PIDFDashboardTuner("hood", Constants.HOOD_PID);
 	
 	private boolean disableHood = false;
 	private NetworkTableEntry hoodDisable = hoodTab.add("disabel hood", disableHood).getEntry();
@@ -70,7 +70,6 @@ public class Hood extends SubsystemBase {
 
 	@Override
 	public void periodic() {	
-		
 		if (Constants.SHOT_TUNING) {
 			setAngle(setHoodAngleTuneEntry.getDouble(0));
 		}
@@ -92,16 +91,11 @@ public class Hood extends SubsystemBase {
 		setSmartDashboardCommands();
 
 		SmartDashboard.putBoolean("hood limit switch ", getLimitSwitch());
-
 	}
 
 	private void initLogging() {
 		DataLogger.addDataElement("hoodAngle", this::getAngle);
 		DataLogger.addDataElement("hoodSetPoint", this::getSetPoint);
-	}
-
-	public boolean onTarget() {
-		return Math.abs(angle - getAngle()) < Constants.HOOD_TOLERANCE;
 	}
 
 	public void zero() {
@@ -111,7 +105,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public boolean getLimitSwitch() {
-		return hoodMotor.isRevLimitSwitchClosed() == 1;  // TODO change this to forward and reversed
+		return hoodMotor.isRevLimitSwitchClosed() == 1;
 	}
 
 	public double getSetPoint() {

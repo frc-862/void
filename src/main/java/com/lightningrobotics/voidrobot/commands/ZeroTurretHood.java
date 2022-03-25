@@ -34,7 +34,4 @@ public class ZeroTurretHood extends CommandBase {
 	public boolean isFinished() {
 		return false;
 	}
-	
-
-
 }

@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import javax.xml.crypto.Data;
-
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.lightningrobotics.common.logging.DataLogger;
@@ -11,6 +9,7 @@ import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -49,16 +48,16 @@ public class Indexer extends SubsystemBase {
     public int ballCount = 0;
 
     // Enum to determin the color of each ball
-    enum Color {
-        red,
-        blue,
+    public enum BallColor {
+        Red,
+        Blue,
         nothing
     }
 
     // Ball 1 color
-    Color upperBallColor = Color.nothing;
+    BallColor upperBallColor = BallColor.nothing;
     // Ball 2 color
-    Color lowerBallColor = Color.nothing;
+    BallColor lowerBallColor = BallColor.nothing;
 
     private ShuffleboardTab indexerTab = Shuffleboard.getTab("Indexer");
 
@@ -111,26 +110,26 @@ public class Indexer extends SubsystemBase {
         switch(getColorSensorOutputs()) {
             case 0: 
                 if(ballCount == 0) {
-                    upperBallColor = Color.nothing;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.nothing;
+                    lowerBallColor = BallColor.nothing;
                 }
             break;
 
             case 1:
                 if(ballCount == 1) {
-                    upperBallColor = Color.red;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.Red;
+                    lowerBallColor = BallColor.nothing;
                 } else if(ballCount == 2) {
-                    lowerBallColor = Color.red;
+                    lowerBallColor = BallColor.Red;
                 }
             break;
 
             case 2:
                 if(ballCount == 1) {
-                    upperBallColor = Color.blue;
-                    lowerBallColor = Color.nothing;
+                    upperBallColor = BallColor.Blue;
+                    lowerBallColor = BallColor.nothing;
                 } else if(ballCount == 2) {
-                    lowerBallColor = Color.blue;
+                    lowerBallColor = BallColor.Blue;
                 }
             break;
         }
@@ -162,12 +161,21 @@ public class Indexer extends SubsystemBase {
     }
 
     public void setPower(double power) {
+        SmartDashboard.putNumber("INDEXER POWER", power);
         indexerMotor.set(VictorSPXControlMode.PercentOutput, power);
     }
 
     public boolean getEnterStatus(){
         //the ! is added here to make it trigger on enter, not on release
         return enterDebouncer.calculate(!enterSensor.get());
+    }
+
+    public boolean getEnterStatusNoDebounce(){
+        return !enterSensor.get();
+    }
+
+    public boolean getExitStatusNoDebounce(){
+        return !exitSensor.get();
     }
 
     public boolean getExitStatus(){
@@ -199,7 +207,14 @@ public class Indexer extends SubsystemBase {
     }
 
     public void stop() {
-        setPower(0);
-    }	
+        setPower(0d);
+    }
 
+	public BallColor getUpperBallColor() {
+        return upperBallColor;
+    }
+
+    public BallColor getLowerBallColor() {
+        return lowerBallColor;
+    }
 }

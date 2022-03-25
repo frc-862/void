@@ -45,5 +45,6 @@ public final class RobotMap {
     public static final int FLYWHEEL_MOTOR_ID = 11;
     public static final int  SHOOTER_ENCODER_A = 9;
     public static final int  SHOOTER_ENCODER_B = 8;
+    public static final int HOOD_LIMIT_SWITCH_ID = 3;
 
 }
