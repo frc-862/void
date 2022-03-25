@@ -23,9 +23,10 @@ public class AutonShootCargo extends CommandBase {
 
 	public AutonShootCargo(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting, double rpm, double hoodAngle, double turretAngle) {
 		this.shooter = shooter;
+		this.hood = hood;
 		this.indexer = indexer;
 		this.turret = turret;
-		this.hood = hood;
+		this.targeting = targeting;
 		this.rpm = rpm;
 		this.hoodAngle = hoodAngle;
 		this.turretAngle = turretAngle;
@@ -41,7 +42,7 @@ public class AutonShootCargo extends CommandBase {
 		hood.setAngle(hoodAngle);
 		turret.setAngle(turretAngle);
 
-		if (targeting.onTarget()) {
+		if (targeting.onTarget(rpm, turretAngle, hoodAngle)) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			System.out.println("on target -------------------------------------------");
 			

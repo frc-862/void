@@ -1,5 +1,9 @@
 package com.lightningrobotics.voidrobot;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
@@ -23,16 +27,19 @@ import com.lightningrobotics.voidrobot.subsystems.*;
 import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
-	public static final boolean TESTING = false;
+	public static final boolean TESTING = true;
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
@@ -56,6 +63,11 @@ public class RobotContainer extends LightningContainer {
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
 	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
+
+    public RobotContainer() {
+        super();
+        System.out.println("WHAT IS GOING ONNNNNNNNNN");
+    }
 
     @Override
     protected void configureAutonomousCommands() {
@@ -102,40 +114,40 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {        
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(turret, targeting));
-		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+		// drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+        // turret.setDefaultCommand(new AimTurret(turret, targeting));
+		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
 	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-        climber.setDefaultCommand(
-            new runClimb(
-                climber,
-                () -> (
-                    ((-1*climb.getLeftY()) + 
-                    // I know some people don't like these so I'll document it
-                    // If the d-pad up is pressed, add 1 to total power
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // If the d-pad down is pressed, add -1 to total power
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                () -> (
-                    ((-1*climb.getRightY()) +
-                    // same thing as above, if it's up add 1
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // if it's down add -1
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                //set left and right pivot powers
-                () -> (
-                    climb.getLeftTriggerAxis() - //LT: pivot forwards
-                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
-                ),
-                () -> (
-                    climb.getRightTriggerAxis() - //RT: pivot forwards
-                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
-                )
-            )
-        );
+        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        // climber.setDefaultCommand(
+        //     new runClimb(
+        //         climber,
+        //         () -> (
+        //             ((-1*climb.getLeftY()) + 
+        //             // I know some people don't like these so I'll document it
+        //             // If the d-pad up is pressed, add 1 to total power
+        //             (climb.getPOV() == 0 ? 1 : 0) +
+        //             // If the d-pad down is pressed, add -1 to total power
+        //             (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+        //         ),
+        //         () -> (
+        //             ((-1*climb.getRightY()) +
+        //             // same thing as above, if it's up add 1
+        //             (climb.getPOV() == 0 ? 1 : 0) +
+        //             // if it's down add -1
+        //             (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+        //         ),
+        //         //set left and right pivot powers
+        //         () -> (
+        //             climb.getLeftTriggerAxis() - //LT: pivot forwards
+        //             (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
+        //         ),
+        //         () -> (
+        //             climb.getRightTriggerAxis() - //RT: pivot forwards
+        //             (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
+        //         )
+        //     )
+        // );
 	}
 
     @Override
@@ -166,7 +178,14 @@ public class RobotContainer extends LightningContainer {
 	private void registerTestPaths() {
 		try {
 			Autonomous.register("1 meter", 
-			(new Path("1Meter.path", false)).getCommand(drivetrain));
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> System.out.println("One Meter Forward Yay!")),
+                    new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0)), 
+                                        new Pose2d(1d, 0d, Rotation2d.fromDegrees(0)))).getCommand(drivetrain),
+                    new InstantCommand(() -> System.out.println("Did We Move One Meter?"))
+                )
+                
+            );
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}

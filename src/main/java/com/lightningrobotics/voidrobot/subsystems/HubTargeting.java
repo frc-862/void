@@ -98,6 +98,20 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
+	public boolean onTarget(double shooterRPM, double turretAngle, double hoodAngle) {
+
+		var currTurret = currentTurretAngleSupplier.get().getDegrees();
+		var currHood = currentHoodAngleSupplier.getAsDouble();
+		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
+
+		return 
+			(Math.abs(shooterRPM - currRPM) < Constants.SHOOTER_TOLERANCE) &&
+			(Math.abs(turretAngle - currTurret) < Constants.TURRET_TOLERANCE) &&
+			(Math.abs(hoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+
+	}
+
+
 	// Set Up Hub Targeting
   	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
 
