@@ -1,8 +1,11 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.net.DatagramSocketImpl;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
+import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -40,7 +43,7 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry biasDistanceEntry = targetingTab.add("Bias Distnace", 0).getEntry();
 	private final NetworkTableEntry hasVisionEntry = targetingTab.add("Has Vision", false).getEntry();
 	private final NetworkTableEntry onTargetEntry = targetingTab.add("On Target", false).getEntry();
-	private final NetworkTableEntry velocityEntry = targetingTab.add("Change In Velocity", 0).getEntry();
+	private final NetworkTableEntry velocityEntry = targetingTab.add("Velocity", 0).getEntry();
 	private final NetworkTableEntry motionBiasAngleEntry = targetingTab.add("Motion Bias Angle", 0).getEntry();
 	private final NetworkTableEntry motionBiasDistanceEntry = targetingTab.add("Motion Bias Distnace", 0).getEntry();
 	private final NetworkTableEntry deltaDistanceEntry = targetingTab.add("Delta Distnace", 0).getEntry();
@@ -57,6 +60,7 @@ public class HubTargeting extends SubsystemBase {
 
 	// Subsystem Input Variables
 	private Supplier<Pose2d> currentPoseSupplier;
+	private Supplier<DrivetrainSpeed> currentSpeedSupplier;
 	private Supplier<Rotation2d> currentTurretAngleSupplier;
 	private DoubleSupplier currentHoodAngleSupplier;
 	private DoubleSupplier currentFlywheelRPMSupplier;
@@ -74,7 +78,7 @@ public class HubTargeting extends SubsystemBase {
 	private double angleBias = 0d;
 	
 	// Motion Bias
-	private double motionBiasDistance = 0d;;
+	private double motionAdjustedDistance = 0d;;
 	private double motionBiasAngle = 0d;
 	private double deltaDistance = 0d;
 
@@ -123,12 +127,12 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
-
 	// Set Up Hub Targeting
-  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
+  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<DrivetrainSpeed> currentSpeedSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
 
 		// Setup Value Suppliers
 		this.currentPoseSupplier = currentPoseSupplier;
+		this.currentSpeedSupplier = currentSpeedSupplier;
 		this.currentTurretAngleSupplier = currentTurretAngleSupplier;
 		this.currentHoodAngleSupplier = currentHoodAngleSupplier;
 		this.currentFlywheelRPMSupplier = currentFlywheelRPMSupplier;
@@ -158,7 +162,7 @@ public class HubTargeting extends SubsystemBase {
 		filterDistance();
 
 		// Account for robot motion
-		// filterRobotMotion();
+		filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -179,6 +183,9 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("targetX", () -> visionTargetXOffsetEntry.getDouble(-1));
 		DataLogger.addDataElement("targetY", () -> visionTargetYOffsetEntry.getDouble(-1));
 
+		//Drive Logging
+		DataLogger.addDataElement("relativeVelocityY", () -> velocityEntry.getDouble(0));
+
 		// Target Output Logging
 		DataLogger.addDataElement("targetTurretAngle", () -> targetTurretAngle);
 		DataLogger.addDataElement("targetFlywheelRPM", () -> targetFlywheelRPM);
@@ -193,7 +200,7 @@ public class HubTargeting extends SubsystemBase {
 		
 		// Log Motion Biases
 		DataLogger.addDataElement("motionBiasAngle", () -> motionBiasAngle);
-		DataLogger.addDataElement("motionBiasDistance", () -> motionBiasDistance);
+		DataLogger.addDataElement("motionBiasDistance", () -> motionAdjustedDistance);
 		DataLogger.addDataElement("deltaDistance", () -> deltaDistance);
 
 	}
@@ -208,7 +215,7 @@ public class HubTargeting extends SubsystemBase {
 		hasVisionEntry.setBoolean(hasVision());
 		onTargetEntry.setBoolean(onTarget());
 		motionBiasAngleEntry.setDouble(motionBiasAngle);
-		motionBiasDistanceEntry.setDouble(motionBiasDistance);
+		motionBiasDistanceEntry.setDouble(motionAdjustedDistance);
 		deltaDistanceEntry.setDouble(deltaDistance);
 		
 	}
@@ -232,30 +239,30 @@ public class HubTargeting extends SubsystemBase {
 		
 		try {
 
-			// Calculate Change in Velocity
-			var pose = currentPoseSupplier.get();
-			var deltaX = pose.getX() - prevPose.getX();
-			var deltaY = pose.getY() - prevPose.getY(); 
-			var vel = -(Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2))); // negative b/c shooter on the back of the robot
-			prevPose = pose;
-			velocityEntry.setDouble(vel);
+			DrivetrainSpeed speed = currentSpeedSupplier.get();
+			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
+			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
+			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
+			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
 			var theta = targetTurretAngle;
 
-			motionBiasDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(vel, 2)) - (2 * dist * vel * Math.cos(theta)));
+			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
 			
-			if(motionBiasDistance <= 0) {
-				System.err.println("Bias Distance <= 0 - Will Fail");
-				return;
-			}
+			//if(motionAdjustedDistance <= 0) {
+			//	System.err.println("Bias Distance <= 0 - Will Fail");
+			//	return;
+			//}
 			
-			motionBiasAngle = Math.acos( ( (Math.pow(dist, 2)) + (Math.pow(motionBiasDistance, 2)) - (Math.pow(vel, 2)) ) / (2 * dist * motionBiasDistance) );
-			deltaDistance = hubDistance - motionBiasDistance;
+			var unsignedMotionBiasAngle = Math.toDegrees(Math.acos( ( (Math.pow(dist, 2)) + (Math.pow(motionAdjustedDistance, 2)) - (Math.pow(relativeVel, 2)) ) / (2 * dist * motionAdjustedDistance))) ;
+			deltaDistance = hubDistance - motionAdjustedDistance;
 
-			if(motionBiasDistance > 0) {
-				hubDistance = motionBiasDistance;
-				targetTurretAngle += motionBiasAngle;
+			motionBiasAngle = unsignedMotionBiasAngle * Math.signum(relativeVel) * Math.signum(theta);
+
+			if(motionAdjustedDistance > 0) {
+				hubDistance = motionAdjustedDistance;
+				targetTurretAngle -= motionBiasAngle;
 			} else {
 				System.err.println("robot motion out of bounds");
 			}

@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.lightningrobotics.common.LightningContainer;
@@ -62,7 +60,7 @@ public class RobotContainer extends LightningContainer {
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
+	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
 
     @Override
     protected void configureAutonomousCommands() {
