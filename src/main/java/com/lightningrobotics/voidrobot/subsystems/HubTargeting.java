@@ -318,7 +318,7 @@ public class HubTargeting extends SubsystemBase {
 	}
 	
 	public void adjustBiasAngle(double delta) {
-		angleBias += delta;
+		angleBias -= delta; // needs to subtract to add on to the delta, its werid
 	}
 
 	public void zeroBias() {

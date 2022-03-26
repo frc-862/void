@@ -72,8 +72,8 @@ public class RobotContainer extends LightningContainer {
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
 			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+			// Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+            Autonomous.register("5 Ball Terminal Vision", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();
