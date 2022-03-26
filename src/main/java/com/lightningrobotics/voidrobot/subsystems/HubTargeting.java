@@ -25,7 +25,7 @@ public class HubTargeting extends SubsystemBase {
 
 	// Network Table for Limelight & Vision Data
 	private final NetworkTable limelightTab = NetworkTableInstance.getDefault().getTable("limelight");
-	private final ShuffleboardTab visionTab = Shuffleboard.getTab("Vision Tab");
+	private final ShuffleboardTab targetingTab = Shuffleboard.getTab("Targeting Tab");
 
 	// Entries for Angle & Distance
 	private final NetworkTableEntry visionTargetAreaEntry = limelightTab.getEntry("ta");
@@ -34,12 +34,19 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry visionTargetDetectedEntry = limelightTab.getEntry("tv");
 	private final NetworkTableEntry visionLEDEntry = limelightTab.getEntry("ledMode");
 	private final NetworkTableEntry visionSnapshotEntry = limelightTab.getEntry("snapshot");
-	private final NetworkTableEntry visionDistanceEntry = visionTab.add("Vision Distance", 0).getEntry();
-	private final NetworkTableEntry visionAngleEntry = visionTab.add("Vision Angle", 0).getEntry();
-	private final NetworkTableEntry biasAngleEntry = visionTab.add("Bias Angle", 0).getEntry();
-	private final NetworkTableEntry biasDistanceEntry = visionTab.add("Bias Distnace", 0).getEntry();
-	private final NetworkTableEntry hasVisionEntry = visionTab.add("Has Vision", false).getEntry();
-	private final NetworkTableEntry onTargetEntry = visionTab.add("On Target", false).getEntry();
+	private final NetworkTableEntry visionDistanceEntry = targetingTab.add("Vision Distance", 0).getEntry();
+	private final NetworkTableEntry visionAngleEntry = targetingTab.add("Vision Angle", 0).getEntry();
+	private final NetworkTableEntry biasAngleEntry = targetingTab.add("Bias Angle", 0).getEntry();
+	private final NetworkTableEntry biasDistanceEntry = targetingTab.add("Bias Distnace", 0).getEntry();
+	private final NetworkTableEntry hasVisionEntry = targetingTab.add("Has Vision", false).getEntry();
+	private final NetworkTableEntry onTargetEntry = targetingTab.add("On Target", false).getEntry();
+	private final NetworkTableEntry velocityEntry = targetingTab.add("Change In Velocity", 0).getEntry();
+	private final NetworkTableEntry motionBiasAngleEntry = targetingTab.add("Motion Bias Angle", 0).getEntry();
+	private final NetworkTableEntry motionBiasDistanceEntry = targetingTab.add("Motion Bias Distnace", 0).getEntry();
+	private final NetworkTableEntry deltaDistanceEntry = targetingTab.add("Delta Distnace", 0).getEntry();
+
+	// Position Tracker
+	private Pose2d prevPose = new Pose2d();
 
 	// Moving Average Filter
 	private MovingAverageFilter maf = new MovingAverageFilter(Constants.DISTANCE_MOVING_AVG_ELEMENTS);
@@ -65,6 +72,11 @@ public class HubTargeting extends SubsystemBase {
 	// Bias Vars
 	private double distanceBias = 0d;
 	private double angleBias = 0d;
+	
+	// Motion Bias
+	private double motionBiasDistance = 0d;;
+	private double motionBiasAngle = 0d;
+	private double deltaDistance = 0d;
 
 	// Main Output Variables
 	private double targetTurretAngle;
@@ -145,6 +157,9 @@ public class HubTargeting extends SubsystemBase {
 
 		filterDistance();
 
+		// Account for robot motion
+		// filterRobotMotion();
+
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
 
@@ -175,6 +190,11 @@ public class HubTargeting extends SubsystemBase {
 
 		// Log On Target
 		DataLogger.addDataElement("onTarget", () -> onTarget() ? 1 : 0);
+		
+		// Log Motion Biases
+		DataLogger.addDataElement("motionBiasAngle", () -> motionBiasAngle);
+		DataLogger.addDataElement("motionBiasDistance", () -> motionBiasDistance);
+		DataLogger.addDataElement("deltaDistance", () -> deltaDistance);
 
 	}
 
@@ -187,8 +207,10 @@ public class HubTargeting extends SubsystemBase {
 		biasDistanceEntry.setDouble(distanceBias);
 		hasVisionEntry.setBoolean(hasVision());
 		onTargetEntry.setBoolean(onTarget());
+		motionBiasAngleEntry.setDouble(motionBiasAngle);
+		motionBiasDistanceEntry.setDouble(motionBiasDistance);
+		deltaDistanceEntry.setDouble(deltaDistance);
 		
-
 	}
 
 	private void snapshot() {
@@ -198,11 +220,53 @@ public class HubTargeting extends SubsystemBase {
 				lastVisionSnapshot	= Timer.getFPGATimestamp();
 				visionSnapshotEntry.setNumber(1);
 				System.out.println("Logging Snapshot Taken");
+				visionSnapshotEntry.setNumber(0);
+
 			}
 		}
 	}
 
 	// Math Util Functions
+
+	private void filterRobotMotion() {
+		
+		try {
+
+			// Calculate Change in Velocity
+			var pose = currentPoseSupplier.get();
+			var deltaX = pose.getX() - prevPose.getX();
+			var deltaY = pose.getY() - prevPose.getY(); 
+			var vel = -(Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2))); // negative b/c shooter on the back of the robot
+			prevPose = pose;
+			velocityEntry.setDouble(vel);
+
+			var dist = hubDistance;
+			var theta = targetTurretAngle;
+
+			motionBiasDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(vel, 2)) - (2 * dist * vel * Math.cos(theta)));
+			
+			if(motionBiasDistance <= 0) {
+				System.err.println("Bias Distance <= 0 - Will Fail");
+				return;
+			}
+			
+			motionBiasAngle = Math.acos( ( (Math.pow(dist, 2)) + (Math.pow(motionBiasDistance, 2)) - (Math.pow(vel, 2)) ) / (2 * dist * motionBiasDistance) );
+			deltaDistance = hubDistance - motionBiasDistance;
+
+			if(motionBiasDistance > 0) {
+				hubDistance = motionBiasDistance;
+				targetTurretAngle += motionBiasAngle;
+			} else {
+				System.err.println("robot motion out of bounds");
+			}
+
+		} catch (Exception e) {
+			System.err.println("failed to process robot motion");
+			e.printStackTrace();
+		}
+		
+
+	}
 
 	private double calcHubDistance() {
 		var theta = visionTargetYOffsetEntry.getDouble(-1d); // get limelight angle degrees
@@ -245,7 +309,6 @@ public class HubTargeting extends SubsystemBase {
 		hubDistance = processedDistance;
 		SmartDashboard.putNumber("Turret Angle Gyro", turretTarget);
 		targetTurretAngle = turretTarget;
-		// hubAngleOffset =  currentTurretAngleSupplier.get().getDegrees() + processedOffsetAngle;
 
 	}
 

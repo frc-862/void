@@ -7,6 +7,7 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonVisionShooting extends CommandBase {
@@ -14,43 +15,48 @@ public class AutonVisionShooting extends CommandBase {
 	private final Shooter shooter;
 	private final Hood hood;
 	private final Indexer indexer;
-	private final Turret turret;
 	private final HubTargeting targeting;
 
-	private double visionOffset;
-	private double distanceOffset;
+	private double angleBias;
+	private double distanceBias;
+	private double RPMBias;
 
 	private boolean shooting = false;
 
-	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting, double visionBias, double distanceBias) {
+
+	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, double angleBias, double distanceBias, double RPMBias) {
 		this.shooter = shooter;
 		this.indexer = indexer;
-		this.turret = turret;
 		this.hood = hood;
 		this.targeting = targeting;
-		this.visionOffset = visionBias;
-		this.distanceOffset = distanceBias;
+		this.angleBias = angleBias;
+		this.distanceBias = distanceBias;
+		this.RPMBias = RPMBias;
 
-		addRequirements(shooter, hood, indexer, turret);
+		addRequirements(shooter, hood, indexer);
 
 	}
 
 	@Override
 	public void initialize() {	
 		targeting.zeroBias();
-		targeting.adjustBiasDistance(distanceOffset);
-		targeting.adjustBiasAngle(visionOffset);
+		targeting.adjustBiasDistance(distanceBias);
 	}
 	
 	@Override
 	public void execute() {
+		SmartDashboard.putNumber("distance bias thingy", distanceBias);
+		SmartDashboard.putNumber("angle bias things", angleBias);
+
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
-		var turretAngle = targeting.getTargetTurretAngle();
 
-		shooter.setRPM(rpm);
+		shooter.setRPM(rpm + RPMBias);
 		hood.setAngle(hoodAngle);
-		turret.setAngle(turretAngle);
+
+		if (indexer.getCollectedBall()) {			
+			targeting.adjustBiasAngle(angleBias);
+		}
 
 		if ((targeting.onTarget()) || shooting) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
