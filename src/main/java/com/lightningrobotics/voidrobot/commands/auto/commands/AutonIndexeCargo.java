@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonIndexeCargo extends CommandBase {
 
-private final Indexer indexer;
+    private final Indexer indexer;
+    private int ballsWanted = 0;
 
-    public AutonIndexeCargo(Indexer indexer) {
+    public AutonIndexeCargo(Indexer indexer, int ballsWanted) {
         this.indexer = indexer;
+        this.ballsWanted = ballsWanted;
 
         addRequirements(indexer);
 
@@ -20,7 +22,7 @@ private final Indexer indexer;
 
     @Override
     public void execute() {
-        indexer.setPower(0.5d);
+        indexer.setPower(0.4d);
     }
 
     @Override
@@ -30,6 +32,6 @@ private final Indexer indexer;
 
     @Override
     public boolean isFinished() {
-        return indexer.getColorSensor().getProximity() > 350; // indexer.getColorSensor().getProximity() > 350 && indexer.getBallCount = 2;
+        return indexer.getBallCount() == ballsWanted; // indexer.getColorSensor().getProximity() > 350 && 
     }
 }
