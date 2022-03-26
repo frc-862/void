@@ -17,12 +17,12 @@ public class runClimb extends CommandBase {
 
     private boolean zeroBool = true;
 
-    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower) {
+    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
         this.climber = climber;
         this.leftClimbPower = leftClimbPower;
         this.rightClimbPower = rightClimbPower;
-        // this.rightPivotPower = rightPivotPower;
-        // this.leftPivotPower = leftPivotPower;
+        this.rightPivotPower = rightPivotPower;
+        this.leftPivotPower = leftPivotPower;
 
         addRequirements(climber);
     }
@@ -30,15 +30,16 @@ public class runClimb extends CommandBase {
     @Override
     public void execute() {
         climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
-        // if(rightPivotPower.getAsDouble() != 0 || leftPivotPower.getAsDouble() !=0) {
-        //     climber.setPivotPower(rightPivotPower.getAsDouble(), leftPivotPower.getAsDouble());
-        //     zeroBool = true;
-        // } else if(zeroBool) {
-        //     climber.setPivotPower(0, 0);
-        //     zeroBool = false;
-        // }
+        if(rightPivotPower.getAsDouble() != 0 || leftPivotPower.getAsDouble() !=0) {
+            // climber.setPivotPower(rightPivotPower.getAsDouble(), leftPivotPower.getAsDouble());
+            zeroBool = true;
+        } else if(zeroBool) {
+            // climber.setPivotPower(0, 0);
+            zeroBool = false;
+        }
 
-        
+        // climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
+       
     }
 
     @Override

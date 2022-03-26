@@ -32,9 +32,12 @@ public class Climber extends SubsystemBase {
 	private double leftArmPower;
 	private double rightArmPower;
 
+	private double pivotPower = 0;
+
 	private double startTime;
 
 	private boolean isSettled = false;
+	private boolean checkIfSettled = true;
 
 	private enum pivotPosition {
 		hold,
@@ -53,16 +56,19 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry targetClimb = climbTab.add("target climb", 0).getEntry();
 	private NetworkTableEntry loaded = climbTab.add("has load", 0).getEntry();
 	private NetworkTableEntry gyroPitch = climbTab.add("pitch", 0).getEntry();
+	private NetworkTableEntry isSettledEntry = climbTab.add("is settled", false).getEntry();
+	private NetworkTableEntry reachSensorEntry = climbTab.add("reach", false).getEntry();
+	private NetworkTableEntry holdSensorEntry = climbTab.add("hold", false).getEntry();
 
-	private NetworkTableEntry kP_load = climbTab.add("kP with load", 0).getEntry();
+	private NetworkTableEntry kP_load = climbTab.add("kP with load", 0.07).getEntry();
 	private NetworkTableEntry kI_load = climbTab.add("kI with load", 0).getEntry();
 	private NetworkTableEntry kD_load = climbTab.add("kD with load", 0).getEntry();
 	private NetworkTableEntry kF_load = climbTab.add("kF with load", 0).getEntry();
 	
 	private NetworkTableEntry kP_noLoad = climbTab.add("kP without load", 0.07).getEntry();
-	private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
-	private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
-
+	// private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
+	// private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
+	
   	public Climber(LightningIMU imu) {
 		// Sets the IDs of our arm motors
 		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
@@ -125,6 +131,8 @@ public class Climber extends SubsystemBase {
 		//only set one as the left motor is set to follow the right
 		rightPivot.set(TalonSRXControlMode.PercentOutput, rightPower);
 		leftPivot.set(TalonSRXControlMode.PercentOutput, leftPower);
+
+		pivotPower = (rightPower+leftPower)/2;
 	}
 
 	/**
@@ -132,6 +140,7 @@ public class Climber extends SubsystemBase {
 	 * @param climbMode 0 for unloaded PID, 1 for loaded
 	 */
 	public void setArmsTarget(double armTarget, int climbMode) {
+		System.out.println("setting arm target _______________________________------");
 		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
 		rightArm.selectProfileSlot(climbMode, climbMode);
 	}
@@ -140,6 +149,7 @@ public class Climber extends SubsystemBase {
 	 * run the pivots towards collector until they hit the limit switch
 	 */
 	public void pivotToHold() {
+		System.out.println("running pviot ot hold_____________________");
 		setPivotPower(Constants.DEFAULT_PIVOT_POWER, Constants.DEFAULT_PIVOT_POWER);
 	}
 
@@ -147,6 +157,7 @@ public class Climber extends SubsystemBase {
 	 * run the pivots away from collector until they hit the limit switch
 	 */
 	public void pivotToReach() {
+		System.out.println("running pviot ot reach_______________________");
 		setPivotPower(-Constants.DEFAULT_PIVOT_POWER, -Constants.DEFAULT_PIVOT_POWER);
 	}
 
@@ -158,15 +169,29 @@ public class Climber extends SubsystemBase {
 	/**
 	 * @return true if the pivot is at its far limit from the collector
 	 */
-	public boolean getReachSensor() {
+	public boolean getLeftReachSensor() {
 		return leftPivot.isRevLimitSwitchClosed() == 1;
 	}
 
 	/**
 	 * @return true if the pivot is at its near limit to the collector
 	 */
-	public boolean getHoldSensor() {
+	public boolean getLeftHoldSensor() {
 		return leftPivot.isFwdLimitSwitchClosed() == 1;
+	}
+
+	/**
+	 * @return true if the pivot is at its far limit from the collector
+	 */
+	public boolean getRightReachSensor() {
+		return rightPivot.isRevLimitSwitchClosed() == 1;
+	}
+
+	/**
+	 * @return true if the pivot is at its near limit to the collector
+	 */
+	public boolean getRightHoldSensor() {
+		return rightPivot.isFwdLimitSwitchClosed() == 1;
 	}
 
 	public boolean isSettled() {
@@ -177,10 +202,10 @@ public class Climber extends SubsystemBase {
 	 * @return true if the pivot is triggering the appropriate sensor
 	 */
 	public boolean pivotOnTarget() {
-		if(rightPivot.getMotorOutputPercent() == -1) {
-			return getHoldSensor();
+		if(pivotPower == Constants.DEFAULT_PIVOT_POWER) {
+			return getLeftHoldSensor() && getRightHoldSensor();
 		} else {
-			return getReachSensor();
+			return getLeftReachSensor() && getRightReachSensor();
 		}
 	}
 
@@ -199,36 +224,52 @@ public class Climber extends SubsystemBase {
 		return pivotOnTarget() && armsOnTarget();
 	}
 
+	/**
+	 * checks the pivot state based on which sensor is being triggered
+	 */
 	private void checkPivotState() {
-		if(getHoldSensor()) {
+		if(getLeftHoldSensor() && getRightHoldSensor()) {
 			pivotState = pivotPosition.hold;
-		} else if(getReachSensor()) {
+		} else if(getLeftReachSensor() && getRightReachSensor()) {
 			pivotState = pivotPosition.reach;
 		} else {
 			pivotState = pivotPosition.moving;
 		}
 	}
-
+	/**
+	 * checks if the gyro is settled
+	 */
 	private void checkIfSettled() {
-		if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) < Constants.GYRO_SETTLE_THRESHOLD) {
+		//if our gyro angle is within a threshold, start a timer
+		if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) < Constants.GYRO_SETTLE_THRESHOLD && checkIfSettled) {
 			startTime = Timer.getFPGATimestamp();
+
+			checkIfSettled = false;
+		} else if(Math.abs(imu.getPitch().getDegrees() - Constants.ON_RUNG_ANGLE) > Constants.GYRO_SETTLE_THRESHOLD) {
+			startTime = Timer.getFPGATimestamp();
+
+			checkIfSettled = true;
 		}
 
+		//if the gyro is within the threshold for a certain amount of time, we have settled
 		if(startTime - Timer.getFPGATimestamp() > Constants.GYRO_SETTLE_TIME) {
 			isSettled = true;
 		} else {
 			isSettled = false;
 		}
+
+		// isSettledEntry.setBoolean(isSettled);
+
 	}
 
-	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad, double kI_noLoad, double kD_noLoad) {
+	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad) {//, double kI_noLoad, double kD_noLoad) {
 		leftArm.config_kP(0, kP_noLoad);
-		leftArm.config_kI(0, kI_noLoad);
-		leftArm.config_kD(0, kD_noLoad);
+		// leftArm.config_kI(0, kI_noLoad);
+		// leftArm.config_kD(0, kD_noLoad);
 
 		rightArm.config_kP(0, kP_noLoad);
-		rightArm.config_kI(0, kI_noLoad);
-		rightArm.config_kD(0, kD_noLoad);
+		// rightArm.config_kI(0, kI_noLoad);
+		// rightArm.config_kD(0, kD_noLoad);
 
 		leftArm.config_kP(1, kP_load);
 		leftArm.config_kI(1, kI_load);
@@ -245,7 +286,7 @@ public class Climber extends SubsystemBase {
 	public void periodic() {
 		//temporary, while we're testing
 		
-		setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
+		// setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
 
 		if(resetClimb.getBoolean(false)) {
 			resetArmEncoders();
@@ -256,7 +297,12 @@ public class Climber extends SubsystemBase {
 
 		gyroPitch.setNumber(imu.getPitch().getDegrees());
 		
-		setArmPIDGains(kP_load.getDouble(0), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07), kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
+		setArmPIDGains(kP_load.getDouble(0.07), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07));//, kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
+
+		reachSensorEntry.setBoolean(getLeftReachSensor() && getRightReachSensor());
+		holdSensorEntry.setBoolean(getLeftHoldSensor() && getRightHoldSensor());
+
+		isSettledEntry.setBoolean(onTarget()); //TODO: not
 
 		//end of temporary, while we're testing
 		
@@ -266,7 +312,6 @@ public class Climber extends SubsystemBase {
 
 		checkPivotState();
 	}
-
 	public void stopPivot() {
 		setPivotPower(0, 0);
 	}

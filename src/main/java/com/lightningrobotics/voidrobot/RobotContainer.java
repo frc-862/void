@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
@@ -44,7 +45,7 @@ public class RobotContainer extends LightningContainer {
 	private static final Intake intake = new Intake();
     private static final Hood hood = new Hood();
 	// private static final LEDs leds = new LEDs();
-	
+                                            
 	// Joysticks
 	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
@@ -112,28 +113,7 @@ public class RobotContainer extends LightningContainer {
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
         climber.setDefaultCommand(
             new runClimb(
-            //     climber,
-            //     () -> (
-            //         (-1*climb.getLeftY()) +
-            //         // I know some people don't like these so I'll document it
-            //         // If the d-pad up is pressed, add 1 to total power
-            //         (climb.getPOV() == 0 ? 1 : 0) +
-            //         // If the d-pad down is pressed, add -1 to total power
-            //         (climb.getPOV() == 180 ? -1 : 0)
-            //     ),
-            //     () -> (
-            //         (-1*climb.getRightY()) +
-            //         // same thing as above, if it's up add 1
-            //         (climb.getPOV() == 0 ? 1 : 0) +
-            //         // if it's down add -1
-            //         (climb.getPOV() == 180 ? -1 : 0)
-            //     ),
-            //     //set left and right pivot powers
-            //     () -> (
-            //         climb.getRightTriggerAxis() - //RT: pivot forwards
-            //         climb.getLeftTriggerAxis() //LT: pivot backwards
-            //     )
-            climber,
+                climber,
                 () -> (
                     ((-1*climb.getLeftY()) + 
                     // I know some people don't like these so I'll document it
@@ -148,6 +128,14 @@ public class RobotContainer extends LightningContainer {
                     (climb.getPOV() == 0 ? 1 : 0) +
                     // if it's down add -1
                     (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                ),
+                () -> (
+                    climb.getLeftTriggerAxis() - //LT: pivot forwards
+                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
+                ),
+                () -> (
+                    climb.getRightTriggerAxis() - //RT: pivot forwards
+                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
                 )
             )
         );
