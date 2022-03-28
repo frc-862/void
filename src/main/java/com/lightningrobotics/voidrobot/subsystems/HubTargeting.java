@@ -315,7 +315,7 @@ public class HubTargeting extends SubsystemBase {
 		var realY = rotateY(relativeX, relativeY, lastKnownHeading);
 	
 		// extract back to a distance and angle
-		var processedDistance = lastKnownDistance - realY;
+		var processedDistance = Math.sqrt(Math.pow((lastKnownDistance - relativeX), 2) + Math.pow(relativeX, 2));
 		var turretTarget = (lastKnownHeading) + (Math.toDegrees(Math.atan2(realX,(lastKnownDistance-realY)))-(changeInRotation));
 			
 		hubDistance = processedDistance;
