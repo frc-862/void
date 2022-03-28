@@ -64,6 +64,7 @@ public class AutonVisionShooting extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
+		// TODO indexer.stop();
 		shooter.setRPM(4000);
 		hood.setAngle(0.5);
 		targeting.zeroBias();
