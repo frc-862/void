@@ -30,6 +30,6 @@ private final Indexer indexer;
 
     @Override
     public boolean isFinished() {
-        return indexer.getColorSensor().getProximity() > 350; // return indexer.getColorSensorOutputs() != 0;
+        return indexer.getColorSensor().getProximity() > 350; // indexer.getColorSensor().getProximity() > 350 && indexer.getBallCount = 2;
     }
 }

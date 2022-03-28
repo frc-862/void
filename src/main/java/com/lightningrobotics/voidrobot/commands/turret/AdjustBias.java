@@ -32,10 +32,10 @@ public class AdjustBias extends CommandBase {
 				targeting.adjustBiasDistance(-0.05);
 			break;
 			case 270: 
-				targeting.adjustBiasAngle(-0.05);
+				targeting.adjustBiasAngle(0.05);
 			break;
 			case 90: 
-				targeting.adjustBiasAngle(0.05);
+				targeting.adjustBiasAngle(-0.05);
 			break;
 		}
 

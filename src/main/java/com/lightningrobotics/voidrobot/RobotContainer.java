@@ -1,5 +1,7 @@
 package com.lightningrobotics.voidrobot;
 
+import java.util.Arrays;
+
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
@@ -23,16 +25,19 @@ import com.lightningrobotics.voidrobot.subsystems.*;
 import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
-	public static final boolean TESTING = false;
+	public static final boolean TESTING = true;
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
@@ -55,7 +60,7 @@ public class RobotContainer extends LightningContainer {
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
+	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -65,8 +70,8 @@ public class RobotContainer extends LightningContainer {
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
 			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
-			Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+			// Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+            Autonomous.register("5 Ball Terminal Vision", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();
@@ -105,8 +110,8 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-	    // shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
+        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
         climber.setDefaultCommand(
             new runClimb(
                 climber,
@@ -166,7 +171,14 @@ public class RobotContainer extends LightningContainer {
 	private void registerTestPaths() {
 		try {
 			Autonomous.register("1 meter", 
-			(new Path("1Meter.path", false)).getCommand(drivetrain));
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> System.out.println("One Meter Forward Yay!")),
+                    new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0)), 
+                                        new Pose2d(1d, 0d, Rotation2d.fromDegrees(0)))).getCommand(drivetrain),
+                    new InstantCommand(() -> System.out.println("Did We Move One Meter?"))
+                )
+                
+            );
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
