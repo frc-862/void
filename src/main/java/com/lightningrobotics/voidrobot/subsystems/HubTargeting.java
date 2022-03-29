@@ -173,7 +173,7 @@ public class HubTargeting extends SubsystemBase {
 		filterDistance();
 
 		// Account for robot motion
-		filterRobotMotion();
+		// filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();

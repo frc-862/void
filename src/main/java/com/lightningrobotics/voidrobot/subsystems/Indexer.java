@@ -147,6 +147,10 @@ public class Indexer extends SubsystemBase {
 	public void initializeBallsHeld() {
 		ballCount = 1;
 	}
+     
+    public void setBallCount(int ballCount) {
+        this.ballCount = ballCount;
+    }
 
     public void resetBallCount() {
         ballCount = 0;

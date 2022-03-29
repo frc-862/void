@@ -21,7 +21,6 @@ public class AutonVisionShooting extends CommandBase {
 	private double distanceBias;
 	private double RPMBias;
 
-
 	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, double angleBias, double distanceBias, double RPMBias) {
 		this.shooter = shooter;
 		this.indexer = indexer;
@@ -64,7 +63,7 @@ public class AutonVisionShooting extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		// TODO indexer.stop();
+		indexer.stop();
 		shooter.setRPM(4000);
 		hood.setAngle(0.5);
 		targeting.zeroBias();

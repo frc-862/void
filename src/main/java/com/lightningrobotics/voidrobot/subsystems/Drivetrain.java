@@ -64,13 +64,6 @@ public class Drivetrain extends DifferentialDrivetrain {
 			rightPositionSupplier
         );
         this.imu = imu;
-
-
-        this.withEachMotor((m) -> {
-            WPI_TalonFX motor = (WPI_TalonFX)m;
-            motor.setNeutralMode(NeutralMode.Coast);   
-            motor.configOpenloopRamp(0.15);
-        });
     
         intitLogging();
 
@@ -113,10 +106,27 @@ public class Drivetrain extends DifferentialDrivetrain {
         SmartDashboard.putNumber("currentVelocity", currentVelocity);
         SmartDashboard.putNumber("rot thigy", rot);
 
+        setMotorCoastMode();
 
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
         SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
         SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
+    }
+
+    public void setMotorBreakMode() {
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Brake);   
+            motor.configOpenloopRamp(0.15);
+        });
+    } 
+
+    public void setMotorCoastMode() {
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Coast);   
+            motor.configOpenloopRamp(0.15);
+        });
     }
 
     public double getCurrentVelocity() {

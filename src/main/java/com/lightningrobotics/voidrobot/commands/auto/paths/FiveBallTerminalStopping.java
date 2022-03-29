@@ -4,6 +4,7 @@ import javax.sound.midi.MidiEvent;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
@@ -32,50 +33,50 @@ public class FiveBallTerminalStopping extends ParallelCommandGroup {
 			new InstantCommand(() -> targeting.setState(0)),
 			new AimTurret(turret, targeting),
 			new AutonIntake(intake),
+			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
+				new InstantCommand(drivetrain::setMotorBreakMode),
 
 				// first shot
 				new ParallelDeadlineGroup(
 					new TimedCommand(start5Ball.getCommand(drivetrain), start5Ball.getDuration(drivetrain) - 0.7d),
 					new SequentialCommandGroup(
-						new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0.2d, 200d),
+						new AutonVisionShooting(shooter, hood, indexer, targeting, 3d, 0.2d, 200d),
 						new InstantCommand(() -> targeting.setState(1)),
 						new TimedCommand(new AutonIndexeCargo(indexer, 2), start5Ball.getDuration(drivetrain))
 					)
 				),
+				new InstantCommand(drivetrain::stop),
 
 				// balls 2 and 3
 				new InstantCommand(() -> targeting.setState(2)),
-				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d),
+				new TimedCommand(new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d), 2),
 
 				// drives to collect 4 and 5
 				new InstantCommand(() -> targeting.setState(3)),
-				new ParallelRaceGroup(
+				new ParallelDeadlineGroup (
 					new SequentialCommandGroup(
-						middle5Ball.getCommand(drivetrain, 4d, 1d),
-						new InstantCommand(() -> targeting.setState(4))
+						new TimedCommand(new AutonIndexeCargo(indexer, 2), middle5Ball.getDuration(drivetrain) + 0.5),
+						new InstantCommand(() -> targeting.setState(5))
 					),
 					new SequentialCommandGroup(
-						new TimedCommand(new AutonIndexeCargo(indexer, 2), middle5Ball.getDuration(drivetrain)),
-						new InstantCommand(() -> targeting.setState(5))
+						middle5Ball.getCommand(drivetrain, 4d, 2d),
+						new InstantCommand(() -> targeting.setState(4))
 					)
 				),
 
 				// drives to shoot 4 and 5
 				new InstantCommand(() -> targeting.setState(6)),
-				end5Ball.getCommand(drivetrain, 4d, 1d),
+				end5Ball.getCommand(drivetrain, 5d, 2.5d),
+				new InstantCommand(() -> indexer.setBallCount(2)),
+				new InstantCommand(drivetrain::setMotorCoastMode),
 				
 				// shoots 4 and 5
 				new InstantCommand(() -> targeting.setState(7)),
 				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d)
 
-
-
-				// middle5Ball.getCommand(drivetrain, 5, 1.5),
-				// end5Ball.getCommand(drivetrain, 7, 1.5),
-				// oneMeter.getCommand(drivetrain, 0.1, 0.1)
 			)
 		
 		);
