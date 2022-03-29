@@ -4,7 +4,14 @@
 
 package com.lightningrobotics.voidrobot.commands.climber;
 
+import java.util.function.BooleanSupplier;
+
 import com.lightningrobotics.common.command.core.WaitCommand;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsRelease;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 
@@ -18,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 public class NextRung extends CommandBase {
     Climber climber;
     boolean toEnd = false;
+    BooleanSupplier cancelButton;
 
     private enum currentRung {
         mid,
@@ -26,8 +34,9 @@ public class NextRung extends CommandBase {
         climbing
     }
 
-    public NextRung(Climber climber) {
+    public NextRung(Climber climber, BooleanSupplier cancelButton) {
         this.climber = climber;
+        this.cancelButton = cancelButton;
 
         addRequirements(climber);
     }
@@ -38,40 +47,27 @@ public class NextRung extends CommandBase {
         new SequentialCommandGroup(
             // command starts when the passive hooks are engaged on a bar
 
-            new InstantCommand(climber::toggleManual),
-             
-            new ParallelCommandGroup(
-                new InstantCommand(climber::pivotToReach),
-                new InstantCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT, 0))
-            ),
+            new InstantCommand(climber::toggleManual, climber),
 
-            new WaitUntilCommand(climber::onTarget),
+            new ParallelCommandGroup(
+                new PivotToReach(climber),
+                new ArmsToReach(climber, 0)
+            ),
 
             //new InstantCommand(climber::pivotToHold).withTimeout(0.25), //make sure we're engaged before we start pulling up
 
-            new InstantCommand(climber::pivotToHold),
+            new PivotToHold(climber),
 
-            new WaitUntilCommand(climber::pivotOnTarget),
+            new ArmsEngageHooks(climber, 1),
 
-            new InstantCommand(() -> climber.setArmsTarget(Constants.TRIGGER_HEIGHT, 1)),
-
-            new WaitUntilCommand(climber::armsOnTarget),
-
-            new InstantCommand(() -> climber.setArmsTarget(Constants.HOLD_HEIGHT, 0)),
-
-            new WaitUntilCommand(climber::armsOnTarget),
+            new ArmsRelease(climber, 0),
 
             new InstantCommand(() -> toEnd = true)
-        
         ).schedule();
 
         //repeat for each rung
     }
 
-    @Override
-    public void execute() {
-        
-    }
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
@@ -83,6 +79,6 @@ public class NextRung extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return toEnd;
+        return toEnd | cancelButton.getAsBoolean();
     }
 }

@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class runClimb extends CommandBase {
-    
+public class ManualClimb extends CommandBase {
+
     public final Climber climber;
 
     private DoubleSupplier leftClimbPower;
@@ -20,7 +20,7 @@ public class runClimb extends CommandBase {
 
     private boolean zeroBool = true;
 
-    public runClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
+    public ManualClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
         this.climber = climber;
         this.leftClimbPower = leftClimbPower;
         this.rightClimbPower = rightClimbPower;
@@ -42,7 +42,6 @@ public class runClimb extends CommandBase {
         }
 
         // climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
-       
     }
 
     @Override

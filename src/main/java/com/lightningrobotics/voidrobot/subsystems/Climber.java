@@ -145,7 +145,7 @@ public class Climber extends SubsystemBase {
 	 */
 	public void setArmsTarget(double armTarget, int climbMode) {
 		System.out.println("setting arm target _______________________________------");
-		this.armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
+		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
 		rightArm.selectProfileSlot(climbMode, climbMode);
 	}
 

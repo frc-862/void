@@ -14,7 +14,9 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminalVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.NextRung;
-import com.lightningrobotics.voidrobot.commands.climber.runClimb;
+import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
@@ -34,7 +36,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.*;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
@@ -103,9 +104,9 @@ public class RobotContainer extends LightningContainer {
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
-        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new InstantCommand(climber::pivotToHold));
-        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new InstantCommand(climber::pivotToReach));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenPressed(new NextRung(climber), false);
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new PivotToHold(climber));
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new PivotToReach(climber));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber, () -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
     }
 
@@ -117,7 +118,7 @@ public class RobotContainer extends LightningContainer {
 	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
         climber.setDefaultCommand(
-            new runClimb(
+            new ManualClimb(
                 climber,
                 () -> (
                     ((-1*climb.getLeftY()) + 
