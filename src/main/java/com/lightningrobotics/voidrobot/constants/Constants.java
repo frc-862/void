@@ -117,10 +117,10 @@ public final class Constants {
         {
 			put(-135d, 150d);
 			put(-90d, 150d);
-			put(-45d, 150d);
+			put(-45d, 250d);
 			put(-15d, 0d);
 			put(15d, 0d);
-			put(45d, 150d);
+			put(45d, 250d);
 			put(90d, 150d);
 			put(135d, 150d);
         }

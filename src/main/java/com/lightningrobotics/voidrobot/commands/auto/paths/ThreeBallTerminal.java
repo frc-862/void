@@ -34,7 +34,7 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 					new SequentialCommandGroup(
 						new AutonShootCargo(shooter, hood, indexer, turret, targeting, 4000d, 0d, 20d),
 						new ParallelDeadlineGroup(
-							new AutonIndexeCargo(indexer),
+							// new AutonIndexeCargo(indexer),
 							new AimTurret(turret, targeting)
 						)
 					)
@@ -49,8 +49,8 @@ public class ThreeBallTerminal extends ParallelCommandGroup {
 						new TimedCommand(new AutonShootCargoVision(shooter, hood, indexer, targeting), 2),
 
 						new ParallelDeadlineGroup(
-							end3Ball.getCommand(drivetrain),
-							new AutonIndexeCargo(indexer)
+							end3Ball.getCommand(drivetrain)
+							// new AutonIndexeCargo(indexer)
 						),
 						
 						new InstantCommand(() -> System.out.println("about to shoot ball three ----------------------------------------")),

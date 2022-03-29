@@ -8,7 +8,7 @@ import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
-import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminalVision;
+import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminalStopping;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminalVision;
@@ -74,7 +74,7 @@ public class RobotContainer extends LightningContainer {
 			Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
 			Autonomous.register("3 Ball Terminal Vision", new ThreeBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
 			// Autonomous.register("3 Ball Terminal", new ThreeBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
-            Autonomous.register("5 Ball Terminal Vision", new FiveBallTerminalVision(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+            Autonomous.register("5 Ball Terminal Vision", new FiveBallTerminalStopping(drivetrain, indexer, intake, shooter, hood, turret, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();

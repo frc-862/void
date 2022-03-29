@@ -21,9 +21,6 @@ public class AutonVisionShooting extends CommandBase {
 	private double distanceBias;
 	private double RPMBias;
 
-	private boolean shooting = false;
-
-
 	public AutonVisionShooting(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, double angleBias, double distanceBias, double RPMBias) {
 		this.shooter = shooter;
 		this.indexer = indexer;
@@ -58,32 +55,23 @@ public class AutonVisionShooting extends CommandBase {
 			targeting.adjustBiasAngle(angleBias);
 		}
 
-		if ((targeting.onTarget()) || shooting) {
+		if ((targeting.onTarget())) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-			shooting = true;
-		}
-		else if (indexer.getColorSensor().getProximity() < 350) {
-			indexer.setPower(0.5d);
-		} else {
-			indexer.stop();
 		}
 
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		// shooter.coast();
-		// indexer.stop();
-		// hood.stop();
-		// turret.stop();
-		shooting = false;
+		indexer.stop();
+		shooter.setRPM(4000);
+		hood.setAngle(0.5);
 		targeting.zeroBias();
-		
 	}
 
 	@Override
 	public boolean isFinished() {
-		return indexer.getEjectedBall();
+		return indexer.getBallCount() == 0;
 	}
 	
 }

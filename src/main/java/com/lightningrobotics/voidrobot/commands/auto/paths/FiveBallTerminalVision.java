@@ -38,9 +38,9 @@ public class FiveBallTerminalVision extends ParallelCommandGroup {
 						new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0.2d, 200d),
 
 						new AutonVisionShooting(shooter, hood, indexer, targeting, 10d, 1d, 0d), 
-						new AutonVisionShooting(shooter, hood, indexer, targeting, 10d, 3d, 0d),
+						new AutonVisionShooting(shooter, hood, indexer, targeting, 10d, 3d, 0d)
 
-						new AutonIndexeCargo(indexer)
+						// new AutonIndexeCargo(indexer)
 					)
 				),
 
