@@ -11,6 +11,8 @@ import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +21,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Drivetrain extends DifferentialDrivetrain {
 
     private LightningIMU imu;
+
+    private double currentVelocity;
+
+    private Pose2d pose = new Pose2d();
+    private Pose2d prevPose = new Pose2d();
+
+    private Rotation2d heading = Rotation2d.fromDegrees(0);
+    private Rotation2d prevHeading = Rotation2d.fromDegrees(0);
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -34,13 +44,13 @@ public class Drivetrain extends DifferentialDrivetrain {
 
 	// This function only deals wit ticks to a distance, so the *10 handles the per second operation needed
 	private static final DoubleSupplier leftVelocitySupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier rightVelocitySupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[1]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() * 10d), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier leftPositionSupplier =  
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
 	private static final DoubleSupplier rightPositionSupplier = 
-		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[1]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
+		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
     
     public Drivetrain(LightningIMU imu) {
         super(
@@ -80,13 +90,38 @@ public class Drivetrain extends DifferentialDrivetrain {
         DataLogger.addDataElement("heading", () -> this.getPose().getRotation().getDegrees());
         DataLogger.addDataElement("poseX", () -> this.getPose().getX());
         DataLogger.addDataElement("poseY", () -> this.getPose().getY());
+
+        // Moveing while shooting stuff
     }
 
     @Override
     public void periodic() {
         super.periodic();
+
+        pose = this.getPose();
+        heading = this.getPose().getRotation();
+        
+        var deltaX = pose.getX() - prevPose.getX();
+        var deltaY = pose.getY() - prevPose.getY(); 
+
+        currentVelocity = (Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)));
+        var rot = Math.atan2(deltaY, deltaX);  
+        
+        prevPose = pose;
+        prevHeading = heading; 
+
+        SmartDashboard.putNumber("currentVelocity", currentVelocity);
+        SmartDashboard.putNumber("rot thigy", rot);
+
+
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
         SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
         SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
     }
+
+    public double getCurrentVelocity() {
+        return -currentVelocity; // this is negative b/c we want it shooter-forward
+    }
+
+
 }
