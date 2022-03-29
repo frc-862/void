@@ -87,6 +87,9 @@ public class HubTargeting extends SubsystemBase {
 	private double targetFlywheelRPM;
 	private double targetHoodAngle;
 
+	// Command State
+	private int state = 0;
+
 	// Main Output External Access Functions
 	
 	public double getTargetTurretAngle() {
@@ -127,6 +130,14 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
+	public void setState(int state) {
+		this.state = state;
+	}
+
+	public int getState() {
+		return state;
+	}
+
 	// Set Up Hub Targeting
   	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<DrivetrainSpeed> currentSpeedSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
 
@@ -162,7 +173,7 @@ public class HubTargeting extends SubsystemBase {
 		filterDistance();
 
 		// Account for robot motion
-		filterRobotMotion();
+		// filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -202,6 +213,8 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("motionBiasAngle", () -> motionBiasAngle);
 		DataLogger.addDataElement("motionBiasDistance", () -> motionAdjustedDistance);
 		DataLogger.addDataElement("deltaDistance", () -> deltaDistance);
+
+		DataLogger.addDataElement("state", this::getState);
 
 	}
 
