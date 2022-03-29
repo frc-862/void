@@ -39,6 +39,8 @@ public class Climber extends SubsystemBase {
 	private boolean isSettled = false;
 	private boolean checkIfSettled = true;
 
+	private boolean doManual = false;
+
 	private enum pivotPosition {
 		hold,
 		reach,
@@ -59,11 +61,12 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry isSettledEntry = climbTab.add("is settled", false).getEntry();
 	private NetworkTableEntry reachSensorEntry = climbTab.add("reach", false).getEntry();
 	private NetworkTableEntry holdSensorEntry = climbTab.add("hold", false).getEntry();
+	private NetworkTableEntry climbPower = climbTab.add("climb power", 0).getEntry();
 
 	private NetworkTableEntry kP_load = climbTab.add("kP with load", 0.07).getEntry();
 	private NetworkTableEntry kI_load = climbTab.add("kI with load", 0).getEntry();
 	private NetworkTableEntry kD_load = climbTab.add("kD with load", 0).getEntry();
-	private NetworkTableEntry kF_load = climbTab.add("kF with load", 0).getEntry();
+	private NetworkTableEntry kF_load = climbTab.add("kF with load", 0.15).getEntry();
 	
 	private NetworkTableEntry kP_noLoad = climbTab.add("kP without load", 0.07).getEntry();
 	// private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
@@ -113,11 +116,12 @@ public class Climber extends SubsystemBase {
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {
-		leftArmPower = leftPower;
-		rightArmPower = rightPower;
+		leftArmPower = leftPower*climbPower.getDouble(0);
+		rightArmPower = rightPower*climbPower.getDouble(0);
 	}
 
 	private void moveArms() {
+		// if(doManual) {
 		if(useManual.getBoolean(false)) {
 			leftArm.set(TalonFXControlMode.PercentOutput, leftArmPower);
 			rightArm.set(TalonFXControlMode.PercentOutput, rightArmPower);
@@ -258,8 +262,16 @@ public class Climber extends SubsystemBase {
 			isSettled = false;
 		}
 
-		// isSettledEntry.setBoolean(isSettled);
+		isSettledEntry.setBoolean(isSettled);
 
+	}
+
+	public void toggleManual() {
+		doManual = !doManual;
+	}
+
+	public boolean getManual() {
+		return doManual;
 	}
 
 	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad) {//, double kI_noLoad, double kD_noLoad) {
@@ -286,7 +298,7 @@ public class Climber extends SubsystemBase {
 	public void periodic() {
 		//temporary, while we're testing
 		
-		// setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
+		setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
 
 		if(resetClimb.getBoolean(false)) {
 			resetArmEncoders();
@@ -301,8 +313,6 @@ public class Climber extends SubsystemBase {
 
 		reachSensorEntry.setBoolean(getLeftReachSensor() && getRightReachSensor());
 		holdSensorEntry.setBoolean(getLeftHoldSensor() && getRightHoldSensor());
-
-		isSettledEntry.setBoolean(onTarget()); //TODO: not
 
 		//end of temporary, while we're testing
 		

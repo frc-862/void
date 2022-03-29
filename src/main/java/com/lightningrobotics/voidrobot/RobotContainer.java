@@ -120,14 +120,14 @@ public class RobotContainer extends LightningContainer {
                     // If the d-pad up is pressed, add 1 to total power
                     (climb.getPOV() == 0 ? 1 : 0) +
                     // If the d-pad down is pressed, add -1 to total power
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                    (climb.getPOV() == 180 ? -1 : 0)) * 1
                 ),
                 () -> (
                     ((-1*climb.getRightY()) +
                     // same thing as above, if it's up add 1
                     (climb.getPOV() == 0 ? 1 : 0) +
                     // if it's down add -1
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
+                    (climb.getPOV() == 180 ? -1 : 0)) * 1
                 ),
                 () -> (
                     climb.getLeftTriggerAxis() - //LT: pivot forwards

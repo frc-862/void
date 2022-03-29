@@ -4,6 +4,9 @@ import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class runClimb extends CommandBase {

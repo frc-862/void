@@ -38,7 +38,8 @@ public class NextRung extends CommandBase {
         new SequentialCommandGroup(
             // command starts when the passive hooks are engaged on a bar
 
-            // 
+            new InstantCommand(climber::toggleManual),
+             
             new ParallelCommandGroup(
                 new InstantCommand(climber::pivotToReach),
                 new InstantCommand(() -> climber.setArmsTarget(Constants.REACH_HEIGHT, 0))
@@ -76,6 +77,7 @@ public class NextRung extends CommandBase {
     public void end(boolean interrupted) {
         System.out.println("STOPPED _______________________________");
         climber.stop();
+        climber.toggleManual();
     }
 
     // Returns true when the command should end.
