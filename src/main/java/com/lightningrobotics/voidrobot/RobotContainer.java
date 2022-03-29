@@ -14,6 +14,7 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.ThreeBallTerminalVision;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.NextRung;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
 import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
@@ -106,7 +107,9 @@ public class RobotContainer extends LightningContainer {
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
         (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new PivotToHold(climber));
         (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new PivotToReach(climber));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber, () -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
+
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenPressed(new ArmsEngageHooks(climber));
 
     }
 

@@ -13,7 +13,6 @@ public class PivotToReach extends CommandBase {
 
     public PivotToReach(Climber climber) {
         this.climber = climber;
-        addRequirements(climber);
     }
 
     @Override

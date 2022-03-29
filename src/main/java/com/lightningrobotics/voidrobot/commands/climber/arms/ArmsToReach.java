@@ -11,17 +11,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ArmsToReach extends CommandBase {
     Climber climber;
-    int climbMode;
 
-    public ArmsToReach(Climber climber, int climbMode) {
+    public ArmsToReach(Climber climber) {
         this.climber = climber;
-        this.climbMode = climbMode;
         addRequirements(climber);
     }
 
     @Override
     public void initialize() {
-        climber.setArmsTarget(Constants.REACH_HEIGHT, climbMode);
+        climber.setArmsTarget(Constants.REACH_HEIGHT);
     }
 
     @Override

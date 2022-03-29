@@ -21,7 +21,7 @@ public class ArmsRelease extends CommandBase {
 
     @Override
     public void initialize() {
-        climber.setArmsTarget(Constants.HOLD_HEIGHT, climbMode);
+        climber.setArmsTarget(Constants.HOLD_HEIGHT);
     }
 
     @Override

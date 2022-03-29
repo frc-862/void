@@ -31,6 +31,8 @@ public class Climber extends SubsystemBase {
 	private double armsTarget = 0;
 	private double leftArmPower;
 	private double rightArmPower;
+	private double autoLeftArmPower;
+	private double autoRightArmPower;
 
 	private double pivotPower = 0;
 
@@ -125,12 +127,31 @@ public class Climber extends SubsystemBase {
 		if(useManual.getBoolean(false)) {
 			leftArm.set(TalonFXControlMode.PercentOutput, leftArmPower);
 			rightArm.set(TalonFXControlMode.PercentOutput, rightArmPower);
+
+			armsTarget = 0;
 		} else {
-			leftArm.set(TalonFXControlMode.Position, armsTarget);
-			rightArm.set(TalonFXControlMode.Position, armsTarget);
+			// leftArm.set(TalonFXControlMode.Position, armsTarget);
+			// rightArm.set(TalonFXControlMode.Position, armsTarget);
+			// leftArm.set(TalonFXControlMode.MotionMagic, armsTarget);
+			// rightArm.set(TalonFXControlMode.MotionMagic, armsTarget);
+
+			if(armsTarget != 0) {
+				leftArm.set(TalonFXControlMode.Position, armsTarget);
+				rightArm.set(TalonFXControlMode.Position, armsTarget);
+			} else {
+				leftArm.set(TalonFXControlMode.PercentOutput, autoLeftArmPower);
+				rightArm.set(TalonFXControlMode.PercentOutput, autoRightArmPower);
+			}
 		}
 	}
  
+	public void setClimbPowerManual(double leftPower, double rightPower) {
+		armsTarget = 0;
+
+		autoLeftArmPower = leftPower;
+		autoRightArmPower = rightPower;
+	}
+
 	public void setPivotPower(double leftPower, double rightPower) {
 		//only set one as the left motor is set to follow the right
 		rightPivot.set(TalonSRXControlMode.PercentOutput, rightPower);
@@ -143,10 +164,9 @@ public class Climber extends SubsystemBase {
 	 * @param armTarget desired set point, in encoder ticks
 	 * @param climbMode 0 for unloaded PID, 1 for loaded
 	 */
-	public void setArmsTarget(double armTarget, int climbMode) {
+	public void setArmsTarget(double armTarget) {
 		System.out.println("setting arm target _______________________________------");
 		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
-		rightArm.selectProfileSlot(climbMode, climbMode);
 	}
 
 	/**
@@ -170,6 +190,14 @@ public class Climber extends SubsystemBase {
 		rightArm.setSelectedSensorPosition(0);
 	}
 
+	public double getleftEncoder() {
+		return leftArm.getSelectedSensorPosition();
+	}
+
+
+	public double getRightEncoder() {
+		return rightArm.getSelectedSensorPosition();
+	}
 	/**
 	 * @return true if the pivot is at its far limit from the collector
 	 */
@@ -298,7 +326,7 @@ public class Climber extends SubsystemBase {
 	public void periodic() {
 		//temporary, while we're testing
 		
-		setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
+		// setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
 
 		if(resetClimb.getBoolean(false)) {
 			resetArmEncoders();
