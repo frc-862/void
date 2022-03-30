@@ -173,7 +173,7 @@ public class HubTargeting extends SubsystemBase {
 		filterDistance();
 
 		// Account for robot motion
-		// filterRobotMotion();
+		filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -394,6 +394,9 @@ public class HubTargeting extends SubsystemBase {
 		return hubDistance > 0 && visionTargetDetectedEntry.getDouble(0) == 1;
 	}
 
+	public double getHubDistance(){
+		return hubDistance;
+	}
 	// Bias Util
 
 	public void adjustBiasDistance(double delta) {
