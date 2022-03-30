@@ -24,7 +24,7 @@ public class ArmsToReach extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        //climber.stopArms(); //still not sure if this should be here...
+        climber.stopArms();
     }
 
     @Override

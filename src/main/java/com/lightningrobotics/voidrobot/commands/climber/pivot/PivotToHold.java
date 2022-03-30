@@ -13,7 +13,7 @@ public class PivotToHold extends CommandBase {
 
     public PivotToHold(Climber climber) {
         this.climber = climber;
-        addRequirements(climber);
+        //addRequirements(climber); //TODO: make a pivot subsystem
     }
 
     @Override

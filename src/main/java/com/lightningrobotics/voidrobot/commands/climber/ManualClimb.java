@@ -4,9 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ManualClimb extends CommandBase {
@@ -15,38 +13,26 @@ public class ManualClimb extends CommandBase {
 
     private DoubleSupplier leftClimbPower;
     private DoubleSupplier rightClimbPower;
-    private DoubleSupplier rightPivotPower;
-    private DoubleSupplier leftPivotPower;
 
     private boolean zeroBool = true;
 
-    public ManualClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower, DoubleSupplier leftPivotPower, DoubleSupplier rightPivotPower) {
+    public ManualClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower) {
         this.climber = climber;
         this.leftClimbPower = leftClimbPower;
         this.rightClimbPower = rightClimbPower;
-        this.rightPivotPower = rightPivotPower;
-        this.leftPivotPower = leftPivotPower;
 
         addRequirements(climber);
     }
 
     @Override
     public void execute() {
-        climber.setClimbPower(leftClimbPower.getAsDouble(), rightClimbPower.getAsDouble());
-        if(rightPivotPower.getAsDouble() != 0 || leftPivotPower.getAsDouble() !=0) {
-            // climber.setPivotPower(rightPivotPower.getAsDouble(), leftPivotPower.getAsDouble());
-            zeroBool = true;
-        } else if(zeroBool) {
-            // climber.setPivotPower(0, 0);
-            zeroBool = false;
-        }
-
-        // climber.setPivotPower(leftPivotPower.getAsDouble(), rightPivotPower.getAsDouble());
+        climber.setClimbPower(
+            MathUtil.applyDeadband(leftClimbPower.getAsDouble(), 0.1),
+            MathUtil.applyDeadband(rightClimbPower.getAsDouble(), 0.1));
     }
 
     @Override
     public void end(boolean interrupted) {
-        super.end(interrupted);
         climber.stop();
     }
 

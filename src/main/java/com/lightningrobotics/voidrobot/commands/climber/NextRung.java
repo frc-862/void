@@ -22,39 +22,16 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
-public class NextRung extends CommandBase {
+public class NextRung extends SequentialCommandGroup {
     Climber climber;
     boolean toEnd = false;
-    BooleanSupplier cancelButton;
-
-    private enum currentRung {
-        mid,
-        high,
-        traversal,
-        climbing
-    }
 
     public NextRung(Climber climber) {
-        this.climber = climber;
-        this.cancelButton = cancelButton;
-
-        addRequirements(climber);
-    }
-
-    // Called when the command is initially scheduled.
-    @Override
-    public void initialize() {
-        new SequentialCommandGroup(
-            // command starts when the passive hooks are engaged on a bar
-
-            new InstantCommand(climber::toggleManual, climber),
-
+        super(
             new ParallelCommandGroup(
                 new PivotToReach(climber),
-
                 new SequentialCommandGroup(
                     new WaitCommand(1),
-
                     new ArmsToReach(climber)
                 )
             ),
@@ -63,33 +40,21 @@ public class NextRung extends CommandBase {
 
             new ParallelCommandGroup(
                 new PivotToHold(climber),
-
                 new SequentialCommandGroup (
                     new WaitCommand(0.25),
-
                     new ArmsEngageHooks(climber)
                 )
-            ),
-            // ),
-            // new ArmsRelease(climber, 0),
-
-            new InstantCommand(() -> toEnd = true)
-        ).schedule();
-
-        //repeat for each rung
+            ) 
+        );
+        this.climber = climber;
+        addRequirements(climber);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        super.end(interrupted);
         System.out.println("STOPPED _______________________________");
         climber.stop();
-        climber.toggleManual();
-    }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        return toEnd;
     }
 }

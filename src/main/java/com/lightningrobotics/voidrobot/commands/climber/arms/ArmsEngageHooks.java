@@ -4,7 +4,6 @@
 
 package com.lightningrobotics.voidrobot.commands.climber.arms;
 
-import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,39 +14,36 @@ public class ArmsEngageHooks extends CommandBase {
     double leftPower;
     double rightPower;
 
-    double thing1 = 10000; //temporary
-    double thing2 = -1; //also temporary
+    double staticHookHeight = 10000; //temporary
+    double armPower = -1; //also temporary
 
     boolean toEnd = false;
 
     public ArmsEngageHooks(Climber climber) {//, int climbMode) {
         this.climber = climber;
-        // this.climbMode = climbMode;
-        // addRequirements(climber);
+        addRequirements(climber);
     }
 
     @Override
     public void initialize() {
-        // climber.setArmsTarget(Constants.TRIGGER_HEIGHT, climbMode);
-
-        climber.setClimbPower(thing2, thing2);
+        climber.setClimbPower(armPower, armPower);
     }
 
     @Override
     public void execute() {
-        if(climber.getleftEncoder() <= thing1) {
+        if(climber.getleftEncoder() <= staticHookHeight) {
             leftPower = 0;
         } else {
-            leftPower = thing2;
+            leftPower = armPower;
         }
 
-        if(climber.getRightEncoder() <= thing1) {
+        if(climber.getRightEncoder() <= staticHookHeight) {
             rightPower = 0;
         } else {
-            rightPower = thing2;
+            rightPower = armPower;
         }
 
-        climber.setClimbPowerManual(leftPower, rightPower);
+        climber.setClimbPower(leftPower, rightPower);
     }
 
     @Override
@@ -57,6 +53,6 @@ public class ArmsEngageHooks extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return climber.getleftEncoder() <= thing1 && climber.getRightEncoder() <= thing1;
+        return climber.getleftEncoder() <= staticHookHeight && climber.getRightEncoder() <= staticHookHeight;
     }
 }

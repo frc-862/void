@@ -29,20 +29,12 @@ public class Climber extends SubsystemBase {
 
 	//initialize set point for arm height
 	private double armsTarget = 0;
-	private double leftArmPower;
-	private double rightArmPower;
-	private double autoLeftArmPower;
-	private double autoRightArmPower;
-
 	private double pivotPower = 0;
 
 	private double startTime;
 
 	private boolean isSettled = false;
 	private boolean checkIfSettled = true;
-
-	private boolean doManual = false;
-
 	private enum pivotPosition {
 		hold,
 		reach,
@@ -53,26 +45,10 @@ public class Climber extends SubsystemBase {
 
 	//pid tuning stuff, will be removed later
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
-	private NetworkTableEntry resetClimb = climbTab.add("reset climb", false).getEntry();
-	private NetworkTableEntry useManual = climbTab.add("use manual", false).getEntry();
 	private NetworkTableEntry leftArmPos = climbTab.add("left arm", 100).getEntry();
 	private NetworkTableEntry rightArmPos = climbTab.add("right arm", 100).getEntry();
-	private NetworkTableEntry targetClimb = climbTab.add("target climb", 0).getEntry();
-	private NetworkTableEntry loaded = climbTab.add("has load", 0).getEntry();
 	private NetworkTableEntry gyroPitch = climbTab.add("pitch", 0).getEntry();
 	private NetworkTableEntry isSettledEntry = climbTab.add("is settled", false).getEntry();
-	private NetworkTableEntry reachSensorEntry = climbTab.add("reach", false).getEntry();
-	private NetworkTableEntry holdSensorEntry = climbTab.add("hold", false).getEntry();
-	private NetworkTableEntry climbPower = climbTab.add("climb power", 0).getEntry();
-
-	private NetworkTableEntry kP_load = climbTab.add("kP with load", 0.07).getEntry();
-	private NetworkTableEntry kI_load = climbTab.add("kI with load", 0).getEntry();
-	private NetworkTableEntry kD_load = climbTab.add("kD with load", 0).getEntry();
-	private NetworkTableEntry kF_load = climbTab.add("kF with load", 0.15).getEntry();
-	
-	private NetworkTableEntry kP_noLoad = climbTab.add("kP without load", 0.07).getEntry();
-	// private NetworkTableEntry kI_noLoad = climbTab.add("kI without load", 0).getEntry();
-	// private NetworkTableEntry kD_noLoad = climbTab.add("kD without load", 0).getEntry();
 	
   	public Climber(LightningIMU imu) {
 		// Sets the IDs of our arm motors
@@ -118,38 +94,8 @@ public class Climber extends SubsystemBase {
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {
-		leftArmPower = leftPower*climbPower.getDouble(0);
-		rightArmPower = rightPower*climbPower.getDouble(0);
-	}
-
-	private void moveArms() {
-		// if(doManual) {
-		if(useManual.getBoolean(false)) {
-			leftArm.set(TalonFXControlMode.PercentOutput, leftArmPower);
-			rightArm.set(TalonFXControlMode.PercentOutput, rightArmPower);
-
-			armsTarget = 0;
-		} else {
-			// leftArm.set(TalonFXControlMode.Position, armsTarget);
-			// rightArm.set(TalonFXControlMode.Position, armsTarget);
-			// leftArm.set(TalonFXControlMode.MotionMagic, armsTarget);
-			// rightArm.set(TalonFXControlMode.MotionMagic, armsTarget);
-
-			if(armsTarget != 0) {
-				leftArm.set(TalonFXControlMode.Position, armsTarget);
-				rightArm.set(TalonFXControlMode.Position, armsTarget);
-			} else {
-				leftArm.set(TalonFXControlMode.PercentOutput, autoLeftArmPower);
-				rightArm.set(TalonFXControlMode.PercentOutput, autoRightArmPower);
-			}
-		}
-	}
- 
-	public void setClimbPowerManual(double leftPower, double rightPower) {
-		armsTarget = 0;
-
-		autoLeftArmPower = leftPower;
-		autoRightArmPower = rightPower;
+		leftArm.set(TalonFXControlMode.PercentOutput, leftPower);
+		rightArm.set(TalonFXControlMode.PercentOutput, rightPower);
 	}
 
 	public void setPivotPower(double leftPower, double rightPower) {
@@ -167,6 +113,8 @@ public class Climber extends SubsystemBase {
 	public void setArmsTarget(double armTarget) {
 		System.out.println("setting arm target _______________________________------");
 		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
+		leftArm.set(TalonFXControlMode.Position, armsTarget);
+		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}
 
 	/**
@@ -294,59 +242,32 @@ public class Climber extends SubsystemBase {
 
 	}
 
-	public void toggleManual() {
-		doManual = !doManual;
-	}
+	// private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad) {//, double kI_noLoad, double kD_noLoad) {
+	// 	leftArm.config_kP(0, kP_noLoad);
+	// 	// leftArm.config_kI(0, kI_noLoad);
+	// 	// leftArm.config_kD(0, kD_noLoad);
 
-	public boolean getManual() {
-		return doManual;
-	}
+	// 	rightArm.config_kP(0, kP_noLoad);
+	// 	// rightArm.config_kI(0, kI_noLoad);
+	// 	// rightArm.config_kD(0, kD_noLoad);
 
-	private void setArmPIDGains(double kP_load, double kI_load, double kD_load, double kF_load, double kP_noLoad) {//, double kI_noLoad, double kD_noLoad) {
-		leftArm.config_kP(0, kP_noLoad);
-		// leftArm.config_kI(0, kI_noLoad);
-		// leftArm.config_kD(0, kD_noLoad);
+	// 	leftArm.config_kP(1, kP_load);
+	// 	leftArm.config_kI(1, kI_load);
+	// 	leftArm.config_kD(1, kD_load);
+	// 	leftArm.config_kF(1, kF_load);
 
-		rightArm.config_kP(0, kP_noLoad);
-		// rightArm.config_kI(0, kI_noLoad);
-		// rightArm.config_kD(0, kD_noLoad);
-
-		leftArm.config_kP(1, kP_load);
-		leftArm.config_kI(1, kI_load);
-		leftArm.config_kD(1, kD_load);
-		leftArm.config_kF(1, kF_load);
-
-		rightArm.config_kP(1, kP_load);
-		rightArm.config_kI(1, kI_load);
-		rightArm.config_kD(1, kD_load);
-		rightArm.config_kF(1, kF_load);
-	}
+	// 	rightArm.config_kP(1, kP_load);
+	// 	rightArm.config_kI(1, kI_load);
+	// 	rightArm.config_kD(1, kD_load);
+	// 	rightArm.config_kF(1, kF_load);
+	// }
 
 	@Override
 	public void periodic() {
-		//temporary, while we're testing
-		
-		// setArmsTarget(targetClimb.getDouble(100), (int)loaded.getDouble(0));
-
-		if(resetClimb.getBoolean(false)) {
-			resetArmEncoders();
-		}
 
 		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
 		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
-
 		gyroPitch.setNumber(imu.getPitch().getDegrees());
-		
-		setArmPIDGains(kP_load.getDouble(0.07), kI_load.getDouble(0), kD_load.getDouble(0), kF_load.getDouble(0), kP_noLoad.getDouble(0.07));//, kI_noLoad.getDouble(0), kD_noLoad.getDouble(0));
-
-		reachSensorEntry.setBoolean(getLeftReachSensor() && getRightReachSensor());
-		holdSensorEntry.setBoolean(getLeftHoldSensor() && getRightHoldSensor());
-
-		//end of temporary, while we're testing
-		
-		moveArms();
-
-		checkIfSettled();
 
 		checkPivotState();
 	}
