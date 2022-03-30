@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.commands.auto.paths;
 
-import javax.sound.midi.MidiEvent;
-
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
@@ -9,17 +7,14 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
-import com.lightningrobotics.voidrobot.commands.auto.commands.AutonShootCargo;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class FiveBallTerminalStopping extends ParallelCommandGroup {
+public class FiveBallTerminal extends ParallelCommandGroup {
 
 
 	private static Path start5Ball = new Path("Start5Ball.path", false);
@@ -28,7 +23,7 @@ public class FiveBallTerminalStopping extends ParallelCommandGroup {
 
 	// private static Path oneMeter = new Path("1Meter.path", false);
 
-    public FiveBallTerminalStopping(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception {
+    public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception {
 		super(
 			new InstantCommand(() -> targeting.setState(0)),
 			new AimTurret(turret, targeting),
