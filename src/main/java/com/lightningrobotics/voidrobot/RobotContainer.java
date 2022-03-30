@@ -11,7 +11,12 @@ import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
-import com.lightningrobotics.voidrobot.commands.climber.runClimb;
+import com.lightningrobotics.voidrobot.commands.climber.NextRung;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
+import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
@@ -31,7 +36,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.*;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
@@ -39,7 +43,7 @@ public class RobotContainer extends LightningContainer {
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final Climber climber = new Climber();
+    private static final Climber climber = new Climber(imu);
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
@@ -47,7 +51,7 @@ public class RobotContainer extends LightningContainer {
 	private static final Intake intake = new Intake();
     private static final Hood hood = new Hood();
 	// private static final LEDs leds = new LEDs();
-	
+                                            
 	// Joysticks
 	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
@@ -98,6 +102,13 @@ public class RobotContainer extends LightningContainer {
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new PivotToHold(climber));
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new PivotToReach(climber));
+        (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
+        (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
+
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenPressed(new ArmsEngageHooks(climber));
 
     }
 
@@ -106,37 +117,10 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-	    //shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-        climber.setDefaultCommand(
-            new runClimb(
-                climber,
-                () -> (
-                    ((-1*climb.getLeftY()) + 
-                    // I know some people don't like these so I'll document it
-                    // If the d-pad up is pressed, add 1 to total power
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // If the d-pad down is pressed, add -1 to total power
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                () -> (
-                    ((-1*climb.getRightY()) +
-                    // same thing as above, if it's up add 1
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // if it's down add -1
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                //set left and right pivot powers
-                () -> (
-                    climb.getLeftTriggerAxis() - //LT: pivot forwards
-                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
-                ),
-                () -> (
-                    climb.getRightTriggerAxis() - //RT: pivot forwards
-                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
-                )
-            )
-        );
+	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
+        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+
+        climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> climb.getRightY()));
 	}
 
     @Override
@@ -156,9 +140,14 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void initializeDashboardCommands() { 
 		var tab = Shuffleboard.getTab("hood");
+
+        var climbTab = Shuffleboard.getTab("climber");
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+
+        climbTab.add(new InstantCommand(climber::resetArmEncoders));
+        
 	}
 	
     @Override
