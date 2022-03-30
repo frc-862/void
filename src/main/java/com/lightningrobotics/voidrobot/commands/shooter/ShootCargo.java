@@ -5,7 +5,9 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootCargo extends CommandBase {
@@ -26,14 +28,15 @@ public class ShootCargo extends CommandBase {
 
 	@Override
 	public void execute() {
+		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
 		
-		var rpm = targeting.getTargetFlywheelRPM();
-		var hoodAngle = targeting.getTargetHoodAngle();
+		var rpm = !isEnenmyBall ? targeting.getTargetFlywheelRPM() : Constants.EJECT_BALL_RPM;
+		var hoodAngle = !isEnenmyBall ? targeting.getTargetHoodAngle() : Constants.EJECT_BALL_HOOD_ANGLE;
 
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
 			
-		if(targeting.onTarget()) {
+		if((targeting.onTarget() && !isEnenmyBall) || isEnenmyBall) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
 		

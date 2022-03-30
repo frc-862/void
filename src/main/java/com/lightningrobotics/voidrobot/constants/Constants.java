@@ -68,8 +68,8 @@ public final class Constants {
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
-    public static final double RED_THRESHOLD = 0.4;
-    public static final double BLUE_THRESHOLD = 0.35;
+    public static final double RED_THRESHOLD = 0.45;
+    public static final double BLUE_THRESHOLD = 0.4;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
@@ -89,7 +89,7 @@ public final class Constants {
 	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
-	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+	public static final PIDFController HOOD_PID =  new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
     public static final double HOOD_ZERO_SPEED = -0.4d;
 

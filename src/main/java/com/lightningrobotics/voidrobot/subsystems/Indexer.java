@@ -84,6 +84,9 @@ public class Indexer extends SubsystemBase {
         SmartDashboard.putBoolean("lower", lower);
         SmartDashboard.putBoolean("lower prev", lowerPrev);
         SmartDashboard.putNumber("prox", indexerColorSensor.getProximity());
+        SmartDashboard.putNumber("Red", indexerColorSensor.getColor().red);
+        SmartDashboard.putNumber("Blue", indexerColorSensor.getColor().blue);
+        SmartDashboard.putNumber("Green", indexerColorSensor.getColor().green);
 
         collect1 = !lowerPrev && lower; //Rising edge 
         eject1 = !upper && upperPrev; //Falling edge
