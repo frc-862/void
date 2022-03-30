@@ -33,7 +33,7 @@ public class FiveBallTerminalStopping extends ParallelCommandGroup {
 			new InstantCommand(() -> targeting.setState(0)),
 			new AimTurret(turret, targeting),
 			new AutonIntake(intake),
-			// new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
@@ -45,7 +45,8 @@ public class FiveBallTerminalStopping extends ParallelCommandGroup {
 					new SequentialCommandGroup(
 						new AutonVisionShooting(shooter, hood, indexer, targeting, 3d, 0.2d, 200d),
 						new InstantCommand(() -> targeting.setState(1)),
-						new TimedCommand(new AutonIndexeCargo(indexer, 2), start5Ball.getDuration(drivetrain))
+						new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
+						new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))
 					)
 				),
 				new InstantCommand(drivetrain::stop),
