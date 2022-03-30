@@ -77,6 +77,8 @@ public class Climber extends SubsystemBase {
 		leftPivot.setInverted(false);
 		rightPivot.setInverted(true);
 
+		resetArmEncoders();
+
 		initLogging();
 
 		startTime = Timer.getFPGATimestamp();
