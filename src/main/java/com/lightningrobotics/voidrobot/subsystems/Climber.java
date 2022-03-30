@@ -78,6 +78,7 @@ public class Climber extends SubsystemBase {
 		rightPivot.setInverted(true);
 
 		resetArmEncoders();
+		setGains();
 
 		initLogging();
 
@@ -93,6 +94,24 @@ public class Climber extends SubsystemBase {
 		DataLogger.addDataElement("pivot position", () -> pivotState.toString());
 		DataLogger.addDataElement("pivot power", () -> rightPivot.getMotorOutputPercent());
 		DataLogger.addDataElement("gyro pitch", () -> imu.getPitch().getDegrees());
+	}
+
+	private void setGains() {
+		leftArm.config_kF(1, 0d);
+		leftArm.config_kP(1, 1d);
+		leftArm.config_kI(1, 0);
+		leftArm.config_kD(1, 0);
+		leftArm.configAllowableClosedloopError(1, 1000);
+
+		rightArm.config_kF(1, 0d);
+		rightArm.config_kP(1, 1d);
+		rightArm.config_kI(1, 0);
+		rightArm.config_kD(1, 0);
+		rightArm.configAllowableClosedloopError(1, 1000);
+
+		// leftArm.config_kP(0, 0.07);
+		// leftArm.config_kP(0, 0.07);
+
 	}
 
 	public void setClimbPower(double leftPower, double rightPower) {
@@ -115,6 +134,8 @@ public class Climber extends SubsystemBase {
 	public void setArmsTarget(double armTarget) {
 		System.out.println("setting arm target _______________________________------");
 		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
+
+		leftArm.selectProfileSlot(1, 0);
 		leftArm.set(TalonFXControlMode.Position, armsTarget);
 		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}

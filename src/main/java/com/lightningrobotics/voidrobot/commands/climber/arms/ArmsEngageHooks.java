@@ -14,7 +14,7 @@ public class ArmsEngageHooks extends CommandBase {
     double leftPower;
     double rightPower;
 
-    double staticHookHeight = 10000; //temporary
+    double staticHookHeight = 13000; //temporary
     double armPower = -1; //also temporary
 
     boolean toEnd = false;
@@ -26,24 +26,26 @@ public class ArmsEngageHooks extends CommandBase {
 
     @Override
     public void initialize() {
-        climber.setClimbPower(armPower, armPower);
+        // climber.setClimbPower(armPower, armPower);
     }
 
     @Override
     public void execute() {
-        if(climber.getleftEncoder() <= staticHookHeight) {
-            leftPower = 0;
-        } else {
-            leftPower = armPower;
-        }
+        // if(climber.getleftEncoder() <= staticHookHeight) {
+        //     leftPower = 0;
+        // } else {
+        //     leftPower = armPower;
+        // }
 
-        if(climber.getRightEncoder() <= staticHookHeight) {
-            rightPower = 0;
-        } else {
-            rightPower = armPower;
-        }
+        // if(climber.getRightEncoder() <= staticHookHeight) {
+        //     rightPower = 0;
+        // } else {
+        //     rightPower = armPower;
+        // }
 
-        climber.setClimbPower(leftPower, rightPower);
+        // climber.setClimbPower(leftPower, rightPower);
+
+        climber.setArmsTarget(staticHookHeight);
     }
 
     @Override
@@ -53,6 +55,6 @@ public class ArmsEngageHooks extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return climber.getleftEncoder() <= staticHookHeight && climber.getRightEncoder() <= staticHookHeight;
+        return climber.armsOnTarget();
     }
 }
