@@ -239,9 +239,7 @@ public class HubTargeting extends SubsystemBase {
 			if (Timer.getFPGATimestamp() - lastVisionSnapshot > Constants.SNAPSHOT_DELAY) {
 				lastVisionSnapshot	= Timer.getFPGATimestamp();
 				visionSnapshotEntry.setNumber(1);
-				System.out.println("Logging Snapshot Taken");
 				visionSnapshotEntry.setNumber(0);
-
 			}
 		}
 	}
