@@ -27,6 +27,7 @@ public class Turret extends SubsystemBase {
 	// private final PIDFDashboardTuner tunerFast = new PIDFDashboardTuner("Turret fast", Constants.TURRET_PID_FAST);
 
 	private double targetAngle;
+	private boolean disabelTurret = false;
 	private boolean manualOverride = false;
 
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
@@ -68,10 +69,13 @@ public class Turret extends SubsystemBase {
 		rightLimitSwitchEntry.setBoolean(getLeftLimitSwitch());
 		setTargetAngleEntry.setDouble(getTarget());
 
-		if (!manualOverride) {
+		if (!manualOverride && !disabelTurret) {
 			var power = getMotorOutput(getTarget());
-			// turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
-		} 
+			turretMotor.set(TalonSRXControlMode.PercentOutput, LightningMath.constrain(power, -Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT, Constants.TURRET_NORMAL_MAX_MOTOR_OUTPUT));
+		}
+		else if (disabelTurret) {
+			turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
+		}
 
 		if (getCenterSensor()) {
 			resetEncoder();
@@ -89,6 +93,10 @@ public class Turret extends SubsystemBase {
 	public void stop() {
 		turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 		manualOverride = true;
+	}
+
+	public void setDisableTurret(boolean disabelTurret) {
+		this.disabelTurret = disabelTurret;
 	}
 
 	public Rotation2d getCurrentAngle(){

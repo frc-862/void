@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void coast() {
-		setPower(0.1);
+		setPower(0.1d);
 	}
 
 	public double getCurrentRPM() {

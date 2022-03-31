@@ -28,7 +28,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			new InstantCommand(() -> targeting.setState(0)),
 			new AimTurret(turret, targeting),
 			new AutonIntake(intake),
-			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			new TimedCommand(new AutonDeployIntake(intake), 0.65d),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
@@ -58,14 +58,14 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 						new InstantCommand(() -> targeting.setState(5))
 					),
 					new SequentialCommandGroup(
-						middle5Ball.getCommand(drivetrain, 4d, 2d),
+						middle5Ball.getCommand(drivetrain, 6d, 3d),
 						new InstantCommand(() -> targeting.setState(4))
 					)
 				),
 
 				// drives to shoot 4 and 5
 				new InstantCommand(() -> targeting.setState(6)),
-				end5Ball.getCommand(drivetrain, 5d, 2.5d),
+				end5Ball.getCommand(drivetrain, 6d, 3d),
 				new InstantCommand(() -> indexer.setBallCount(2)),
 				new InstantCommand(drivetrain::setMotorCoastMode),
 				

@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
@@ -67,7 +68,7 @@ public class HubTargeting extends SubsystemBase {
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
-	private double lastKnownDistance = 7d;
+	private double lastKnownDistance = 0d;
 	private double lastKnownHeading = 0d;
 	private double initX = 0d;
     private double initY = 0d;
@@ -253,7 +254,7 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
+			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
 			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
@@ -273,7 +274,7 @@ public class HubTargeting extends SubsystemBase {
 
 			if(motionAdjustedDistance > 0) {
 				hubDistance = motionAdjustedDistance;
-				targetTurretAngle -= motionBiasAngle;
+				targetTurretAngle += motionBiasAngle;
 			} else {
 				System.err.println("robot motion out of bounds");
 			}
@@ -304,7 +305,10 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	private void calcHubGyro() {
-
+		if(lastKnownDistance <= 0){
+			return;
+		}
+		
 		var relativeX = currentPoseSupplier.get().getX() - initX;
 		var relativeY = currentPoseSupplier.get().getY() - initY;
 
@@ -335,8 +339,20 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	private double calcFlywheelRPM() {
-		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
+		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust(); //Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
 		return rpm;
+	}
+
+	private double getTurretAngleRPMAdjust() {
+		final double CLOSEST_SHOT = 2.46;
+		final double FARTHEST_SHOT = 7.0;
+		final double MAX_RPM_GAIN = 250;
+
+		double anglePercent = Math.abs(currentTurretAngleSupplier.get().getDegrees() / Constants.MAX_TURRET_ANGLE);
+		double distancePercent = LightningMath.constrain((hubDistance - CLOSEST_SHOT) / (FARTHEST_SHOT - CLOSEST_SHOT), 0, 1);
+
+		return anglePercent * distancePercent * MAX_RPM_GAIN;
+
 	}
 
 	private double calcHoodAngle() {

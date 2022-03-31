@@ -127,6 +127,15 @@ public class Climber extends SubsystemBase {
 		pivotPower = (rightPower+leftPower)/2;
 	}
 
+
+	public void setLeftPivotPower(double power) {
+		leftPivot.set(TalonSRXControlMode.PercentOutput, power);
+	}
+
+	public void setRightPivotPower(double power) {
+		rightPivot.set(TalonSRXControlMode.PercentOutput, power);
+	}
+
 	/**
 	 * @param armTarget desired set point, in encoder ticks
 	 * @param climbMode 0 for unloaded PID, 1 for loaded
