@@ -13,6 +13,7 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.NextRung;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsLetGoOfHooks;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
@@ -121,30 +122,48 @@ public class RobotContainer extends LightningContainer {
         // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new PivotToReach(climber));
         (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
         (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
-        (new POVButton(climb, 90)).whileHeld(new PivotToHold(climber));
-        (new POVButton(climb, 270)).whileHeld(new PivotToReach(climber));
+        // (new POVButton(climb, 90)).whileHeld(new PivotToHold(climber));
+        // (new POVButton(climb, 270)).whileHeld(new PivotToReach(climber)); 
+		(new POVButton(climb, 90)).whileHeld(new InstantCommand(climber::pivotToHold));
+        (new POVButton(climb, 270)).whileHeld(new InstantCommand(climber::pivotToReach)); 
+
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
         // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whileHeld(new ArmsEngageHooks(climber));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(climber));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
-                                                                        new ParallelCommandGroup(
-                                                                            new PivotToReach(climber),
-                                                                            new SequentialCommandGroup(
-                                                                                new WaitCommand(0.7),
-                                                                                new ArmsToReach(climber)
-                                                                            )
-                                                                        ),
-                                                                        new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
-                                                                            new InstantCommand(climber::stopPivot)
-                                                                        )
-                                                                    );
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
+		// 																// new ArmsLetGoOfHooks(climber),
+        //                                                                 new ParallelCommandGroup(
+        //                                                                     // new PivotToReach(climber),
+		// 																	new ArmsToReach(climber),
+        //                                                                     new SequentialCommandGroup(
+        //                                                                         new WaitCommand(0.2),
+		// 																		new PivotToReach(climber)
+        //                                                                         // new ArmsToReach(climber)
+        //                                                                     )
+        //                                                                 ),
+        //                                                                 new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
+        //                                                                     new InstantCommand(climber::stopPivot)
+        //                                                                 )
+        //                                                             );
+
+		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
+				new ArmsLetGoOfHooks(climber),
+				new PivotToReach(climber),
+				new ArmsToReach(climber),
+			),
+			new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
+				new InstantCommand(climber::stopPivot)
+			)
+		);
+
+
         (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
                                                                 new ParallelCommandGroup(
                                                                     new PivotToHold(climber),
                                                                     new SequentialCommandGroup (
-                                                                        new WaitCommand(0.25),
+                                                                        new WaitCommand(0.5),
                                                                         new ArmsEngageHooks(climber)
                                                                     )
                                                                 )    

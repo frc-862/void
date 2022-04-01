@@ -66,7 +66,7 @@ public class Turret extends SubsystemBase {
 		currentAngle.setDouble(getCurrentAngle().getDegrees());
 		centerSensorEntry.setBoolean(getCenterSensor());
 		leftLimitSwitchEntry.setBoolean(getLeftLimitSwitch());
-		rightLimitSwitchEntry.setBoolean(getLeftLimitSwitch());
+		rightLimitSwitchEntry.setBoolean(getRightLimitSwitch());
 		setTargetAngleEntry.setDouble(getTarget());
 
 		if (!manualOverride && !disabelTurret) {

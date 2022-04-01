@@ -8,18 +8,18 @@ import com.lightningrobotics.voidrobot.subsystems.Climber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmsEngageHooks extends CommandBase {
+public class ArmsLetGoOfHooks extends CommandBase {
     Climber climber;
     // int climbMode;
     double leftPower;
     double rightPower;
 
-    double staticHookHeight = 7200; //temporary
+    double staticHookHeight = 13500; //temporary
     double armPower = -1; //also temporary
 
     boolean toEnd = false;
 
-    public ArmsEngageHooks(Climber climber) {//, int climbMode) {
+    public ArmsLetGoOfHooks(Climber climber) {//, int climbMode) {
         this.climber = climber;
         addRequirements(climber);
     }

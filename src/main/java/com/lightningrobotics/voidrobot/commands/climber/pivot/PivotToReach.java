@@ -22,7 +22,7 @@ public class PivotToReach extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        //climber.stopPivot(); //Not sure if this should be here or not????
+        climber.stopPivot(); //Not sure if this should be here or not????
     }
 
     @Override
