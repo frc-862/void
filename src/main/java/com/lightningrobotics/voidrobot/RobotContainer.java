@@ -41,6 +41,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -72,7 +73,7 @@ public class RobotContainer extends LightningContainer {
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
+	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM, indexer::getEjectedBall);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -118,14 +119,14 @@ public class RobotContainer extends LightningContainer {
                 new InstantCommand(() -> turret.setDisableTurret(false)),
                 new InstantCommand(() -> hood.setDisableHood(false))
         ));
-        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new PivotToHold(climber));
-        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new PivotToReach(climber));
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(climber::pivotToHold);
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(climber::pivotToReach);
         (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
         (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
         // (new POVButton(climb, 90)).whileHeld(new PivotToHold(climber));
         // (new POVButton(climb, 270)).whileHeld(new PivotToReach(climber)); 
-		(new POVButton(climb, 90)).whileHeld(new InstantCommand(climber::pivotToHold));
-        (new POVButton(climb, 270)).whileHeld(new InstantCommand(climber::pivotToReach)); 
+		// (new POVButton(climb, 90)).whileHeld(new InstantCommand(climber::pivotToHold));
+        // (new POVButton(climb, 270)).whileHeld(new InstantCommand(climber::pivotToReach)); 
 
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
@@ -151,34 +152,35 @@ public class RobotContainer extends LightningContainer {
 		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
 				new ArmsLetGoOfHooks(climber),
 				new PivotToReach(climber),
-				new ArmsToReach(climber),
-			),
-			new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
-				new InstantCommand(climber::stopPivot)
+				new ArmsToReach(climber)
+				// new WaitCommand(0.5),
+				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
+				// new InstantCommand(climber::stopPivot)
 			)
 		);
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
-                                                                new ParallelCommandGroup(
-                                                                    new PivotToHold(climber),
-                                                                    new SequentialCommandGroup (
-                                                                        new WaitCommand(0.5),
-                                                                        new ArmsEngageHooks(climber)
-                                                                    )
-                                                                )    
-                                                            );
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld( new ConditionalCommand(new ArmsEngageHooks(climber), 
+																									new ParallelCommandGroup(
+																										new PivotToHold(climber),
+																										new SequentialCommandGroup (
+																											new WaitCommand(1.0),
+																											new ArmsEngageHooks(climber)
+																										)
+																									), () -> (climber.getLeftHoldSensor() && climber.getRightHoldSensor())
+																							)
+																						);
 
         // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> climb.getLeftTriggerAxis()));
         // (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveRightPivot(climber, () -> climb.getRightTriggerAxis()));
         // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveLeftPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
         // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveRightPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
 
-        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
-        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> Constants.DEFAULT_PIVOT_POWER));
+        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
+        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> Constants.DEFAULT_PIVOT_POWER));
 
-        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> -climb.getLeftTriggerAxis()));
-        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveRightPivot(climber, () -> -climb.getRightTriggerAxis()));
+        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> -climb.getLeftTriggerAxis()));
+        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> climb.getRightTriggerAxis()));
 
 
     }

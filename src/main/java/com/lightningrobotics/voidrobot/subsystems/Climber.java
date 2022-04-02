@@ -91,7 +91,7 @@ public class Climber extends SubsystemBase {
 		DataLogger.addDataElement("leftArmPosition", () -> leftArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("rightArmPosition", () -> rightArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("armsTarget", () -> armsTarget);
-		DataLogger.addDataElement("pivot position", () -> pivotState.toString());
+		DataLogger.addDataElement("pivot position", () -> pivotState == pivotPosition.hold ? 0 : (pivotState == pivotPosition.reach ? 2 : 3));
 		DataLogger.addDataElement("pivot power", () -> rightPivot.getMotorOutputPercent());
 		DataLogger.addDataElement("gyro pitch", () -> imu.getPitch().getDegrees());
 	}
@@ -101,7 +101,7 @@ public class Climber extends SubsystemBase {
 		leftArm.config_kP(1, 1d);
 		leftArm.config_kI(1, 0);
 		leftArm.config_kD(1, 0);
-		leftArm.configAllowableClosedloopError(1, 1000);
+		leftArm.configAllowableClosedloopError(1, 750);
 
 		rightArm.config_kF(1, 0d);
 		rightArm.config_kP(1, 1d);

@@ -14,7 +14,7 @@ public class ArmsEngageHooks extends CommandBase {
     double leftPower;
     double rightPower;
 
-    double staticHookHeight = 7200; //temporary
+    double staticHookHeight = 0d; //temporary
     double armPower = -1; //also temporary
 
     boolean toEnd = false;

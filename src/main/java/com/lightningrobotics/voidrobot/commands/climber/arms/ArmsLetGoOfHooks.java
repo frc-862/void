@@ -14,7 +14,7 @@ public class ArmsLetGoOfHooks extends CommandBase {
     double leftPower;
     double rightPower;
 
-    double staticHookHeight = 13500; //temporary
+    double staticHookHeight = 25000; //temporary
     double armPower = -1; //also temporary
 
     boolean toEnd = false;
