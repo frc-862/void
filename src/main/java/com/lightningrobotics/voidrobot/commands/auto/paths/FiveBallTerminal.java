@@ -49,7 +49,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 				),
 				new InstantCommand(drivetrain::stop),
 
-				new TimedCommand(new RunCommand(() -> turret.setAngle(0), turret), 0.5),
+				new TimedCommand(new RunCommand(() -> turret.setAngle(28), turret), 0.5),
 
 				// balls 2 and 3
 				new InstantCommand(() -> targeting.setState(2)),
