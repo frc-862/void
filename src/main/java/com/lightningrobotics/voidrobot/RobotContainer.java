@@ -11,7 +11,19 @@ import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
-import com.lightningrobotics.voidrobot.commands.climber.runClimb;
+import com.lightningrobotics.voidrobot.commands.climber.NextRung;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsLetGoOfHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
+import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
+import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
+import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
+import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveBothPivots;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveLeftPivot;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveRightPivot;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
@@ -21,6 +33,7 @@ import com.lightningrobotics.voidrobot.commands.turret.*;
 import com.lightningrobotics.voidrobot.constants.*;
 import com.lightningrobotics.voidrobot.subsystems.*;
 import com.lightningrobotics.common.auto.*;
+import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,10 +41,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer extends LightningContainer {
 
@@ -39,7 +54,7 @@ public class RobotContainer extends LightningContainer {
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final Climber climber = new Climber();
+    private static final Climber climber = new Climber(imu);
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
@@ -47,7 +62,7 @@ public class RobotContainer extends LightningContainer {
 	private static final Intake intake = new Intake();
     private static final Hood hood = new Hood();
 	// private static final LEDs leds = new LEDs();
-	
+                                            
 	// Joysticks
 	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
 	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
@@ -58,7 +73,7 @@ public class RobotContainer extends LightningContainer {
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM);
+	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM, indexer::getEjectedBall);
 
     @Override
     protected void configureAutonomousCommands() {
@@ -84,7 +99,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, targeting), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
-        (new JoystickButton(driverRight, 3)).toggleWhenPressed(new AutoShoot(drivetrain, targeting, turret, indexer, shooter, hood));
+        // (new JoystickButton(driverRight, 3)).toggleWhenPressed(new AutoShoot(drivetrain, targeting, turret, indexer, shooter, hood));
 
         // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
@@ -98,45 +113,87 @@ public class RobotContainer extends LightningContainer {
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whileHeld(new GetReadyForClimb(hood, turret, shooter, targeting));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> turret.setDisableTurret(false)),
+                new InstantCommand(() -> hood.setDisableHood(false))
+        ));
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(climber::pivotToHold);
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(climber::pivotToReach);
+        (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
+        (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
+        // (new POVButton(climb, 90)).whileHeld(new PivotToHold(climber));
+        // (new POVButton(climb, 270)).whileHeld(new PivotToReach(climber)); 
+		// (new POVButton(climb, 90)).whileHeld(new InstantCommand(climber::pivotToHold));
+        // (new POVButton(climb, 270)).whileHeld(new InstantCommand(climber::pivotToReach)); 
+
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
+
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whileHeld(new ArmsEngageHooks(climber));
+
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(climber));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
+		// 																// new ArmsLetGoOfHooks(climber),
+        //                                                                 new ParallelCommandGroup(
+        //                                                                     // new PivotToReach(climber),
+		// 																	new ArmsToReach(climber),
+        //                                                                     new SequentialCommandGroup(
+        //                                                                         new WaitCommand(0.2),
+		// 																		new PivotToReach(climber)
+        //                                                                         // new ArmsToReach(climber)
+        //                                                                     )
+        //                                                                 ),
+        //                                                                 new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
+        //                                                                     new InstantCommand(climber::stopPivot)
+        //                                                                 )
+        //                                                             );
+
+		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
+				new ArmsLetGoOfHooks(climber),
+				new PivotToReach(climber),
+				new ArmsToReach(climber)
+				// new WaitCommand(0.5),
+				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
+				// new InstantCommand(climber::stopPivot)
+			)
+		);
+
+
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld( new ConditionalCommand(new ArmsEngageHooks(climber), 
+																									new ParallelCommandGroup(
+																										new PivotToHold(climber),
+																										new SequentialCommandGroup (
+																											new WaitCommand(1.0),
+																											new ArmsEngageHooks(climber)
+																										)
+																									), () -> (climber.getLeftHoldSensor() && climber.getRightHoldSensor())
+																							)
+																						);
+
+        // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> climb.getLeftTriggerAxis()));
+        // (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveRightPivot(climber, () -> climb.getRightTriggerAxis()));
+        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveLeftPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
+        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveRightPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
+
+        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
+        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> Constants.DEFAULT_PIVOT_POWER));
+
+        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> -climb.getLeftTriggerAxis()));
+        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> climb.getRightTriggerAxis()));
+
 
     }
+
 
     @Override
     protected void configureDefaultCommands() {        
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-	    shooter.setDefaultCommand(new RunShooterDashboard(shooter, hood));
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-        climber.setDefaultCommand(
-            new runClimb(
-                climber,
-                () -> (
-                    ((-1*climb.getLeftY()) + 
-                    // I know some people don't like these so I'll document it
-                    // If the d-pad up is pressed, add 1 to total power
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // If the d-pad down is pressed, add -1 to total power
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                () -> (
-                    ((-1*climb.getRightY()) +
-                    // same thing as above, if it's up add 1
-                    (climb.getPOV() == 0 ? 1 : 0) +
-                    // if it's down add -1
-                    (climb.getPOV() == 180 ? -1 : 0)) * 0.5
-                ),
-                //set left and right pivot powers
-                () -> (
-                    climb.getLeftTriggerAxis() - //LT: pivot forwards
-                    (climb.getLeftBumper() ? 0.5 : 0) //LB: Pivot Backwards
-                ),
-                () -> (
-                    climb.getRightTriggerAxis() - //RT: pivot forwards
-                    (climb.getRightBumper() ? 0.5 : 0) //RB: pivot backwards
-                )
-            )
-        );
+
+        climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
 
     @Override
@@ -156,9 +213,14 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void initializeDashboardCommands() { 
 		var tab = Shuffleboard.getTab("hood");
+
+        var climbTab = Shuffleboard.getTab("climber");
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+
+        climbTab.add(new InstantCommand(climber::resetArmEncoders));
+        
 	}
 	
     @Override

@@ -27,6 +27,9 @@ public class Shooter extends SubsystemBase {
 	private NetworkTableEntry displayTargetRPM = shooterTab.add("target RPM", 0).getEntry();
 	private NetworkTableEntry isAutoShootingEntry = shooterTab.add("Is Autoshooting", false).getEntry();
 	
+	// private NetworkTableEntry kP = shooterTab.add("kP tune", 0).getEntry();
+	// private NetworkTableEntry kD = shooterTab.add("kP tune", 0).getEntry();
+
 	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
 	private NetworkTableEntry setRPMAngleTuneEntry = tuneTab.add("set RPM tune", 0).getEntry();
 
@@ -51,6 +54,10 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {	
+
+		// double kP_val = kP.getDouble(Constants.KP);
+		// double kD_val = kD.getDouble(Constants.KD);
+		// configPIDGains(, Constants.KI, kD.setDouble(Constants.KD), Constants.KV);
 
 		if (Constants.SHOT_TUNING) {
 			setRPM(setRPMAngleTuneEntry.getDouble(0));
@@ -82,7 +89,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void coast() {
-		setPower(0.1);
+		setPower(0.1d);
 	}
 
 	public double getCurrentRPM() {

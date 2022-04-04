@@ -68,12 +68,12 @@ public final class Constants {
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
-    public static final double RED_THRESHOLD = 0.4;
-    public static final double BLUE_THRESHOLD = 0.35;
+    public static final double RED_THRESHOLD = 0.45;
+    public static final double BLUE_THRESHOLD = 0.4;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.35; // 0.00023742; // tune
+    public static final double SHOOTER_KP = 0.2; // 0.00023742; // tune
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
@@ -83,13 +83,13 @@ public final class Constants {
 
     public static final double SHOOTER_COOLDOWN = 1;
 
-	public static final double SHOOTER_TOLERANCE = 50d;
+	public static final double SHOOTER_TOLERANCE = 100d;
 	public static final double HOOD_TOLERANCE = .2d;
 
 	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
     public static final double HOOD_KD = 0d;
-	public static final PIDFController HOOD_PID = new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
+	public static final PIDFController HOOD_PID =  new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
     public static final double HOOD_ZERO_SPEED = -0.4d;
 
@@ -105,31 +105,41 @@ public final class Constants {
 	public static final double HUB_HEIGHT = 104;
 	public static final double MOUNT_ANGLE = 32;
 	public static final double HUB_CENTER_OFFSET = 24;
-	public static final double SNAPSHOT_DELAY = 0.5;
+	public static final double SNAPSHOT_DELAY = 0.3;
 	public static final int DISTANCE_MOVING_AVG_ELEMENTS = 3;
 
     // Auto Shoot
     public static final double EJECT_BALL_RPM = 1500;
     public static final double EJECT_BALL_HOOD_ANGLE = 5; //TODO: tune
 
-    //distance in meters, power in RPMs 
-    public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
-        {
-			put(-135d, 150d);
-			put(-90d, 150d);
-			put(-45d, 200d);
-			put(-15d, 0d);
-			put(15d, 0d);
-			put(45d, 200d);
-			put(90d, 150d);
-			put(135d, 150d);
-        }
-    };
+    //distance in meters, power in RPM
+
+    // public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
+    //     {
+	// 		put(-135d, 150d);
+	// 		put(-90d, 150d);
+	// 		put(-45d, 200d);
+	// 		put(-15d, 0d);
+	// 		put(15d, 0d);
+	// 		put(45d, 200d);
+	// 		put(90d, 150d);
+	// 		put(135d, 150d);
+
+            
+
+    //         // 3.11m; 45 degrees: 0; 45 degrees: 0;
+    //        // 3.67 m; 45 degrees: 75; 90 degrees: 100;
+    //        // 4.13m; 45 degrees: 0; 90 degrees: 100;
+    //        // 4.9m; 45 degrees: 0; 90 degrees: 50;
+    //        // 5.6m; 45 degrees: 0; 90 degrees: 0;
+    //        // 6.08m; 45 degrees: 100; 90 degrees: 250;
+
+    //     }
+    // };
 
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
-			put(0d,0d);
 			put(2.46d, 3550d);
 			put(3.07d, 3650d);
 			put(3.56d, 3850d);
@@ -137,13 +147,21 @@ public final class Constants {
 			put(5.13d, 4250d);
 			put(6.02d, 4550d);
 			put(7.11d, 5000d);
+			put(8.03, 5400d);
+
+			// put(2.46d, 3550d);
+            // put(3.11d, 3750d);
+            // put(3.67d, 3850d);
+            // put(4.13d, 4000d);
+            // put(4.9d, 4400d);
+            // put(5.6d, 4650d);
+            // put(6.08d, 4800d);
         }
     };
 
     //distance in meters, angle in degrees
     public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
-			put(0d, 0d);
 			put(2.46d, 0d);
 			put(3.07d, 0d);
 			put(3.56d, 0.2d);
@@ -151,6 +169,15 @@ public final class Constants {
 			put(5.13d, 0.8d);
 			put(6.02d, 1.1d);
 			put(7.11d, 2.4d);
+			put(8.03, 2.3d);
+
+            // put(2.46d, 0d);
+            // put(3.11d, 0d);
+            // put(3.67d, 1.2d);
+            // put(4.13d, 1.4d);
+            // put(4.9d, 1.9d);
+            // put(5.6d, 2.3d);
+            // put(6.08d, 2.6d);
         }
     };
 
@@ -161,5 +188,19 @@ public final class Constants {
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
     public static final double DEFAULT_WINCH_POWER = 1;
+
+    //Climber
+    public static final double DEFAULT_PIVOT_POWER = 1.0;
+    public static final double MID_RUNG_VALUE = 257000;
+    public static final double MAX_ARM_VALUE = 372000;
+    public static final double HOLD_HEIGHT = 34000; //height to engage the traversal hooks
+    public static final double TRIGGER_HEIGHT = 7100;
+    public static final double REACH_HEIGHT = 330000; //height climber reaches to when pivoting back
+    public static final double ARM_TARGET_THRESHOLD = 750;
+    public static final double ON_RUNG_ANGLE = 1.4;
+    
+    //TODO: tune these values
+    public static final double GYRO_SETTLE_THRESHOLD = 0;
+    public static final double GYRO_SETTLE_TIME = 0;
 
 }

@@ -26,7 +26,6 @@ public class ShootCargo extends CommandBase {
 
 	@Override
 	public void execute() {
-		
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 

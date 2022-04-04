@@ -3,6 +3,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
@@ -64,6 +65,12 @@ public class Drivetrain extends DifferentialDrivetrain {
 			rightPositionSupplier
         );
         this.imu = imu;
+
+		setCanBusFrameRate(StatusFrameEnhanced.Status_1_General, 200);
+		setCanBusFrameRate(StatusFrameEnhanced.Status_2_Feedback0, 500);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_3_Quadrature, 200);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_4_AinTempVbat, 200);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_10_MotionMagic, 200);
     
         intitLogging();
 
@@ -87,10 +94,19 @@ public class Drivetrain extends DifferentialDrivetrain {
         // Moveing while shooting stuff
     }
 
-    @Override
+	private void setCanBusFrameRate(StatusFrameEnhanced frame, int freq) {
+		((WPI_TalonFX)RIGHT_MOTORS[1]).setStatusFramePeriod(frame, freq, 200);
+		((WPI_TalonFX)RIGHT_MOTORS[2]).setStatusFramePeriod(frame, freq, 200);
+
+		((WPI_TalonFX)LEFT_MOTORS[1]).setStatusFramePeriod(frame, freq, 200);
+		((WPI_TalonFX)LEFT_MOTORS[2]).setStatusFramePeriod(frame, freq, 200);
+
+	}
+
+	@Override
     public void periodic() {
         super.periodic();
-
+		
         pose = this.getPose();
         heading = this.getPose().getRotation();
         
