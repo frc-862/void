@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
+import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
@@ -12,6 +13,7 @@ import com.lightningrobotics.voidrobot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class FiveBallTerminal extends ParallelCommandGroup {
@@ -28,7 +30,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			new InstantCommand(() -> targeting.setState(0)),
 			new AimTurret(turret, targeting),
 			new AutonIntake(intake),
-			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			new TimedCommand(new AutonDeployIntake(intake), 0.65d),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
@@ -40,11 +42,14 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 					new SequentialCommandGroup(
 						new AutonVisionShooting(shooter, hood, indexer, targeting, 3d, 0.2d, 200d),
 						new InstantCommand(() -> targeting.setState(1)),
-						new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
-						new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))
+							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
+							// new InstantCommand(() -> turret.setAngle(0)),
+							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))			
 					)
 				),
 				new InstantCommand(drivetrain::stop),
+
+				new TimedCommand(new RunCommand(() -> turret.setAngle(28), turret), 0.5),
 
 				// balls 2 and 3
 				new InstantCommand(() -> targeting.setState(2)),
@@ -58,14 +63,14 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 						new InstantCommand(() -> targeting.setState(5))
 					),
 					new SequentialCommandGroup(
-						middle5Ball.getCommand(drivetrain, 4d, 2d),
+						middle5Ball.getCommand(drivetrain, 6d, 3d),
 						new InstantCommand(() -> targeting.setState(4))
 					)
 				),
 
 				// drives to shoot 4 and 5
 				new InstantCommand(() -> targeting.setState(6)),
-				end5Ball.getCommand(drivetrain, 5d, 2.5d),
+				end5Ball.getCommand(drivetrain, 6d, 3d),
 				new InstantCommand(() -> indexer.setBallCount(2)),
 				new InstantCommand(drivetrain::setMotorCoastMode),
 				

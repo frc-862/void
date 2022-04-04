@@ -1,12 +1,14 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
 import java.net.DatagramSocketImpl;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
@@ -35,6 +37,7 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry visionTargetXOffsetEntry = limelightTab.getEntry("tx");
 	private final NetworkTableEntry visionTargetYOffsetEntry = limelightTab.getEntry("ty");
 	private final NetworkTableEntry visionTargetDetectedEntry = limelightTab.getEntry("tv");
+	private final NetworkTableEntry visionTargetLatencyEntry = limelightTab.getEntry("tl");
 	private final NetworkTableEntry visionLEDEntry = limelightTab.getEntry("ledMode");
 	private final NetworkTableEntry visionSnapshotEntry = limelightTab.getEntry("snapshot");
 	private final NetworkTableEntry visionDistanceEntry = targetingTab.add("Vision Distance", 0).getEntry();
@@ -64,17 +67,18 @@ public class HubTargeting extends SubsystemBase {
 	private Supplier<Rotation2d> currentTurretAngleSupplier;
 	private DoubleSupplier currentHoodAngleSupplier;
 	private DoubleSupplier currentFlywheelRPMSupplier;
+	private BooleanSupplier exitSensor;
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
-	private double lastKnownDistance = 7d;
+	private double lastKnownDistance = 0d;
 	private double lastKnownHeading = 0d;
 	private double initX = 0d;
     private double initY = 0d;
     private double initRot = 0d;
 
 	// Bias Vars
-	private double distanceBias = 0d;
+	private double distanceBias = 0d; // this is what we want to inti to a default
 	private double angleBias = 0d;
 	
 	// Motion Bias
@@ -139,7 +143,7 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	// Set Up Hub Targeting
-  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<DrivetrainSpeed> currentSpeedSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier) {
+  	public HubTargeting(Supplier<Pose2d> currentPoseSupplier, Supplier<DrivetrainSpeed> currentSpeedSupplier, Supplier<Rotation2d> currentTurretAngleSupplier, DoubleSupplier currentHoodAngleSupplier, DoubleSupplier currentFlywheelRPMSupplier, BooleanSupplier exitSensor) {
 
 		// Setup Value Suppliers
 		this.currentPoseSupplier = currentPoseSupplier;
@@ -147,10 +151,13 @@ public class HubTargeting extends SubsystemBase {
 		this.currentTurretAngleSupplier = currentTurretAngleSupplier;
 		this.currentHoodAngleSupplier = currentHoodAngleSupplier;
 		this.currentFlywheelRPMSupplier = currentFlywheelRPMSupplier;
+		this.exitSensor = exitSensor;
 
 		// Setup Subsystem
 		initLogging();
 		CommandScheduler.getInstance().registerSubsystem(this);
+
+		distanceBias = -0.15d;
 
 	}
 
@@ -173,7 +180,7 @@ public class HubTargeting extends SubsystemBase {
 		filterDistance();
 
 		// Account for robot motion
-		// filterRobotMotion();
+		filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -193,6 +200,8 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("targetArea", () -> visionTargetAreaEntry.getDouble(-1));
 		DataLogger.addDataElement("targetX", () -> visionTargetXOffsetEntry.getDouble(-1));
 		DataLogger.addDataElement("targetY", () -> visionTargetYOffsetEntry.getDouble(-1));
+		DataLogger.addDataElement("latency", () -> visionTargetLatencyEntry.getDouble(-1));
+		DataLogger.addDataElement("validTarget", () -> visionTargetDetectedEntry.getDouble(-1));
 
 		//Drive Logging
 		DataLogger.addDataElement("relativeVelocityY", () -> velocityEntry.getDouble(0));
@@ -235,10 +244,10 @@ public class HubTargeting extends SubsystemBase {
 
 	private void snapshot() {
 		// Take Snapshot of Vision Target When Enabled
-		if (DriverStation.isEnabled()) {
+		if (exitSensor.getAsBoolean()) {
 			if (Timer.getFPGATimestamp() - lastVisionSnapshot > Constants.SNAPSHOT_DELAY) {
-				lastVisionSnapshot	= Timer.getFPGATimestamp();
 				visionSnapshotEntry.setNumber(1);
+			} else {
 				visionSnapshotEntry.setNumber(0);
 			}
 		}
@@ -253,7 +262,7 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
+			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
 			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
@@ -273,7 +282,7 @@ public class HubTargeting extends SubsystemBase {
 
 			if(motionAdjustedDistance > 0) {
 				hubDistance = motionAdjustedDistance;
-				targetTurretAngle -= motionBiasAngle;
+				targetTurretAngle += motionBiasAngle;
 			} else {
 				System.err.println("robot motion out of bounds");
 			}
@@ -304,7 +313,10 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	private void calcHubGyro() {
-
+		if(lastKnownDistance <= 0){
+			return;
+		}
+		
 		var relativeX = currentPoseSupplier.get().getX() - initX;
 		var relativeY = currentPoseSupplier.get().getY() - initY;
 
@@ -335,8 +347,20 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	private double calcFlywheelRPM() {
-		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
+		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
 		return rpm;
+	}
+
+	private double getTurretAngleRPMAdjust() {
+		final double CLOSEST_SHOT = 2.46;
+		final double FARTHEST_SHOT = 7.0;
+		final double MAX_RPM_GAIN = 200;
+
+		double anglePercent = Math.abs(currentTurretAngleSupplier.get().getDegrees() / Constants.MAX_TURRET_ANGLE);
+		double distancePercent = LightningMath.constrain((hubDistance - CLOSEST_SHOT) / (FARTHEST_SHOT - CLOSEST_SHOT), 0, 1);
+
+		return anglePercent * distancePercent * MAX_RPM_GAIN;
+
 	}
 
 	private double calcHoodAngle() {
@@ -392,6 +416,9 @@ public class HubTargeting extends SubsystemBase {
 		return hubDistance > 0 && visionTargetDetectedEntry.getDouble(0) == 1;
 	}
 
+	public double getHubDistance(){
+		return hubDistance;
+	}
 	// Bias Util
 
 	public void adjustBiasDistance(double delta) {

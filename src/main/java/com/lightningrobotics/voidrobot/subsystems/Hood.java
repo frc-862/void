@@ -98,6 +98,11 @@ public class Hood extends SubsystemBase {
 		DataLogger.addDataElement("hoodSetPoint", this::getSetPoint);
 	}
 
+	public void setDisableHood(boolean disableHood) {
+		this.disableHood = disableHood;
+		hoodDisable.setBoolean(disableHood);
+	}
+
 	public void zero() {
 		if (getLimitSwitch()) {
 			hoodOffset = getRawAngle();
