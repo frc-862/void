@@ -1,51 +1,52 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.subsystems.Hood;
+import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
-import com.lightningrobotics.voidrobot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootClose extends CommandBase {
 
-	private Shooter shooter;
-	private Indexer indexer;
-	private Turret turret;
-	private Vision vision;
+	private final Shooter shooter;
+	private final Hood hood;
+	private final Indexer indexer;
+	private final Turret turret;
+	private final HubTargeting targeting;
 
-	public ShootClose(Shooter shooter, Indexer indexer, Turret turret, Vision vision) {
-
+	public ShootClose(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
 		this.shooter = shooter;
+		this.hood = hood;
 		this.indexer = indexer;
 		this.turret = turret;
-		this.vision = vision;
+		this.targeting = targeting;
 
-		addRequirements(shooter, indexer); // not adding vision or turret as it is read onl
+		addRequirements(shooter, indexer, turret); // not adding vision or turret as it is read onl
 	}
 	@Override
 	public void initialize() {
-		turret.setManualOverride(true);
-		turret.setTarget(0d);
-		vision.turnOffVisionLight();
+		turret.setAngle(0d);
 	}
 
 	@Override
 	public void execute() {
 		shooter.setRPM(Constants.SHOOT_LOW_RPM);
-		shooter.setHoodAngle(Constants.SHOOT_LOW_ANGLE);
+		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
+		turret.setAngle(0d);
 		
-		if(shooter.getArmed() && turret.getArmed()) {
-			indexer.toShooter();
-		}
+		// TODO work with onTarget
+		indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.stop();
+		shooter.coast();
 		indexer.stop();
-		turret.setManualOverride(false);
+		hood.setAngle(0);
 	}
 
 	@Override

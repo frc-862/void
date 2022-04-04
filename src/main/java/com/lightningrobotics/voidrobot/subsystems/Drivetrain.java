@@ -3,20 +3,33 @@ package com.lightningrobotics.voidrobot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Drivetrain extends DifferentialDrivetrain {
 
     private LightningIMU imu;
+
+    private double currentVelocity;
+
+    private Pose2d pose = new Pose2d();
+    private Pose2d prevPose = new Pose2d();
+
+    private Rotation2d heading = Rotation2d.fromDegrees(0);
+    private Rotation2d prevHeading = Rotation2d.fromDegrees(0);
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -53,10 +66,15 @@ public class Drivetrain extends DifferentialDrivetrain {
         );
         this.imu = imu;
 
-        for (int i = 0; i < RIGHT_MOTORS.length; i++){
-            ((WPI_TalonFX)RIGHT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
-            ((WPI_TalonFX)LEFT_MOTORS[i]).setNeutralMode(NeutralMode.Brake);
-        }
+		setCanBusFrameRate(StatusFrameEnhanced.Status_1_General, 200);
+		setCanBusFrameRate(StatusFrameEnhanced.Status_2_Feedback0, 500);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_3_Quadrature, 200);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_4_AinTempVbat, 200);
+		// setCanBusFrameRate(StatusFrameEnhanced.Status_10_MotionMagic, 200);
+    
+        intitLogging();
+
+		CommandScheduler.getInstance().registerSubsystem(this);
 
     }
 
@@ -64,9 +82,72 @@ public class Drivetrain extends DifferentialDrivetrain {
         return ((WPI_TalonFX)LEFT_MOTORS[0]).getSelectedSensorVelocity() < 0.05 && ((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorVelocity() < 0.05;
     }
 
-    @Override
+    private void intitLogging() {
+        DataLogger.addDataElement("leftVelocity", leftVelocitySupplier);
+        DataLogger.addDataElement("rightVelocity", rightVelocitySupplier);
+        DataLogger.addDataElement("leftPosition", leftPositionSupplier);
+        DataLogger.addDataElement("rightPosition", rightPositionSupplier);
+        DataLogger.addDataElement("heading", () -> this.getPose().getRotation().getDegrees());
+        DataLogger.addDataElement("poseX", () -> this.getPose().getX());
+        DataLogger.addDataElement("poseY", () -> this.getPose().getY());
+
+        // Moveing while shooting stuff
+    }
+
+	private void setCanBusFrameRate(StatusFrameEnhanced frame, int freq) {
+		((WPI_TalonFX)RIGHT_MOTORS[1]).setStatusFramePeriod(frame, freq, 200);
+		((WPI_TalonFX)RIGHT_MOTORS[2]).setStatusFramePeriod(frame, freq, 200);
+
+		((WPI_TalonFX)LEFT_MOTORS[1]).setStatusFramePeriod(frame, freq, 200);
+		((WPI_TalonFX)LEFT_MOTORS[2]).setStatusFramePeriod(frame, freq, 200);
+
+	}
+
+	@Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("headiong", imu.getHeading().getDegrees());
+		
+        pose = this.getPose();
+        heading = this.getPose().getRotation();
+        
+        var deltaX = pose.getX() - prevPose.getX();
+        var deltaY = pose.getY() - prevPose.getY(); 
+
+        currentVelocity = (Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)));
+        var rot = Math.atan2(deltaY, deltaX);  
+        
+        prevPose = pose;
+        prevHeading = heading; 
+
+        SmartDashboard.putNumber("currentVelocity", currentVelocity);
+        SmartDashboard.putNumber("rot thigy", rot);
+
+        setMotorCoastMode();
+
+        SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
+        SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
+        SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
     }
+
+    public void setMotorBreakMode() {
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Brake);   
+            motor.configOpenloopRamp(0.15);
+        });
+    } 
+
+    public void setMotorCoastMode() {
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Coast);   
+            motor.configOpenloopRamp(0.15);
+        });
+    }
+
+    public double getCurrentVelocity() {
+        return -currentVelocity; // this is negative b/c we want it shooter-forward
+    }
+
+
 }

@@ -1,31 +1,21 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Random;
-
 import java.util.function.BiConsumer;
 
 
 public class LEDs extends SubsystemBase {
 
     private static final int ledCount = 30;
-    private static Random rand = new Random();
 
     private AddressableLED led;
     private final AddressableLEDBuffer buffer;
 
-    private ShuffleboardTab LEDTab = Shuffleboard.getTab("LED");
-
-    private NetworkTableEntry Red;
-	private NetworkTableEntry Green;
-	private NetworkTableEntry Blue;
     int i = 0;
 
     public LEDs() {
@@ -40,16 +30,14 @@ public class LEDs extends SubsystemBase {
 
         led.start();
 
-        Red = LEDTab
-            .add("red", 0)
-            .getEntry();
-		Green = LEDTab
-			.add("green", 0)
-			.getEntry();
-		Blue = LEDTab
-			.add("blue", 0)
-			.getEntry();
+		CommandScheduler.getInstance().registerSubsystem(this);
 
+    }
+
+    @Override
+    public void periodic() {
+        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
+        led.setData(buffer);
     }
 
     public static final Color LightningOrange = new Color(1, .5, 0);
@@ -108,11 +96,5 @@ public class LEDs extends SubsystemBase {
 
     public void stopLEDs() {
         withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 0));
-    }
-
-    @Override
-    public void periodic() {
-        withEachLed((buffer, index) -> buffer.setRGB(index, 0, 0, 255));
-        led.setData(buffer);
     }
 }
