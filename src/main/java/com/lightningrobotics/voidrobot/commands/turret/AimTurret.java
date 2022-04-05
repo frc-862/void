@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AimTurret extends CommandBase {
 
-    private final Turret turret;
-	private final HubTargeting targeting;
+    protected final Turret turret;
+	protected final HubTargeting targeting;
 
 	private static boolean zero = false;
 

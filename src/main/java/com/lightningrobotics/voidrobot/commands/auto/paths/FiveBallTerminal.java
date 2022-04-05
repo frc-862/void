@@ -2,12 +2,11 @@ package com.lightningrobotics.voidrobot.commands.auto.paths;
 
 import com.lightningrobotics.common.auto.Path;
 import com.lightningrobotics.common.command.core.TimedCommand;
-import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
-import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
+import com.lightningrobotics.voidrobot.commands.turret.AimTurretConstrained;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -28,7 +27,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
     public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception {
 		super(
 			new InstantCommand(() -> targeting.setState(0)),
-			new AimTurret(turret, targeting),
+			new AimTurretConstrained(turret, targeting, drivetrain),
 			new AutonIntake(intake),
 			new TimedCommand(new AutonDeployIntake(intake), 0.65d),
 
