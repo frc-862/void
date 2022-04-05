@@ -26,7 +26,7 @@ public class ShootCargo extends CommandBase {
 		this.targeting = targeting;
 		this.drivetrain = drivetrain;
 
-		addRequirements(shooter, hood, indexer, drivetrain);
+		addRequirements(shooter, hood, indexer);
 	}
 
 	@Override
@@ -35,10 +35,9 @@ public class ShootCargo extends CommandBase {
 		var hoodAngle = targeting.getTargetHoodAngle();
 
 		if(DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString())) {
-			drivetrain.stop(); 
 			shooter.setRPM(rpm);
 			hood.setAngle(hoodAngle);
-			if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
+			if (targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
 				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			} 
 		}
