@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
@@ -148,6 +149,13 @@ public class Drivetrain extends DifferentialDrivetrain {
     public double getCurrentVelocity() {
         return -currentVelocity; // this is negative b/c we want it shooter-forward
     }
+
+    public void pidStop() { 
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.set(TalonFXControlMode.Velocity, 0);
+        });
+    }  
 
 
 }

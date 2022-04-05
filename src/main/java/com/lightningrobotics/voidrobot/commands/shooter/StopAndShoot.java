@@ -11,7 +11,7 @@ import com.lightningrobotics.voidrobot.subsystems.Turret;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootCargo extends CommandBase {
+public class StopAndShoot extends CommandBase {
 
 	private final Shooter shooter;
 	private final Hood hood;
@@ -19,7 +19,7 @@ public class ShootCargo extends CommandBase {
 	private final HubTargeting targeting;
 	private final Drivetrain drivetrain;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
+	public StopAndShoot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
@@ -35,7 +35,7 @@ public class ShootCargo extends CommandBase {
 		var hoodAngle = targeting.getTargetHoodAngle();
 
 		if(DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString())) {
-			drivetrain.stop(); 
+			drivetrain.pidStop(); 
 			shooter.setRPM(rpm);
 			hood.setAngle(hoodAngle);
 			if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
