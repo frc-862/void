@@ -7,6 +7,7 @@ import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
+import com.lightningrobotics.voidrobot.commands.SystemCheck;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
@@ -38,6 +39,9 @@ import com.lightningrobotics.common.command.drivetrain.differential.Differential
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -215,11 +219,16 @@ public class RobotContainer extends LightningContainer {
 		var tab = Shuffleboard.getTab("hood");
 
         var climbTab = Shuffleboard.getTab("climber");
+
+        var sysCheckTab = Shuffleboard.getTab("system check"); //TODO: check if this is good
+
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 
         climbTab.add(new InstantCommand(climber::resetArmEncoders));
+
+        sysCheckTab.add(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
         
 	}
 	
