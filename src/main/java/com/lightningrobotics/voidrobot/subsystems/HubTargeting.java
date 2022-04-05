@@ -134,6 +134,17 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
+	public boolean onTarget(double shooterRPM, double hoodAngle) {
+
+		var currHood = currentHoodAngleSupplier.getAsDouble();
+		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
+
+		return 
+			(Math.abs(shooterRPM - currRPM) < Constants.SHOOTER_TOLERANCE) &&
+			(Math.abs(hoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+
+	}
+
 	public void setState(int state) {
 		this.state = state;
 	}
