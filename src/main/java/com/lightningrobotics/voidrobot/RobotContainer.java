@@ -95,7 +95,7 @@ public class RobotContainer extends LightningContainer {
     protected void configureButtonBindings() {
 
         // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting), false); // Auto shoot
+        (new JoystickButton(driverRight, 1)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, turret), false); // Auto shoot
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, targeting), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));

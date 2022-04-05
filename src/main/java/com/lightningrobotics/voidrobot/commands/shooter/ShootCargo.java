@@ -5,7 +5,9 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Turret;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ShootCargo extends CommandBase {
@@ -14,14 +16,16 @@ public class ShootCargo extends CommandBase {
 	private final Hood hood;
 	private final Indexer indexer;
 	private final HubTargeting targeting;
+	private final Turret turret;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting) {
+	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Turret turret) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
 		this.targeting = targeting;
+		this.turret = turret;
 
-		addRequirements(shooter, hood, indexer);
+		addRequirements(shooter, hood, indexer, turret);
 	}
 
 	@Override
@@ -29,12 +33,24 @@ public class ShootCargo extends CommandBase {
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 
-		shooter.setRPM(rpm);
-		hood.setAngle(hoodAngle);
+		if(DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString())) {
+			shooter.setRPM(rpm);
+			hood.setAngle(hoodAngle);
+				
+			if(targeting.onTarget()) {
+				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+			}			
+		} else {
+			shooter.setRPM(Constants.EJECT_BALL_RPM);
+			hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE); 
+
+			if (targeting.onTarget(shooter.getCurrentRPM(), turret.getCurrentAngle().getDegrees(), hood.getAngle())){
+				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+			}
 			
-		if(targeting.onTarget()) {
-			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		}
+		
+		
 		
 	}
 
