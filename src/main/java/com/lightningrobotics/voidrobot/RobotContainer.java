@@ -107,9 +107,9 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new AutoIndexCargo(indexer));
-        (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, targeting, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, targeting, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
+        (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, shooter, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
+        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));

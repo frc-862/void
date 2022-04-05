@@ -12,18 +12,18 @@ public class RunIndexer extends CommandBase {
 
     // Creates the indexer subsystem
     private final Indexer indexer;
-    private final HubTargeting targeting;
+    private final Shooter shooter;
     // The power we want to supply to the indexer
     private DoubleSupplier power;
 
     
 
-    public RunIndexer(Indexer indexer, HubTargeting targeting, DoubleSupplier power) {
+    public RunIndexer(Indexer indexer, Shooter shooter, DoubleSupplier power) {
         this.indexer = indexer;
         this.power = power; // The power that is comming from the controller
-        this.targeting = targeting;
+        this.shooter = shooter;
 
-        addRequirements(indexer);
+        addRequirements(indexer); 
     }
 
     @Override
@@ -31,7 +31,7 @@ public class RunIndexer extends CommandBase {
 
     @Override
     public void execute() {
-        if (indexer.getExitStatus() && targeting.onTarget(2000, 0, 0) && power.getAsDouble() > 0) {
+        if (indexer.getExitStatus() && shooter.getCurrentRPM() < 1000 && power.getAsDouble() >= 0) { 
             indexer.setPower(0);
         }
         else {
