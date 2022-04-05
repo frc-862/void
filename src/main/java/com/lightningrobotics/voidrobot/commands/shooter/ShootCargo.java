@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
@@ -14,14 +15,16 @@ public class ShootCargo extends CommandBase {
 	private final Hood hood;
 	private final Indexer indexer;
 	private final HubTargeting targeting;
+	private final Drivetrain drivetrain;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting) {
+	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
 		this.targeting = targeting;
+		this.drivetrain = drivetrain;
 
-		addRequirements(shooter, hood, indexer);
+		addRequirements(shooter, hood, indexer, drivetrain);
 	}
 
 	@Override
@@ -29,13 +32,16 @@ public class ShootCargo extends CommandBase {
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 
-		shooter.setRPM(rpm);
-		hood.setAngle(hoodAngle);
-			
-		if(targeting.onTarget()) {
-			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		drivetrain.stop(); // stop the robot no matter what
+
+		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT) { // getCurrentVelocity() may not work, may need another constant
+			shooter.setRPM(rpm);
+			hood.setAngle(hoodAngle);
+				
+			if(targeting.onTarget()) {
+				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+			}
 		}
-		
 	}
 
 	@Override
