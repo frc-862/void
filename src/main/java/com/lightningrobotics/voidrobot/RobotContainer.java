@@ -99,7 +99,12 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, targeting), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
+        //TODO: Ask eric for button
+        (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
+        (new JoystickButton(driverRight, 4)).whileHeld(new FarWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on Far wall right stick Right button
+        (new JoystickButton(driverRight, 5)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on Launch wall right stick button 5 ?
         // (new JoystickButton(driverRight, 3)).toggleWhenPressed(new AutoShoot(drivetrain, targeting, turret, indexer, shooter, hood));
+
 
         // COPILOT
         (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
