@@ -100,6 +100,16 @@ public final class Constants {
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
 
+    // Canned shot Constants
+    //Close wall
+    public static final double CLOSE_CANNED_SHOT_HOOD_ANGLE = 0;
+    public static final double CLOSE_CANNED_SHOT_TURRET_POSITION = 0;
+    public static final double CLOSE_CANNED_SHOT_FLYWHEEL_SPEED = 3650;
+    //Far wall
+    public static final double FAR_CANNED_SHOT_HOOD_ANGLE = 2.4;
+    public static final double FAR_CANNED_SHOT_TURRET_POSITION = 0;
+    public static final double FAR_CANNED_SHOT_FLYWHEEL_SPEED = 5000;
+
 	// Limelight
 	public static final double MOUNT_HEIGHT = 37.5;
 	public static final double HUB_HEIGHT = 104;
