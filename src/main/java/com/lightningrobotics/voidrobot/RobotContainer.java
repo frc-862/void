@@ -112,8 +112,6 @@ public class RobotContainer extends LightningContainer {
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
 
-        (new JoystickButton(copilot, JoystickConstants.RIGHT_STICK_DOWN)).whileHeld(new AimTurretConstrained(turret, targeting, drivetrain));
-
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
         (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whileHeld(new GetReadyForClimb(hood, turret, shooter, targeting));
