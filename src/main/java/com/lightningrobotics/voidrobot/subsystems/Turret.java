@@ -83,6 +83,9 @@ public class Turret extends SubsystemBase {
 		if (getCenterSensor()) {
 			resetEncoder();
 		}
+		
+		System.out.println(minTurretConstraint);
+		System.out.println(maxTurretConstraint);
 	}
 
 	private void initLogging() {
@@ -115,7 +118,7 @@ public class Turret extends SubsystemBase {
 		double sign = Math.signum(targetAngle);
         targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
 
-        this.targetAngle = LightningMath.constrain(targetAngle, minTurretConstraint, maxTurretConstraint);
+        this.targetAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE); // minTurretConstraint, maxTurretConstraint);
 	}
 
 	public void resetConstraint() {
@@ -124,12 +127,13 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void setConstraint(double center, double constrainRange) {
+		System.out.println("ive been called " + center);
 		minTurretConstraint = LightningMath.constrain(center - constrainRange, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
 		maxTurretConstraint = LightningMath.constrain(center + constrainRange, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
 	}
 
 	public void resetEncoder() {
-		turretMotor.setSelectedSensorPosition(0);
+		turretMotor.setSelectedSensorPosition(0); 
 	}
 
 	public boolean getLeftLimitSwitch() {

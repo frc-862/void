@@ -21,7 +21,7 @@ public class Intake extends SubsystemBase {
 		intakeMotor.setInverted(false);
 		winchMotor = new VictorSPX(RobotMap.INTAKE_WINCH_ID);
 		winchMotor.setNeutralMode(NeutralMode.Brake);
-		winchMotor.setInverted(false);
+		winchMotor.setInverted(true);
 		
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
