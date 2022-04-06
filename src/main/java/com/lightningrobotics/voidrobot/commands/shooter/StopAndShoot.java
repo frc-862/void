@@ -12,7 +12,7 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootCargo extends CommandBase {
+public class StopAndShoot extends CommandBase {
 
 	private final Shooter shooter;
 	private final Hood hood;
@@ -20,32 +20,35 @@ public class ShootCargo extends CommandBase {
 	private final HubTargeting targeting;
 	private final Drivetrain drivetrain;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
+	public StopAndShoot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
 		this.targeting = targeting;
 		this.drivetrain = drivetrain;
 
-		addRequirements(shooter, hood, indexer);
+		addRequirements(shooter, hood, indexer, drivetrain);
 	}
 
 	@Override
 	public void execute() {
+
 		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
 		if(!isEnenmyBall) {
+			drivetrain.pidStop(); 
 			var rpm = targeting.getTargetFlywheelRPM();
 			var hoodAngle = targeting.getTargetHoodAngle();
+
 			shooter.setRPM(rpm);
 			hood.setAngle(hoodAngle);
-			if (targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
+			if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
 				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			} 
 		}
 		else {
 			shooter.setRPM(Constants.EJECT_BALL_RPM);
 			hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE); 
-			if (targeting.onTarget(Constants.EJECT_BALL_RPM, Constants.EJECT_BALL_HOOD_ANGLE)) {
+			if (targeting.onTarget(Constants.EJECT_BALL_RPM, Constants.EJECT_BALL_HOOD_ANGLE)){
 				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 			}
 		}

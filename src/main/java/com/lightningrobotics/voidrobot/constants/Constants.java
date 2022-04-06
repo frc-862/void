@@ -43,7 +43,7 @@ public final class Constants {
         new FeedForwardController(Constants.KS, Constants.KV, Constants.KA)
     );
 
-    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.25; //TODO: tune. also in meters per second.
+    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.15; //TODO: tune. also in meters per second.
 
     public static final double MAXIMUM_ANGULAR_SPEED_TO_SHOOT = 1; //TODO: tune. also in meters per second.
 
@@ -120,7 +120,7 @@ public final class Constants {
 
     // Auto Shoot
     public static final double EJECT_BALL_RPM = 1500;
-    public static final double EJECT_BALL_HOOD_ANGLE = 5; //TODO: tune
+    public static final double EJECT_BALL_HOOD_ANGLE = 4.0; //TODO: tune
 
     //distance in meters, power in RPM
 
