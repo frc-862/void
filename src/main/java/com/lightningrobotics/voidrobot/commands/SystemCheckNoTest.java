@@ -30,6 +30,7 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -41,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
-public class SystemCheck extends SystemTest {
+public class SystemCheckNoTest extends SequentialCommandGroup {
   Intake intake;
   Indexer indexer;
   Drivetrain drivetrain;
@@ -52,51 +53,40 @@ public class SystemCheck extends SystemTest {
   Climber climber;
   BooleanSupplier nextButton;
 
-  boolean isDone = false;
+  static boolean isDone = false;
 
   private static ShuffleboardTab sysCheckTab = Shuffleboard.getTab("system check");
 
   private static NetworkTableEntry currentMode = sysCheckTab.add("current mode", "").getEntry();
 
-  public SystemCheck(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, Climber climber, BooleanSupplier nextButton) {
-    super("system test", LightningFaultCodes.getFaultCode("system test"), Priority.DO_FIRST); //idk what to put here
+  // private static Debouncer m_debouncer = new Debouncer(0.5, Debouncer.DebounceType.kRising);
 
-    this.intake = intake;
-    this.indexer = indexer;
-    this.drivetrain = drivetrain;
-    this.shooter = shooter;
-    this.hood = hood;
-    this.targeting = targeting;
-    this.turret = turret;
-    this.climber = climber;
-    
-    this.nextButton = nextButton;
-
-    new SequentialCommandGroup(
+  public SystemCheckNoTest(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, Climber climber, BooleanSupplier nextButton) {
+    super(
         new InstantCommand(() -> currentMode.setString("intake in")),
         new StartEndCommand(
-            () -> intake.setPower(1), 
+            () -> intake.setPower(0.5), 
             () -> intake.setPower(0),
             intake
         ).until(nextButton),
 
         new InstantCommand(() -> currentMode.setString("intake out")),
         new StartEndCommand(
-            () -> intake.setPower(-1), 
+            () -> intake.setPower(-0.5), 
             () -> intake.setPower(0),
             intake
         ).until(nextButton),
 
         new InstantCommand(() -> currentMode.setString("indexer up")),
         new StartEndCommand(
-            () -> indexer.setPower(1), 
+            () -> indexer.setPower(0.5), 
             () -> indexer.setPower(0),
             indexer
         ).until(nextButton),
 
         new InstantCommand(() -> currentMode.setString("indexer down")),
         new StartEndCommand(
-            () -> indexer.setPower(-1), 
+            () -> indexer.setPower(-0.5), 
             () -> indexer.setPower(0),
             indexer
         ).until(nextButton),
@@ -160,7 +150,18 @@ public class SystemCheck extends SystemTest {
         new InstantCommand(() -> currentMode.setString("done!")),
 
         new InstantCommand(() -> isDone = true)
-      ).schedule();
+    );
+    this.intake = intake;
+    this.indexer = indexer;
+    this.drivetrain = drivetrain;
+    this.shooter = shooter;
+    this.hood = hood;
+    this.targeting = targeting;
+    this.turret = turret;
+    this.climber = climber;
+    
+    this.nextButton = nextButton;
+
   }
 
   @Override
@@ -176,20 +177,6 @@ public class SystemCheck extends SystemTest {
       new InstantCommand(() -> hood.setDisableHood(false))
     ).schedule();
   }
-
-  @Override
-  public void initialize() {
-  }
-  @Override
-  public void execute() {
-  }
-
-  @Override
-  public boolean didPass() {
-      return isDone;
-  }
-  
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

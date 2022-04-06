@@ -5,9 +5,12 @@ import java.util.Arrays;
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
+import com.lightningrobotics.common.testing.SystemTest;
+import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
 import com.lightningrobotics.voidrobot.commands.SystemCheck;
+import com.lightningrobotics.voidrobot.commands.SystemCheckNoTest;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
@@ -37,6 +40,7 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -198,6 +202,7 @@ public class RobotContainer extends LightningContainer {
         // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
 
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        
 	}
 
     @Override
@@ -207,7 +212,9 @@ public class RobotContainer extends LightningContainer {
     protected void configureFaultMonitors() { }
 
     @Override
-    protected void configureSystemTests() { }
+    protected void configureSystemTests() { 
+        // SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+    }
 
     @Override
     public LightningDrivetrain getDrivetrain() {
@@ -228,7 +235,7 @@ public class RobotContainer extends LightningContainer {
 
         climbTab.add(new InstantCommand(climber::resetArmEncoders));
 
-        sysCheckTab.add(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+        sysCheckTab.add(new SystemCheckNoTest(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
         
 	}
 	
@@ -255,6 +262,6 @@ public class RobotContainer extends LightningContainer {
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
-	}
+	} 
 
 }
