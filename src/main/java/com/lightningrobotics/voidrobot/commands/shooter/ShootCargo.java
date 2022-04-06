@@ -36,7 +36,9 @@ public class ShootCargo extends CommandBase {
 
 		if(DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString())) {
 			drivetrain.stop(); 
+			System.out.println("Current drivetrain veloacity: " + drivetrain.getCurrentVelocity());
 			if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT) { // getCurrentVelocity() may not work, may need another constant
+	
 				shooter.setRPM(rpm);
 				hood.setAngle(hoodAngle);
 					
