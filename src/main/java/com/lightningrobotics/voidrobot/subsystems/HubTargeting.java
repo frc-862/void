@@ -342,7 +342,7 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
-	private double calcTurretAngle() {
+	public double calcTurretAngle() {
 		return currentTurretAngleSupplier.get().getDegrees() + hubAngleOffset;
 	}
 

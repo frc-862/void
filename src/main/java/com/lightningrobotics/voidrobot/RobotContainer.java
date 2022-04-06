@@ -79,6 +79,7 @@ public class RobotContainer extends LightningContainer {
     protected void configureAutonomousCommands() {
 
         try {
+            Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
             Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
@@ -110,6 +111,8 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count
+
+        (new JoystickButton(copilot, JoystickConstants.RIGHT_STICK_DOWN)).whileHeld(new AimTurretConstrained(turret, targeting, drivetrain));
 
 		// CLIMB
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
