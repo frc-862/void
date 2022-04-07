@@ -100,7 +100,7 @@ public class HubTargeting extends SubsystemBase {
 	private double targetHoodAngle;
 
 	// Command State
-	private int state = 0;
+	private double state = 0;
 	private int lastImageIndex = -1;
 
 	// Main Output External Access Functions
@@ -172,11 +172,11 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
-	public void setState(int state) {
+	public void setState(double state) {
 		this.state = state;
 	}
 
-	public int getState() {
+	public double getState() {
 		return state;
 	}
 

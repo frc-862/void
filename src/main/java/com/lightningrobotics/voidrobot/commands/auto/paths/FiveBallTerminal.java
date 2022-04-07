@@ -43,14 +43,17 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 						new InstantCommand(() -> targeting.setState(1)),
 							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
 							// new InstantCommand(() -> turret.setAngle(0)),
+							new InstantCommand(() -> targeting.setState(1.5)),
 							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))			
 					)
 				),
+				new InstantCommand(() -> targeting.setState(1.75)),
 				new InstantCommand(drivetrain::stop),
 
 				// balls 2 and 3
 				new InstantCommand(() -> targeting.setState(2)),
 				new TimedCommand(new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d), 2),
+				new InstantCommand(() -> targeting.setState(2.5)),
 
 				new InstantCommand(() -> turret.setConstraint(0, 25)),
 
@@ -62,22 +65,22 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 						new InstantCommand(() -> targeting.setState(5))
 					),
 					new SequentialCommandGroup(
-						middle5Ball.getCommand(drivetrain, 6d, 3d),
+						middle5Ball.getCommand(drivetrain, 6d, 4d),
 						new InstantCommand(() -> targeting.setState(4))
 					)
 				),
 
 				// drives to shoot 4 and 5
 				new InstantCommand(() -> targeting.setState(6)),
-				end5Ball.getCommand(drivetrain, 6d, 3d),
+				end5Ball.getCommand(drivetrain, 6d, 4d),
 				new InstantCommand(() -> indexer.setBallCount(2)),
 				new InstantCommand(drivetrain::setMotorCoastMode),
+				new InstantCommand(drivetrain::stop),
 				
 				// shoots 4 and 5
 				new InstantCommand(() -> targeting.setState(7)),
 				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d),
 
-				new InstantCommand(drivetrain::stop),
 				new InstantCommand(() -> turret.resetConstraint())
 
 			)
