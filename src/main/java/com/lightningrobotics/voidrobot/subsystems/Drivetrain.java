@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
@@ -74,6 +75,12 @@ public class Drivetrain extends DifferentialDrivetrain {
 		// setCanBusFrameRate(StatusFrameEnhanced.Status_10_MotionMagic, 200);
     
         intitLogging();
+
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.config_kP(0, 0.036934);
+            motor.config_kF(0, 0.005);
+        });
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 
@@ -150,6 +157,19 @@ public class Drivetrain extends DifferentialDrivetrain {
     public double getCurrentVelocity() {
         return -currentVelocity; // this is negative b/c we want it shooter-forward
     }
+
+    public void setMotorBrakeMode(){
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Brake);
+        });
+    }
+    public void pidStop() { 
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.set(TalonFXControlMode.Velocity, 0);
+        });
+    }  
 
 
 }

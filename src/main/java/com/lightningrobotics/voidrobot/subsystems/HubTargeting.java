@@ -51,6 +51,9 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry biasDistanceEntry = targetingTab.add("Bias Distnace", 0).getEntry();
 	private final NetworkTableEntry hasVisionEntry = targetingTab.add("Has Vision", false).getEntry();
 	private final NetworkTableEntry onTargetEntry = targetingTab.add("On Target", false).getEntry();
+	private final NetworkTableEntry shooterOnTargetEntry = targetingTab.add("Shooter On Target", false).getEntry();
+	private final NetworkTableEntry hoodOnTargetEntry = targetingTab.add("Hood On Target", false).getEntry();
+	private final NetworkTableEntry turretOnTargetEntry = targetingTab.add("Turret On Target", false).getEntry();
 	private final NetworkTableEntry velocityEntry = targetingTab.add("Velocity", 0).getEntry();
 	private final NetworkTableEntry motionBiasAngleEntry = targetingTab.add("Motion Bias Angle", 0).getEntry();
 	private final NetworkTableEntry motionBiasDistanceEntry = targetingTab.add("Motion Bias Distnace", 0).getEntry();
@@ -120,23 +123,52 @@ public class HubTargeting extends SubsystemBase {
 		var currHood = currentHoodAngleSupplier.getAsDouble();
 		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
 
+		var turretOnTarget =  (Math.abs(targetTurretAngle - currTurret) < Constants.TURRET_TOLERANCE);
+		turretOnTargetEntry.setBoolean(turretOnTarget);
+		var hoodOnTarget =  (Math.abs(targetHoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+		hoodOnTargetEntry.setBoolean(hoodOnTarget);
+		var shooterOnTarget =  (Math.abs(targetFlywheelRPM - currRPM) < Constants.SHOOTER_TOLERANCE);
+		shooterOnTargetEntry.setBoolean(shooterOnTarget);
+
 		return 
-			(Math.abs(targetFlywheelRPM - currRPM) < Constants.SHOOTER_TOLERANCE) &&
-			(Math.abs(targetTurretAngle - currTurret) < Constants.TURRET_TOLERANCE) &&
-			(Math.abs(targetHoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+			hoodOnTarget &&
+			turretOnTarget &&
+			shooterOnTarget;
 
 	}
 
 	public boolean onTarget(double shooterRPM, double turretAngle, double hoodAngle) {
 
-		var currTurret = currentTurretAngleSupplier.get().getDegrees();
+		var currTurret = turretAngle;
 		var currHood = currentHoodAngleSupplier.getAsDouble();
 		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
 
+		var turretOnTarget =  (Math.abs(turretAngle - currTurret) < Constants.TURRET_TOLERANCE);
+		turretOnTargetEntry.setBoolean(turretOnTarget);
+		var hoodOnTarget =  (Math.abs(hoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+		hoodOnTargetEntry.setBoolean(hoodOnTarget);
+		var shooterOnTarget =  (Math.abs(shooterRPM - currRPM) < Constants.SHOOTER_TOLERANCE);
+		shooterOnTargetEntry.setBoolean(shooterOnTarget);
+
 		return 
-			(Math.abs(shooterRPM - currRPM) < Constants.SHOOTER_TOLERANCE) &&
-			(Math.abs(turretAngle - currTurret) < Constants.TURRET_TOLERANCE) &&
-			(Math.abs(hoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+			hoodOnTarget &&
+			turretOnTarget &&
+			shooterOnTarget;
+
+	}
+
+	public boolean onTarget(double shooterRPM, double hoodAngle) {
+		var currHood = currentHoodAngleSupplier.getAsDouble();
+		var currRPM = currentFlywheelRPMSupplier.getAsDouble();
+
+		var hoodOnTarget =  (Math.abs(hoodAngle - currHood) < Constants.HOOD_TOLERANCE);
+		hoodOnTargetEntry.setBoolean(hoodOnTarget);
+		var shooterOnTarget =  (Math.abs(shooterRPM - currRPM) < Constants.SHOOTER_TOLERANCE);
+		shooterOnTargetEntry.setBoolean(shooterOnTarget);
+
+		return 
+			hoodOnTarget &&
+			shooterOnTarget;
 
 	}
 
@@ -270,7 +302,7 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
+			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
 			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
