@@ -294,14 +294,15 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
-			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
 			var theta = targetTurretAngle;
 
-			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
+			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
+			relativeVel = relativeVel * Constants.DISTANCE_TO_TIME_SHOOT_MAP.get(dist); //convert velocity to a distance
+			velocityEntry.setDouble(relativeVel);
 			
+			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
 			//if(motionAdjustedDistance <= 0) {
 			//	System.err.println("Bias Distance <= 0 - Will Fail");
 			//	return;

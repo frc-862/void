@@ -191,6 +191,15 @@ public final class Constants {
         }
     };
 
+    //distance in meters, time the ball takes to get in from the shooter to the target
+    public static final InterpolationMap DISTANCE_TO_TIME_SHOOT_MAP = new InterpolationMap() {
+        {
+            put(0d, 1.5d);
+            put(10d, 1.5d);
+            put(20d, 1.5d);
+        }
+    };
+
     public static final boolean SHOT_TUNING = false; // use this when making a new interpolation
                                                     //TODO: set this back later
 	// Intake
