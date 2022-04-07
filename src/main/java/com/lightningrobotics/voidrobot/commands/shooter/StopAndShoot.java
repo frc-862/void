@@ -33,6 +33,12 @@ public class StopAndShoot extends CommandBase {
 	@Override
 	public void execute() {
 		drivetrain.pidStop();
+		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+		var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
+		var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
+
+		shooter.setRPM(rpm);
+		hood.setAngle(hoodAngle);
 
 		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);

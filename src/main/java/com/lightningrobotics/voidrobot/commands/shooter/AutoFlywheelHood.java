@@ -17,13 +17,14 @@ public class AutoFlywheelHood extends CommandBase {
 	private final HubTargeting targeting;
 	private final Indexer indexer;
 
+
 	public AutoFlywheelHood(Shooter shooter, Hood hood, HubTargeting targeting, Indexer indexer){
 		this.shooter = shooter;
 		this.hood = hood;
 		this.targeting = targeting;
 		this.indexer = indexer;
 
-		addRequirements(shooter, hood, indexer);
+		addRequirements(shooter, hood);
 	}
 
 	@Override
@@ -37,15 +38,18 @@ public class AutoFlywheelHood extends CommandBase {
 			shooter.setRPM(rpm);
 			hood.setAngle(hoodAngle);
 
-			// if the only ball is enemy ball, shoots directly
-			if(isEnenmyBall && indexer.getBallCount() == 1 && targeting.onTarget(rpm, hoodAngle)){
-				indexer.setPower(1);
-			}
+			// // if the only ball is enemy ball, shoots directly
+			// if(isEnenmyBall && indexer.getBallCount() == 1){
+			// 	indexer.setPower(1);
+			// }
+			// else{
+			// 	indexer.setPower(0);
+			// }
 		}
 		else{
 			shooter.coast();
 			hood.setAngle(0);
-			indexer.setPower(0);
+			// indexer.setPower(0);
 		}
 	}
 

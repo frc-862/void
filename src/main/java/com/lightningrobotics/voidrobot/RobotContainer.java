@@ -198,7 +198,7 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        //indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        indexer.setDefaultCommand(new EjectBall(indexer));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
@@ -222,6 +222,9 @@ public class RobotContainer extends LightningContainer {
 		var tab = Shuffleboard.getTab("hood");
 
         var climbTab = Shuffleboard.getTab("climber");
+
+        var indexerTab = Shuffleboard.getTab("indexer");
+        indexerTab.add(indexer);
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
