@@ -1,5 +1,7 @@
 package com.lightningrobotics.voidrobot.constants;
 
+import javax.swing.plaf.TreeUI;
+
 // import javax.smartcardio.CardNotPresentException;
 
 import com.lightningrobotics.common.controller.FeedForwardController;
@@ -154,10 +156,12 @@ public final class Constants {
 			put(3.07d, 3650d);
 			put(3.56d, 3850d);
 			put(4.24d, 3950d);
-			put(5.13d, 4250d);
+			//put(4.6d, 4250d);
+			put(5.13d, 4300d);
 			put(6.02d, 4550d);
 			put(7.11d, 5000d);
 			put(8.03, 5400d);
+            put(9.35, 5500d);
 
 			// put(2.46d, 3550d);
             // put(3.11d, 3750d);
@@ -176,10 +180,12 @@ public final class Constants {
 			put(3.07d, 0d);
 			put(3.56d, 0.2d);
 			put(4.24d, 0.4d);
+			//put(4.6d, 2.0d);
 			put(5.13d, 0.8d);
 			put(6.02d, 1.1d);
 			put(7.11d, 2.4d);
 			put(8.03, 2.3d);
+            put(9.35, 3.0d);
 
             // put(2.46d, 0d);
             // put(3.11d, 0d);
@@ -200,7 +206,7 @@ public final class Constants {
         }
     };
 
-    public static final boolean SHOT_TUNING = false; // use this when making a new interpolation
+    public static final boolean SHOT_TUNING = true; // use this when making a new interpolation
                                                     //TODO: set this back later
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;

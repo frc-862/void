@@ -1,7 +1,9 @@
 package com.lightningrobotics.voidrobot.commands.indexer;
 
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
+import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -10,7 +12,7 @@ public class AutoIndexCargo extends CommandBase {
     // Creates our indexer subsystem
     private final Indexer indexer;
 
-    private double indexTimeBall1 = 0.35d; // 0.185d; // The time we want the indexer to index in seconds
+    private double indexTimeBall1 = 0.2d; // 0.185d; // The time we want the indexer to index in seconds
     private double indexTimeBall2 = 0.275d; // The time we want the indexer to index in seconds
     private double startIndexTime = 0d; // Setting a default start time of 0
 
@@ -21,7 +23,7 @@ public class AutoIndexCargo extends CommandBase {
     public AutoIndexCargo(Indexer indexer) {
 		this.indexer = indexer;
 
-		// addRequirements(indexer); TODO maybe fix
+		 addRequirements(indexer);// TODO maybe fix
 	}
 
     @Override
@@ -30,19 +32,23 @@ public class AutoIndexCargo extends CommandBase {
     @Override
     public void execute() {
 
+        boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && !(indexer.getUpperBallColor() == BallColor.nothing);
+        
         if (indexer.getCollectedBall()) { // && indexer.getAutoIndex()
             startIndexTime = Timer.getFPGATimestamp();
         }
-
-        if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1) {
+        if(indexer.getBallCount() == 1 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall1 && !isEnenmyBall) {
             indexer.setPower(power);
 			isStopped = false;
         } 
+        else if (indexer.getBallCount() == 1 && isEnenmyBall){
+            indexer.setPower(power);
+        }
         else if(indexer.getBallCount() == 2 && Timer.getFPGATimestamp() - startIndexTime < indexTimeBall2 && indexer.getBallCount() != 2) { // Checks to see if we have reached the amount of time we want to index, then stops
             indexer.setPower(power);
 			isStopped = false;
         } 
-		else if(!isStopped){
+		else if(!isStopped || isEnenmyBall){
             indexer.setPower(0);
 			isStopped = true;
         } 
