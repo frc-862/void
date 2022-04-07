@@ -42,7 +42,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 						new InstantCommand(() -> turret.setConstraint(40, 25)),
 						new InstantCommand(() -> targeting.setState(1)),
 							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
-							// new InstantCommand(() -> turret.setAngle(0)),
+							new InstantCommand(() -> shooter.setRPM(4200)),
 							new InstantCommand(() -> targeting.setState(1.5)),
 							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))			
 					)
