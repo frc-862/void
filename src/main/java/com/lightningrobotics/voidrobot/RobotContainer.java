@@ -213,7 +213,7 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureSystemTests() { 
-        // SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+        SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
     }
 
     @Override
@@ -235,7 +235,7 @@ public class RobotContainer extends LightningContainer {
 
         climbTab.add(new InstantCommand(climber::resetArmEncoders));
 
-        sysCheckTab.add(new SystemCheckNoTest(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+        // sysCheckTab.add(new SystemCheckNoTest(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
         
 	}
 	
