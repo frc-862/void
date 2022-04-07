@@ -61,15 +61,15 @@ public final class Constants {
     public static final double TURRET_kI_FAST = 0.00; 
     public static final double TURRET_kD_FAST = 0.001; 
     public static final double DEFAULT_ANGLE = 0;
-    public static final double MAX_TURRET_ANGLE = 110d;
-    public static final double MIN_TURRET_ANGLE = -110d;
+    public static final double MAX_TURRET_ANGLE = 100d;
+    public static final double MIN_TURRET_ANGLE = -100d;
     public static final double TURRET_TOLERANCE = 5; // degrees
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
-    public static final double RED_THRESHOLD = 0.45;
-    public static final double BLUE_THRESHOLD = 0.4;
+    public static final double RED_THRESHOLD = 0.38;
+    public static final double BLUE_THRESHOLD = 0.32;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
@@ -191,7 +191,7 @@ public final class Constants {
         }
     };
 
-    public static final boolean SHOT_TUNING = true; // use this when making a new interpolation
+    public static final boolean SHOT_TUNING = false; // use this when making a new interpolation
                                                     //TODO: set this back later
 	// Intake
 	public static final double INTAKE_DEPLOY_TIME = 2d;

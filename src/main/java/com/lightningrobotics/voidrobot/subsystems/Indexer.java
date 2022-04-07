@@ -27,7 +27,7 @@ public class Indexer extends SubsystemBase {
     private final DigitalInput exitSensor  = new DigitalInput(RobotMap.EXIT_BEAM_BREAK);
 
     Debouncer enterDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
-    Debouncer exitDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
+    Debouncer exitDebouncer = new Debouncer(0);
 
     // define variables to store beam break data
     private boolean lower;
@@ -71,6 +71,8 @@ public class Indexer extends SubsystemBase {
         indexerTab.addString("upper ball color", () -> upperBallColor.toString());
         indexerTab.addString("llower ball color", () -> lowerBallColor.toString());
         indexerTab.addNumber("ball count", () -> ballCount);
+        indexerTab.addBoolean("upper sensor", () -> upper);
+        indexerTab.addBoolean("lower sensor", () -> lower);
 
 		CommandScheduler.getInstance().registerSubsystem(this);
     }
@@ -103,6 +105,7 @@ public class Indexer extends SubsystemBase {
         }
         if (eject1) {
             ballCount--;
+            upperBallColor = lowerBallColor;
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
 

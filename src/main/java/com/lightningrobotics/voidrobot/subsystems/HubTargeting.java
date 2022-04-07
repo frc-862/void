@@ -294,7 +294,7 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
+			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
 			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;

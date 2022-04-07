@@ -19,14 +19,12 @@ public class LaunchPadCannedShot extends CommandBase {
   private final Shooter shooter;
 	private final Hood hood;
 	private final Indexer indexer;
-  private final Turret turret;
   private final HubTargeting targeting;
 
-  public LaunchPadCannedShot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Turret turret) {
+  public LaunchPadCannedShot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting) {
     this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
-    this.turret = turret;
     this.targeting = targeting;
 
 		addRequirements(shooter, hood, indexer);
@@ -39,11 +37,10 @@ public class LaunchPadCannedShot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      turret.setAngle(Constants.FAR_CANNED_SHOT_TURRET_POSITION); // set Turret to 0
       hood.setAngle(Constants.FAR_CANNED_SHOT_HOOD_ANGLE); // set Hood to 0
       shooter.setRPM(Constants.FAR_CANNED_SHOT_FLYWHEEL_SPEED); // set RPM to 3650.0
 
-      if(targeting.onTarget(Constants.FAR_CANNED_SHOT_FLYWHEEL_SPEED, Constants.FAR_CANNED_SHOT_TURRET_POSITION, Constants.FAR_CANNED_SHOT_HOOD_ANGLE)){
+      if(targeting.onTarget(Constants.FAR_CANNED_SHOT_FLYWHEEL_SPEED, Constants.FAR_CANNED_SHOT_HOOD_ANGLE)){
         indexer.setPower(Constants.DEFAULT_INDEXER_POWER); // Turn on Indexer to shoot   
       }
   }

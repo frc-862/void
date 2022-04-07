@@ -32,37 +32,22 @@ public class StopAndShoot extends CommandBase {
 
 	@Override
 	public void execute() {
+		drivetrain.pidStop();
 
-		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
-		if(!isEnenmyBall) {
-			drivetrain.pidStop(); 
-			var rpm = targeting.getTargetFlywheelRPM();
-			var hoodAngle = targeting.getTargetHoodAngle();
-
-			shooter.setRPM(rpm);
-			hood.setAngle(hoodAngle);
-			if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
-				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-			} 
-		}
-		else {
-			shooter.setRPM(Constants.EJECT_BALL_RPM);
-			hood.setAngle(Constants.EJECT_BALL_HOOD_ANGLE); 
-			if (targeting.onTarget(Constants.EJECT_BALL_RPM, Constants.EJECT_BALL_HOOD_ANGLE)){
-				indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
-			}
-		}
+		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		} 
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.coast();
+		//shooter.coast();
 		indexer.stop();
-		if (indexer.getBallCount() == 0) {
-			hood.setAngle(0);
-		} else {
-			hood.setPower(0);
-		}
+		// if (indexer.getBallCount() == 0) {
+		// 	hood.setAngle(0);
+		// } else {
+		// 	hood.setPower(0);
+		// }
 	}
 
 	@Override

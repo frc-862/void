@@ -99,6 +99,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, targeting), false); // Auto shoot
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
+        //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer)); // Auto shoot
         (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); // Auto shoot
         //TODO: Ask eric for button
        // (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
@@ -197,8 +198,8 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        // indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-
+        //indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
 

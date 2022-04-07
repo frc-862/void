@@ -31,7 +31,7 @@ public class RunIndexer extends CommandBase {
 
     @Override
     public void execute() {
-        if (indexer.getExitStatus() && shooter.getCurrentRPM() < 1000 && power.getAsDouble() >= 0) { 
+        if (indexer.getExitStatusNoDebounce() && shooter.getCurrentRPM() < 1000 && power.getAsDouble() >= 0) { 
             indexer.setPower(0);
         }
         else {
