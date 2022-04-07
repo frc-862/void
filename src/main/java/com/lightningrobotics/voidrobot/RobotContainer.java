@@ -223,8 +223,12 @@ public class RobotContainer extends LightningContainer {
 
         var climbTab = Shuffleboard.getTab("climber");
 
-        var indexerTab = Shuffleboard.getTab("indexer");
-        indexerTab.add(indexer);
+        var subsystemTab = Shuffleboard.getTab("subsystems");
+        subsystemTab.add(indexer);
+        subsystemTab.add(shooter);
+        subsystemTab.add(climber);
+        subsystemTab.add(intake);
+        subsystemTab.add(hood);
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
