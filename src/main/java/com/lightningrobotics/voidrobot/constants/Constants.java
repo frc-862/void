@@ -20,6 +20,9 @@ public final class Constants {
     public static final double KV = 2.1297;
     public static final double KA = 0.35019;
 
+    public static final double DRIVETRAIN_BRAKE_KP = 0.00066934;
+    public static final double DRIVETRAIN_MAX_ACCELERATION = 200; //encoder ticks per 100 ms
+
     public static final boolean LEFT_1_INVERT = false;
     public static final boolean LEFT_2_INVERT = false;
     public static final boolean LEFT_3_INVERT = false;

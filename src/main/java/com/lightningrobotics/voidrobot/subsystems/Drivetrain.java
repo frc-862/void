@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
@@ -78,8 +79,9 @@ public class Drivetrain extends DifferentialDrivetrain {
 
         this.withEachMotor((m) -> {
             WPI_TalonFX motor = (WPI_TalonFX)m;
-            motor.config_kP(0, 0.026934);
+            motor.config_kP(0, Constants.DRIVETRAIN_BRAKE_KP);
             motor.config_kF(0, 0.005);
+            motor.configMotionAcceleration(Constants.DRIVETRAIN_MAX_ACCELERATION);
         });
 
 		CommandScheduler.getInstance().registerSubsystem(this);

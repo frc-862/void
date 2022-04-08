@@ -25,6 +25,3 @@ pluginManagement {
         }
     }
 }
-
-include ':lightning'
-project(':lightning').projectDir = file("../lightning")
