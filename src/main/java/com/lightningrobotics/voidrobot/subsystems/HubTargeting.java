@@ -193,6 +193,7 @@ public class HubTargeting extends SubsystemBase {
 
 		// Setup Subsystem
 		initLogging();
+		setLastVisionIndex();
 		CommandScheduler.getInstance().registerSubsystem(this);
 
 		distanceBias = -0.15d;
@@ -493,8 +494,9 @@ public class HubTargeting extends SubsystemBase {
 				// Instantiating the StringBuffer class to hold the result
 				StringBuffer sb = new StringBuffer();
 				while (sc.hasNext()) {
-					sb.append(sc.next());
-					// System.out.println(sc.next());
+					String line = sc.next();
+					sb.append(line);
+					
 				}
 				// Retrieving the String from the String Buffer object
 				String result = sb.toString();
@@ -504,12 +506,13 @@ public class HubTargeting extends SubsystemBase {
 				// result = result.replaceAll("<[^>]*>", "");
 				// System.out.println("Contents of the web page: "+result);
 
-				Pattern p = Pattern.compile("href=\"\\([0-9]+\\).jpg");
+				Pattern p = Pattern.compile("href=\"([0-9]+).jpg");
 				var m = p.matcher(result);
 				String last = "";
 
 				while (m.find()) {
 					var match = m.group(1);
+					System.out.println("Match: >" + match + "<");
 					last = match;
 				}
 

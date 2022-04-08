@@ -125,44 +125,50 @@ public final class Constants {
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {
-			put(2.46d, 3550d);
-			put(3.07d, 3650d);
-			put(3.56d, 3850d);
-			put(4.24d, 3950d);
-			put(5.13d, 4250d);
-			put(6.02d, 4550d);
-			put(7.11d, 5000d);
-			put(8.03, 5400d);
-
 			// put(2.46d, 3550d);
-            // put(3.11d, 3750d);
-            // put(3.67d, 3850d);
-            // put(4.13d, 4000d);
-            // put(4.9d, 4400d);
-            // put(5.6d, 4650d);
-            // put(6.08d, 4800d);
+			// put(3.07d, 3650d);
+			// put(3.56d, 3850d);
+			// put(4.24d, 3950d);
+			// put(5.13d, 4250d);
+			// put(6.02d, 4550d);
+			// put(7.11d, 5000d);
+			// put(8.03, 5400d);
+
+			put(2.46d, 3550d);
+            put(3.11d, 3750d);
+            put(3.67d, 3850d);
+            put(4.13d, 4000d);
+            put(4.9d, 4400d);
+            put(5.6d, 4650d);
+            put(6.08d, 4800d);
+            put(7.11d, 5000d);
+			put(8.03d, 5400d);
+            put(9.35d, 5500d);
         }
     };
 
     //distance in meters, angle in degrees
     public static final InterpolationMap HOOD_ANGLE_MAP = new InterpolationMap() {
         {
-			put(2.46d, 0d);
-			put(3.07d, 0d);
-			put(3.56d, 0.2d);
-			put(4.24d, 0.4d);
-			put(5.13d, 0.8d);
-			put(6.02d, 1.1d);
-			put(7.11d, 2.4d);
-			put(8.03, 2.3d);
+			// put(2.46d, 0d);
+			// put(3.07d, 0d);
+			// put(3.56d, 0.2d);
+			// put(4.24d, 0.4d);
+			// put(5.13d, 0.8d);
+			// put(6.02d, 1.1d);
+			// put(7.11d, 2.4d);
+			// put(8.03, 2.3d);
 
-            // put(2.46d, 0d);
-            // put(3.11d, 0d);
-            // put(3.67d, 1.2d);
-            // put(4.13d, 1.4d);
-            // put(4.9d, 1.9d);
-            // put(5.6d, 2.3d);
-            // put(6.08d, 2.6d);
+            put(2.46d, 0d);
+            put(3.11d, 0d);
+            put(3.67d, 1.2d);
+            put(4.13d, 1.4d);
+            put(4.9d, 1.9d);
+            put(5.6d, 2.3d);
+            put(6.08d, 2.6d);
+			put(7.11d, 2.4d);
+			put(8.03d, 2.3d);
+            put(9.35d, 3.0d);
         }
     };
 
