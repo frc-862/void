@@ -27,6 +27,7 @@ public class Drivetrain extends DifferentialDrivetrain {
     private double currentVelocity;
 
     private Pose2d pose = new Pose2d();
+    private Pose2d poseContinious = new Pose2d();
     private Pose2d prevPose = new Pose2d();
 
     private Rotation2d heading = Rotation2d.fromDegrees(0);
@@ -117,6 +118,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         super.periodic();
 		
         pose = this.getPose();
+        poseContinious = this.getPose();
         heading = this.getPose().getRotation();
         
         var deltaX = pose.getX() - prevPose.getX();
@@ -126,7 +128,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         var rot = Math.atan2(deltaY, deltaX);  
         
         prevPose = pose;
-        prevHeading = heading; 
+        prevHeading = heading;
 
         SmartDashboard.putNumber("currentVelocity", currentVelocity);
         SmartDashboard.putNumber("rot thigy", rot);

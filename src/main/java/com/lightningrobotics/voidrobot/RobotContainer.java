@@ -79,6 +79,7 @@ public class RobotContainer extends LightningContainer {
     protected void configureAutonomousCommands() {
 
         try {
+            Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
 			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
             Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));

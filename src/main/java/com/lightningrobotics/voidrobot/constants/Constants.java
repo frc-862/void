@@ -124,31 +124,6 @@ public final class Constants {
     public static final double EJECT_BALL_RPM = 1500;
     public static final double EJECT_BALL_HOOD_ANGLE = 4.0; //TODO: tune
 
-    //distance in meters, power in RPM
-
-    // public static final InterpolationMap ANGLE_POWER_MAP = new InterpolationMap() {
-    //     {
-	// 		put(-135d, 150d);
-	// 		put(-90d, 150d);
-	// 		put(-45d, 200d);
-	// 		put(-15d, 0d);
-	// 		put(15d, 0d);
-	// 		put(45d, 200d);
-	// 		put(90d, 150d);
-	// 		put(135d, 150d);
-
-            
-
-    //         // 3.11m; 45 degrees: 0; 45 degrees: 0;
-    //        // 3.67 m; 45 degrees: 75; 90 degrees: 100;
-    //        // 4.13m; 45 degrees: 0; 90 degrees: 100;
-    //        // 4.9m; 45 degrees: 0; 90 degrees: 50;
-    //        // 5.6m; 45 degrees: 0; 90 degrees: 0;
-    //        // 6.08m; 45 degrees: 100; 90 degrees: 250;
-
-    //     }
-    // };
-
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
         {

@@ -1,9 +1,14 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
+import java.io.IOException;
 import java.net.DatagramSocketImpl;
+import java.net.InetAddress;
+import java.net.URL;
+import java.util.Scanner;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainSpeed;
 import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
@@ -95,7 +100,8 @@ public class HubTargeting extends SubsystemBase {
 	private double targetHoodAngle;
 
 	// Command State
-	private int state = 0;
+	private double state = 0;
+	private int lastImageIndex = -1;
 
 	// Main Output External Access Functions
 	
@@ -166,11 +172,11 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
-	public void setState(int state) {
+	public void setState(double state) {
 		this.state = state;
 	}
 
-	public int getState() {
+	public double getState() {
 		return state;
 	}
 
@@ -234,6 +240,7 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("targetY", () -> visionTargetYOffsetEntry.getDouble(-1));
 		DataLogger.addDataElement("latency", () -> visionTargetLatencyEntry.getDouble(-1));
 		DataLogger.addDataElement("validTarget", () -> visionTargetDetectedEntry.getDouble(-1));
+		DataLogger.addDataElement("lastImageIndex", () -> lastImageIndex);
 
 		//Drive Logging
 		DataLogger.addDataElement("relativeVelocityY", () -> velocityEntry.getDouble(0));
@@ -279,6 +286,7 @@ public class HubTargeting extends SubsystemBase {
 		if (exitSensor.getAsBoolean()) {
 			if (Timer.getFPGATimestamp() - lastVisionSnapshot > Constants.SNAPSHOT_DELAY) {
 				visionSnapshotEntry.setNumber(1);
+				lastImageIndex++;
 			} else {
 				visionSnapshotEntry.setNumber(0);
 			}
@@ -375,7 +383,7 @@ public class HubTargeting extends SubsystemBase {
 
 	}
 
-	private double calcTurretAngle() {
+	public double calcTurretAngle() {
 		return currentTurretAngleSupplier.get().getDegrees() + hubAngleOffset;
 	}
 
@@ -467,4 +475,60 @@ public class HubTargeting extends SubsystemBase {
 		angleBias = 0;
 	}
 
+	private Thread findLastImage = null;
+
+	public void setLastVisionIndex() {
+		findLastImage = new Thread(() -> {
+			try {
+				InetAddress address = InetAddress.getByName("limelight.local");
+				// Try to reach the specified address within the timeout
+				// periode. If during this periode the address cannot be
+				// reach then the method returns false.
+				while (!address.isReachable(10000)) ;
+
+				// Instantiating the URL class
+				URL url = new URL("http://limelight.local:5801/snapshots/");
+
+				// Retrieving the contents of the specified page
+				Scanner sc = new Scanner(url.openStream());
+				// Instantiating the StringBuffer class to hold the result
+				StringBuffer sb = new StringBuffer();
+				while (sc.hasNext()) {
+					sb.append(sc.next());
+					// System.out.println(sc.next());
+				}
+				// Retrieving the String from the String Buffer object
+				String result = sb.toString();
+
+				// System.out.println(result);
+				// Removing the HTML tags
+				// result = result.replaceAll("<[^>]*>", "");
+				// System.out.println("Contents of the web page: "+result);
+
+				Pattern p = Pattern.compile("href=\"\\([0-9]+\\).jpg");
+				var m = p.matcher(result);
+				String last = "";
+
+				while (m.find()) {
+					var match = m.group(1);
+					last = match;
+				}
+
+				lastImageIndex = Integer.parseInt(last);
+
+			} catch (IOException ex) {
+				System.out.println(ex);
+			}
+		});
+
+		findLastImage.start();
+	}
+
+	public int getLastImageIndex() {
+		return lastImageIndex;
+	}
+
+	public int incrementImageIndex() {
+		return lastImageIndex += 1;
+	}
 }

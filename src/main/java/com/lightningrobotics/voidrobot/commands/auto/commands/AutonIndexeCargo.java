@@ -32,6 +32,6 @@ public class AutonIndexeCargo extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return indexer.getBallCount() == ballsWanted; // indexer.getColorSensor().getProximity() > 350 && 
+        return indexer.getBallCount() == indexer.getBallCount() + ballsWanted; // indexer.getColorSensor().getProximity() > 350 && 
     }
 }
