@@ -199,7 +199,7 @@ public class RobotContainer extends LightningContainer {
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
         indexer.setDefaultCommand(new AutoIndexCargo(indexer));
-        //shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
+        shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
 

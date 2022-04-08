@@ -77,7 +77,7 @@ public class Drivetrain extends DifferentialDrivetrain {
 
         this.withEachMotor((m) -> {
             WPI_TalonFX motor = (WPI_TalonFX)m;
-            motor.config_kP(0, 0.036934);
+            motor.config_kP(0, 0.026934);
             motor.config_kF(0, 0.005);
         });
 
@@ -97,7 +97,9 @@ public class Drivetrain extends DifferentialDrivetrain {
         DataLogger.addDataElement("heading", () -> this.getPose().getRotation().getDegrees());
         DataLogger.addDataElement("poseX", () -> this.getPose().getX());
         DataLogger.addDataElement("poseY", () -> this.getPose().getY());
-
+        DataLogger.addDataElement("accelX", () -> imu.getNavxAccelerationX());
+        DataLogger.addDataElement("accelY", () -> imu.getNavxAccelerationY());
+        DataLogger.addDataElement("accelZ", () -> imu.getNavxAccelerationZ());
         // Moveing while shooting stuff
     }
 

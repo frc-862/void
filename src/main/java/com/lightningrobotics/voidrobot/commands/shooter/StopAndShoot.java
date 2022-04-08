@@ -1,6 +1,8 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.common.util.LightningMath;
+import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
@@ -22,6 +24,11 @@ public class StopAndShoot extends CommandBase {
 	private final HubTargeting targeting;
 	private final Drivetrain drivetrain;
 	private final LightningIMU imu;
+	private final MovingAverageFilter mafX = new MovingAverageFilter(2);
+	private final MovingAverageFilter mafY = new MovingAverageFilter(2);
+	private final MovingAverageFilter mafZ = new MovingAverageFilter(2);
+
+	private final double STOPPING_TOLERANCE = 0.25d;
 
 	public StopAndShoot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain, LightningIMU imu) {
 		this.shooter = shooter;
@@ -41,11 +48,25 @@ public class StopAndShoot extends CommandBase {
 		var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 		var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
 
+		var accelX = mafX.filter(imu.getNavxAccelerationX());
+		var accelY = mafY.filter(imu.getNavxAccelerationY());
+		var accelZ = mafZ.filter(imu.getNavxAccelerationZ());
+
+		var isXStopping = Math.abs(accelX) < STOPPING_TOLERANCE;
+		var isYStopping = Math.abs(accelY) - 1  < STOPPING_TOLERANCE;
+		var isZStopping = Math.abs(accelZ) < STOPPING_TOLERANCE;
+
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
-		SmartDashboard.putBoolean("IMU moving", imu.isMoving());
+		SmartDashboard.putNumber("IMU X acc", imu.getNavxAccelerationX());
+		SmartDashboard.putNumber("IMU Y acc", imu.getNavxAccelerationY());
+		SmartDashboard.putNumber("IMU Z acc", imu.getNavxAccelerationZ());
+		SmartDashboard.putBoolean("IMU X stopped", isXStopping);
+		SmartDashboard.putBoolean("IMU Y stopped", isYStopping);
+		SmartDashboard.putBoolean("IMU Z stopped", isZStopping);
+		
 
-		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
+		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget() && isXStopping && isYStopping && isZStopping){
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		} 
 	}
