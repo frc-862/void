@@ -137,9 +137,6 @@ public final class Constants {
 			// put(4.6d, 4250d);
 			// put(5.13d, 4300d);
 			// put(6.02d, 4550d);
-			put(7.11d, 5000d);
-			put(8.03, 5400d);
-            put(9.35, 5500d);
 
 			put(2.46d, 3550d);
             put(3.11d, 3750d);
@@ -148,6 +145,9 @@ public final class Constants {
             put(4.9d, 4400d);
             put(5.6d, 4650d);
             put(6.08d, 4800d);
+            put(7.11d, 5000d);
+			put(8.03d, 5400d);
+            put(9.35d, 5500d);
         }
     };
 
@@ -158,12 +158,10 @@ public final class Constants {
 			// put(3.07d, 0d);
 			// put(3.56d, 0.2d);
 			// put(4.24d, 0.4d);
-			// put(4.6d, 2.0d);
 			// put(5.13d, 0.8d);
 			// put(6.02d, 1.1d);
-			put(7.11d, 2.4d);
-			put(8.03, 2.3d);
-            put(9.35, 3.0d);
+			// put(7.11d, 2.4d);
+			// put(8.03, 2.3d);
 
             put(2.46d, 0d);
             put(3.11d, 0d);
@@ -172,15 +170,9 @@ public final class Constants {
             put(4.9d, 1.9d);
             put(5.6d, 2.3d);
             put(6.08d, 2.6d);
-        }
-    };
-
-    //distance in meters, time the ball takes to get in from the shooter to the target
-    public static final InterpolationMap DISTANCE_TO_TIME_SHOOT_MAP = new InterpolationMap() {
-        {
-            put(0d, 1.5d);
-            put(10d, 1.5d);
-            put(20d, 1.5d);
+			put(7.11d, 2.4d);
+			put(8.03d, 2.3d);
+            put(9.35d, 3.0d);
         }
     };
 
