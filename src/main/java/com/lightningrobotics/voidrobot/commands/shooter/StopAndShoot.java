@@ -13,6 +13,7 @@ import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -28,7 +29,9 @@ public class StopAndShoot extends CommandBase {
 	private final MovingAverageFilter mafY = new MovingAverageFilter(2);
 	private final MovingAverageFilter mafZ = new MovingAverageFilter(2);
 
+	private double enenmyOurTimer = 0;
 	private final double STOPPING_TOLERANCE = 0.25d;
+	private final double ENENMY_OUR_WAIT_TIME = 0.4d;
 
 	public StopAndShoot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain, LightningIMU imu) {
 		this.shooter = shooter;
@@ -44,9 +47,29 @@ public class StopAndShoot extends CommandBase {
 	@Override
 	public void execute() {
 		drivetrain.pidStop();
-		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
-		var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
-		var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
+
+		var allianceBallColor = DriverStation.getAlliance().toString();
+		boolean isEnenmyBall = !allianceBallColor.equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+
+		var getRPM = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
+		var getHoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
+
+		var setRPM = 0d;
+		var setHoodAngle = 0d;
+		
+		// Enemy-Our ball sequence: prevent RPM going down, causing our ball to shoot shorter than intended
+		// If detect enemyball in lower, our ball on upper, start timer.
+		if(indexer.getUpperBallColor().toString().equals(allianceBallColor) && !indexer.getLowerBallColor().toString().equals(allianceBallColor) && indexer.getBallCount() == 2){
+			enenmyOurTimer = Timer.getFPGATimestamp();
+			setRPM = getRPM;
+			setHoodAngle = getHoodAngle; 
+		}
+		
+		// when upper ball shoots, timer stops. Wait before decreasing RPM
+		if(Timer.getFPGATimestamp() - enenmyOurTimer > ENENMY_OUR_WAIT_TIME || enenmyOurTimer == 0){
+			setRPM = getRPM;
+			setHoodAngle = getHoodAngle;
+		}
 
 		var accelX = mafX.filter(imu.getNavxAccelerationX());
 		var accelY = mafY.filter(imu.getNavxAccelerationY());
@@ -56,15 +79,14 @@ public class StopAndShoot extends CommandBase {
 		var isYStopping = Math.abs(accelY) - 1  < STOPPING_TOLERANCE;
 		var isZStopping = Math.abs(accelZ) < STOPPING_TOLERANCE;
 
-		shooter.setRPM(rpm);
-		hood.setAngle(hoodAngle);
+		shooter.setRPM(setRPM);
+		hood.setAngle(setHoodAngle);
 		SmartDashboard.putNumber("IMU X acc", imu.getNavxAccelerationX());
 		SmartDashboard.putNumber("IMU Y acc", imu.getNavxAccelerationY());
 		SmartDashboard.putNumber("IMU Z acc", imu.getNavxAccelerationZ());
 		SmartDashboard.putBoolean("IMU X stopped", isXStopping);
 		SmartDashboard.putBoolean("IMU Y stopped", isYStopping);
 		SmartDashboard.putBoolean("IMU Z stopped", isZStopping);
-		
 
 		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget() && isXStopping && isYStopping && isZStopping){
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
@@ -73,13 +95,7 @@ public class StopAndShoot extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		//shooter.coast();
 		indexer.stop();
-		// if (indexer.getBallCount() == 0) {
-		// 	hood.setAngle(0);
-		// } else {
-		// 	hood.setPower(0);
-		// }
 	}
 
 	@Override
