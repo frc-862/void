@@ -21,6 +21,9 @@ public class RunIntake extends CommandBase {
 
     @Override
     public void execute() {
+        if (intake.getBumperSensor()){
+            intake.setPower(0);
+        }
         intake.setPower(power.getAsDouble());
     }
 

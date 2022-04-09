@@ -24,6 +24,8 @@ public final class RobotMap {
     // Intake
     public static final int INTAKE_MOTOR_ID = 15;
     public static final int INTAKE_WINCH_ID = 14;
+    public static final int INTAKE_BUMPER_SENSOR = 20; // TODO dont know this number yet
+    public static final int INTAKE_DEPLOYED_SENSOR = 20; // TODO dont know this number yet
 
     // Turret
     public static final int TURRET_MOTOR_ID = 12;

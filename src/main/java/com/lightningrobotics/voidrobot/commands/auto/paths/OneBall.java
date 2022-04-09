@@ -5,6 +5,8 @@ import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonDeployIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
+import com.lightningrobotics.voidrobot.commands.intake.DeployIntake;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -15,10 +17,15 @@ public class OneBall extends ParallelCommandGroup {
 
 	private static Path twoBallPath = new Path("1-2Ball.path", false);
 
-	public OneBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, HubTargeting targeting) throws Exception {
+	public OneBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, Climber climber, HubTargeting targeting) throws Exception {
 		super(
-			new AutonIntake(intake),
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
+			
+			new PivotToReach(climber),
+			new SequentialCommandGroup(
+				new DeployIntake(intake),
+				new AutonIntake(intake)
+			),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),

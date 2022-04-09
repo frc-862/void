@@ -81,9 +81,9 @@ public class RobotContainer extends LightningContainer {
         try {
             Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
-            Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, targeting));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, targeting));
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, climber, targeting));
+            Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, climber, targeting));
+            Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, climber, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();
@@ -110,7 +110,9 @@ public class RobotContainer extends LightningContainer {
 
 
         // COPILOT
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))).whenInactive(new SafeRetrackIntake(intake));
+        
         (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
