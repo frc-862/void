@@ -93,9 +93,6 @@ public class StopAndShoot extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-<<<<<<< HEAD
-		indexer.stop();
-=======
 		shooter.coast();
 		indexer.stop();
 		hood.setAngle(0);
@@ -104,7 +101,6 @@ public class StopAndShoot extends CommandBase {
 		// } else {
 		// 	hood.setPower(0);
 		// }
->>>>>>> 3b230fe15c01bba1d642d8de903d6f24be618b59
 	}
 
 	@Override
