@@ -6,7 +6,6 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -46,8 +45,9 @@ public class ShootCargo extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		//shooter.coast();
+		shooter.coast();
 		indexer.stop();
+		hood.setAngle(0); // TODO: see if eric likes -nick
 		// if (indexer.getBallCount() == 0) {
 		// 	hood.setAngle(0);
 		// } else {

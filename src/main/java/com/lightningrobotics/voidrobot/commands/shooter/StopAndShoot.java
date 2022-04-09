@@ -1,7 +1,6 @@
 package com.lightningrobotics.voidrobot.commands.shooter;
 
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
-import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
@@ -9,7 +8,6 @@ import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
-import com.lightningrobotics.voidrobot.subsystems.Turret;
 import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -73,8 +71,9 @@ public class StopAndShoot extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		//shooter.coast();
+		shooter.coast();
 		indexer.stop();
+		hood.setAngle(0);
 		// if (indexer.getBallCount() == 0) {
 		// 	hood.setAngle(0);
 		// } else {

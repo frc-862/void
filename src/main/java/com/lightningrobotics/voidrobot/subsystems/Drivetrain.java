@@ -71,9 +71,6 @@ public class Drivetrain extends DifferentialDrivetrain {
 
 		setCanBusFrameRate(StatusFrameEnhanced.Status_1_General, 200);
 		setCanBusFrameRate(StatusFrameEnhanced.Status_2_Feedback0, 500);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_3_Quadrature, 200);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_4_AinTempVbat, 200);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_10_MotionMagic, 200);
     
         intitLogging();
 
@@ -138,8 +135,10 @@ public class Drivetrain extends DifferentialDrivetrain {
         setMotorCoastMode();
 
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
-        SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
-        SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
+        // SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
+        // SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
+
+        SmartDashboard.putNumber("velocity", getCurrentVelocity()); // TODO want to test this
     }
 
     public void setMotorBreakMode() {
@@ -159,7 +158,8 @@ public class Drivetrain extends DifferentialDrivetrain {
     }
 
     public double getCurrentVelocity() {
-        return -currentVelocity; // this is negative b/c we want it shooter-forward
+        return (leftVelocitySupplier.getAsDouble() + rightVelocitySupplier.getAsDouble()) / 2; // TODO want to test this
+        // return -currentVelocity; // this is negative b/c we want it shooter-forward
     }
 
     public void setMotorBrakeMode(){
