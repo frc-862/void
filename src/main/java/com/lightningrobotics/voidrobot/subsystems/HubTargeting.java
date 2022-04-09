@@ -30,12 +30,15 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import pabeles.concurrency.ConcurrencyOps.NewInstance;
 
 public class HubTargeting extends SubsystemBase {
 
 	// Network Table for Limelight & Vision Data
 	private final NetworkTable limelightTab = NetworkTableInstance.getDefault().getTable("limelight");
 	private final ShuffleboardTab targetingTab = Shuffleboard.getTab("Targeting Tab");
+
+	private final ShuffleboardTab moveAndShootTab = Shuffleboard.getTab("MovingTesting");
 
 	// Entries for Angle & Distance
 	private final NetworkTableEntry visionTargetAreaEntry = limelightTab.getEntry("ta");
@@ -58,6 +61,12 @@ public class HubTargeting extends SubsystemBase {
 	private final NetworkTableEntry motionBiasAngleEntry = targetingTab.add("Motion Bias Angle", 0).getEntry();
 	private final NetworkTableEntry motionBiasDistanceEntry = targetingTab.add("Motion Bias Distnace", 0).getEntry();
 	private final NetworkTableEntry deltaDistanceEntry = targetingTab.add("Delta Distnace", 0).getEntry();
+
+	private final NetworkTableEntry masVelocityEntry = moveAndShootTab.add("velocity", 0).getEntry();
+	private final NetworkTableEntry masDistanceEntry = moveAndShootTab.add("distance", 0).getEntry();
+	private final NetworkTableEntry masMultiplierEntry = moveAndShootTab.add("multiplier", 1).getEntry();
+	private final NetworkTableEntry masDeltaAdjust = moveAndShootTab.add("calculated offset", 0).getEntry();
+	private final NetworkTableEntry masReady = targetingTab.add("Ready from camera", false).getEntry();
 
 	// Position Tracker
 	private Pose2d prevPose = new Pose2d();
@@ -221,7 +230,7 @@ public class HubTargeting extends SubsystemBase {
 		hubDistance = LightningMath.constrain(hubDistance, 2.46d, 9.35d); // lowest and highest interpolated values ps: ur bad
 
 		// Account for robot motion
-		// filterRobotMotion();
+			filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -273,6 +282,7 @@ public class HubTargeting extends SubsystemBase {
 
 		// Vision Dashboard Data
 		visionDistanceEntry.setDouble(hubDistance);
+		masDistanceEntry.setDouble(hubDistance);
 		visionAngleEntry.setDouble(hubAngleOffset);
 		biasAngleEntry.setDouble(angleBias);
 		biasDistanceEntry.setDouble(distanceBias);
@@ -302,6 +312,7 @@ public class HubTargeting extends SubsystemBase {
 		
 		try {
 
+
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
@@ -310,8 +321,10 @@ public class HubTargeting extends SubsystemBase {
 			var theta = targetTurretAngle;
 
 			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
-			relativeVel = relativeVel * Constants.DISTANCE_TO_TIME_SHOOT_MAP.get(dist); //convert velocity to a distance
 			velocityEntry.setDouble(relativeVel);
+			masVelocityEntry.setDouble(relativeVel);
+			//relativeVel = relativeVel * Constants.DISTANCE_TO_TIME_SHOOT_MAP.get(dist); //convert velocity to a distance
+			relativeVel = relativeVel * masMultiplierEntry.getDouble(1);
 			
 			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
 			//if(motionAdjustedDistance <= 0) {
@@ -323,6 +336,9 @@ public class HubTargeting extends SubsystemBase {
 			deltaDistance = hubDistance - motionAdjustedDistance;
 
 			motionBiasAngle = unsignedMotionBiasAngle * Math.signum(relativeVel) * Math.signum(theta);
+
+			masDeltaAdjust.setDouble(motionBiasAngle);
+			masReady.setBoolean(Math.abs(motionBiasAngle + visionTargetXOffsetEntry.getDouble(hubAngleOffset)) < 0.1); //like vision target entry will be negative *sighs audibly*
 
 			if(motionAdjustedDistance > 0) {
 				hubDistance = motionAdjustedDistance;
