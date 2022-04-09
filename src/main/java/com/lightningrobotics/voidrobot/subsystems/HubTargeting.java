@@ -218,8 +218,10 @@ public class HubTargeting extends SubsystemBase {
 
 		filterDistance();
 
+		hubDistance = LightningMath.constrain(hubDistance, 2.46d, 9.35d); // lowest and highest interpolated values ps: ur bad
+
 		// Account for robot motion
-		filterRobotMotion();
+		// filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -469,6 +471,14 @@ public class HubTargeting extends SubsystemBase {
 	
 	public void adjustBiasAngle(double delta) {
 		angleBias -= delta; // needs to subtract to add on to the delta, its werid
+	}
+
+	public void setBiasDistance(double distanceBias) {
+		this.distanceBias = distanceBias;
+	}
+
+	public void setBiasAngle(double angleBias) {
+		this.angleBias = angleBias;
 	}
 
 	public void zeroBias() {

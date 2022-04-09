@@ -144,9 +144,6 @@ public final class Constants {
             put(7.11d, 5000d);
 			put(8.03d, 5400d);
             put(9.35d, 5500d);
-            put(7.11d, 5000d);
-			put(8.03d, 5400d);
-            put(9.35d, 5500d);
 
         }
     };
@@ -170,8 +167,8 @@ public final class Constants {
             put(5.6d, 2.3d);
             put(6.08d, 2.6d);
             put(7.11d, 2.4d);
-			put(8.03, 2.3d);
-            put(9.35, 3.0d);
+			put(8.03d, 2.3d);
+            put(9.35d, 3.0d);
 
         }
     };
