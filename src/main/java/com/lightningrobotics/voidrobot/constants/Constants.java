@@ -1,9 +1,5 @@
 package com.lightningrobotics.voidrobot.constants;
 
-import javax.swing.plaf.TreeUI;
-
-// import javax.smartcardio.CardNotPresentException;
-
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
@@ -72,13 +68,13 @@ public final class Constants {
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
 
     // Indexer
-    public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
+    public static final double DEFAULT_INDEXER_POWER = 1.0;
     public static final double RED_THRESHOLD = 0.38;
     public static final double BLUE_THRESHOLD = 0.32;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.2; // 0.00023742; // tune
+    public static final double SHOOTER_KP = 0.2;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
@@ -125,7 +121,7 @@ public final class Constants {
 
     // Auto Shoot
     public static final double EJECT_BALL_RPM = 1500;
-    public static final double EJECT_BALL_HOOD_ANGLE = 4.0; //TODO: tune
+    public static final double EJECT_BALL_HOOD_ANGLE = 4.0;
 
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
@@ -170,7 +166,7 @@ public final class Constants {
             put(4.9d, 1.9d);
             put(5.6d, 2.3d);
             put(6.08d, 2.6d);
-			put(7.11d, 2.4d);
+            put(7.11d, 2.4d);
 			put(8.03d, 2.3d);
             put(9.35d, 3.0d);
         }
@@ -182,11 +178,6 @@ public final class Constants {
             put(0d, 1.5d);
             put(10d, 1.5d);
             put(20d, 1.5d);
-			// put(5.13d, 0.8d);
-			// put(6.02d, 1.1d);
-			// put(7.11d, 2.4d);
-			// put(8.03, 2.3d);
-
         }
     };
 

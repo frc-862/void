@@ -105,7 +105,6 @@ public class AutoShoot extends CommandBase {
     }
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
      // toggles boolean on Shuffleboard whether autoshooting is on
@@ -114,7 +113,6 @@ public class AutoShoot extends CommandBase {
      hood.setAngle(0);
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
