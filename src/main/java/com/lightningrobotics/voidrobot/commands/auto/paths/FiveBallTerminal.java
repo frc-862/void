@@ -5,6 +5,8 @@ import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIndexeCargo;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
+import com.lightningrobotics.voidrobot.commands.intake.DeployIntake;
 import com.lightningrobotics.voidrobot.commands.turret.AimTurret;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
@@ -22,13 +24,17 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 
 	// private static Path oneMeter = new Path("1Meter.path", false);
 
-    public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, HubTargeting targeting) throws Exception {
+    public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Climber climber, HubTargeting targeting) throws Exception {
 		super(
 			new InstantCommand(() -> targeting.setState(0)),
 			new InstantCommand(() -> turret.setConstraint(0, 25)),
 			new AimTurret(turret, targeting),
-			new AutonIntake(intake),
-			// new TimedCommand(new AutonDeployIntake(intake), 0.65d),
+			
+			new PivotToReach(climber),
+			new SequentialCommandGroup(
+				new DeployIntake(intake),
+				new AutonIntake(intake)
+			),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
