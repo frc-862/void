@@ -47,7 +47,7 @@ public class StopAndShoot extends CommandBase {
 		drivetrain.pidStop();
 
 		var allianceBallColor = DriverStation.getAlliance().toString();
-		boolean isEnenmyBall = !allianceBallColor.equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+		boolean isEnenmyBall = indexer.isEnenmyBall();
 
 		var getRPM = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 		var getHoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();

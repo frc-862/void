@@ -32,7 +32,7 @@ public class AutoIndexCargo extends CommandBase {
     @Override
     public void execute() {
 
-        boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && !(indexer.getUpperBallColor() == BallColor.nothing);
+        boolean isEnenmyBall = indexer.isEnenmyBall();
         
         if (indexer.getCollectedBall()) { // && indexer.getAutoIndex()
             startIndexTime = Timer.getFPGATimestamp();
