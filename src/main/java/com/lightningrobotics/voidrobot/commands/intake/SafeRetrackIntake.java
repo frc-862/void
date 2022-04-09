@@ -1,5 +1,6 @@
 package com.lightningrobotics.voidrobot.commands.intake;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -19,7 +20,11 @@ public class SafeRetrackIntake extends CommandBase {
 
     @Override
     public void execute() {
-        intake.actuateIntake(-1d);
+        if (intake.getBumperSensor()) {
+            intake.actuateIntake(0d);
+        } else{
+            intake.actuateIntake(-Constants.DEFAULT_INTAKE_WINCH_POWER);
+        } 
     }
 
     @Override
@@ -29,6 +34,6 @@ public class SafeRetrackIntake extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return intake.getBumperSensor();
+        return false;
     }
 }

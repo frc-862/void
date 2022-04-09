@@ -19,7 +19,7 @@ public class AutonDeployIntake extends CommandBase {
 
 	@Override
 	public void execute() {
-		intake.actuateIntake(Constants.DEFAULT_WINCH_POWER);
+		intake.actuateIntake(Constants.DEFAULT_INTAKE_WINCH_POWER);
 	}
 
 	@Override

@@ -83,9 +83,6 @@ public class Turret extends SubsystemBase {
 		if (getCenterSensor()) {
 			resetEncoder();
 		}
-		
-		System.out.println(minTurretConstraint);
-		System.out.println(maxTurretConstraint);
 	}
 
 	private void initLogging() {

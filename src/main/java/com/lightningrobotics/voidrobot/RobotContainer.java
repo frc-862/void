@@ -111,11 +111,11 @@ public class RobotContainer extends LightningContainer {
 
         // COPILOT
         // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new SequentialCommandGroup(new DeployIntake(intake), new RunIntake(intake, () -> copilot.getRightTriggerAxis()))).whenInactive(new SafeRetrackIntake(intake));
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new RunIntake(intake, () -> copilot.getRightTriggerAxis()));
         
         (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
-        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_WINCH_POWER)); //RB: Retract intake
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_WINCH_POWER)); //SELECT/BACK: Deploy intake
+        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_INTAKE_WINCH_POWER)); //RB: Retract intake
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_INTAKE_WINCH_POWER)); //SELECT/BACK: Deploy intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new AutoIndexCargo(indexer));
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, shooter, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
@@ -202,6 +202,7 @@ public class RobotContainer extends LightningContainer {
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
         indexer.setDefaultCommand(new EjectBall(indexer));
+        // intake.setDefaultCommand(new SafeRetrackIntake(intake));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
