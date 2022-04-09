@@ -4,6 +4,7 @@
 
 package com.lightningrobotics.voidrobot.commands.climber.arms;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Climber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -43,9 +44,9 @@ public class ArmsEngageHooks extends CommandBase {
         //     rightPower = armPower;
         // }
 
-        // climber.setClimbPower(leftPower, rightPower);
+        climber.setClimbPower(leftPower, rightPower);
 
-        climber.setArmsTarget(staticHookHeight);
+        climber.setArmsTarget(Constants.TRIGGER_HEIGHT);
     }
 
     @Override

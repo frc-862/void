@@ -122,8 +122,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 
 		// CLIMB
-		// (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new MakeHoodAndTurretZero(turret, shooter));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whileHeld(new GetReadyForClimb(hood, turret, shooter, targeting));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, targeting));
         (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
             new SequentialCommandGroup(
                 new InstantCommand(() -> turret.setDisableTurret(false)),
@@ -133,59 +132,50 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(climber::pivotToReach);
         (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
         (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
-        // (new POVButton(climb, 90)).whileHeld(new PivotToHold(climber));
-        // (new POVButton(climb, 270)).whileHeld(new PivotToReach(climber)); 
-		// (new POVButton(climb, 90)).whileHeld(new InstantCommand(climber::pivotToHold));
-        // (new POVButton(climb, 270)).whileHeld(new InstantCommand(climber::pivotToReach)); 
 
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
-        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whileHeld(new ArmsEngageHooks(climber));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(climber));
-        // (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
-		// 																// new ArmsLetGoOfHooks(climber),
-        //                                                                 new ParallelCommandGroup(
-        //                                                                     // new PivotToReach(climber),
-		// 																	new ArmsToReach(climber),
-        //                                                                     new SequentialCommandGroup(
-        //                                                                         new WaitCommand(0.2),
-		// 																		new PivotToReach(climber)
-        //                                                                         // new ArmsToReach(climber)
-        //                                                                     )
-        //                                                                 ),
-        //                                                                 new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
-        //                                                                     new InstantCommand(climber::stopPivot)
-        //                                                                 )
-        //                                                             );
 
-		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new SequentialCommandGroup(
+		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
+            new SequentialCommandGroup(
+                new PivotToReach(climber),
+				new ArmsToReach(climber)
+            ),
+            new SequentialCommandGroup(
 				new ArmsLetGoOfHooks(climber),
 				new PivotToReach(climber),
 				new ArmsToReach(climber)
 				// new WaitCommand(0.5),
 				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
 				// new InstantCommand(climber::stopPivot)
-			)
+			),
+            () -> (!climber.getLeftHoldSensor() && !climber.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
+        )
 		);
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld( new ConditionalCommand(new ArmsEngageHooks(climber), 
-																									new ParallelCommandGroup(
-																										new PivotToHold(climber),
-																										new SequentialCommandGroup (
-																											new WaitCommand(1.0),
-																											new ArmsEngageHooks(climber)
-																										)
-																									), () -> (climber.getLeftHoldSensor() && climber.getRightHoldSensor())
-																							)
-																						);
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(new ConditionalCommand(
+            new ArmsEngageHooks(climber), 
+            new ParallelCommandGroup(
+                new PivotToHold(climber),
+                new SequentialCommandGroup (
+                    new WaitCommand(1.0),
+                    new ArmsEngageHooks(climber)
+                )
+            ),
+            () -> (climber.getLeftHoldSensor() && climber.getRightHoldSensor())
+        )
+    );
 
+        // Milford controls
         // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> climb.getLeftTriggerAxis()));
         // (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveRightPivot(climber, () -> climb.getRightTriggerAxis()));
         // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveLeftPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
         // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveRightPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
 
+        // Dont constant
         // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
         // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> Constants.DEFAULT_PIVOT_POWER));
 
