@@ -186,6 +186,7 @@ public final class Constants {
     public static final double MAX_ARM_VALUE = 372000;
     public static final double HOLD_HEIGHT = 34000;
     public static final double TRIGGER_HEIGHT = -8000;
+    public static final double RELEASE_HEIGHT = 25000;
     public static final double REACH_HEIGHT = 330000;
     public static final double ARM_TARGET_THRESHOLD = 750;
     public static final double ON_RUNG_ANGLE = 1.4;

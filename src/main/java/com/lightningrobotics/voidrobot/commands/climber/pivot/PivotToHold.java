@@ -4,30 +4,31 @@
 
 package com.lightningrobotics.voidrobot.commands.climber.pivot;
 
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
+import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class PivotToHold extends CommandBase {
-    Climber climber;
+    ClimbPivots pivots;
 
-    public PivotToHold(Climber climber) {
-        this.climber = climber;
-        //addRequirements(climber); //TODO: make a pivot subsystem
+    public PivotToHold(ClimbPivots pivots) {
+        this.pivots = pivots;
+        addRequirements(pivots);
     }
 
     @Override
     public void initialize() {
-        climber.pivotToHold();
+        pivots.pivotToHold();
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.stopPivot(); //Not sure if this should be here or not????
+        pivots.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return climber.pivotOnTarget();
+        return pivots.onTarget();
     }
 }

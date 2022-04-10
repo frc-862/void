@@ -13,7 +13,7 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.NextRung;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsLetGoOfHooks;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
@@ -54,7 +54,8 @@ public class RobotContainer extends LightningContainer {
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final Climber climber = new Climber(imu);
+    private static final ClimbArms arms = new ClimbArms(imu);
+    private static final ClimbPivots pivots = new ClimbPivots();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
@@ -81,9 +82,9 @@ public class RobotContainer extends LightningContainer {
         try {
             Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
 			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, climber, targeting));
-            Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, climber, targeting));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, climber, targeting));
+			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
+            Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
+            Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, pivots, targeting));
 		} catch (Exception e) {
 			System.err.println("I did an oopsie.");
             e.printStackTrace();
@@ -128,60 +129,57 @@ public class RobotContainer extends LightningContainer {
                 new InstantCommand(() -> turret.setDisableTurret(false)),
                 new InstantCommand(() -> hood.setDisableHood(false))
         ));
-        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(climber::pivotToHold);
-        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(climber::pivotToReach);
-        (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(climber, 1));
-        (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(climber, -1));
+        (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(arms, 1));
+        (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(arms, -1));
 
+        //fully auto climb
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(climber));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(arms, pivots));
 
 		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
             new SequentialCommandGroup(
-                new PivotToReach(climber),
-				new ArmsToReach(climber)
+                new PivotToReach(pivots),
+				new ArmsToReach(arms)
             ),
             new SequentialCommandGroup(
-				new ArmsLetGoOfHooks(climber),
-				new PivotToReach(climber),
-				new ArmsToReach(climber)
+				new ArmsReleaseBar(arms),
+				new PivotToReach(pivots),
+				new ArmsToReach(arms)
 				// new WaitCommand(0.5),
 				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
 				// new InstantCommand(climber::stopPivot)
 			),
-            () -> (!climber.getLeftHoldSensor() && !climber.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
+            () -> (!pivots.getLeftHoldSensor() && !pivots.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
         )
 		);
 
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(new ConditionalCommand(
-            new ArmsEngageHooks(climber), 
+            new ArmsEngageHooks(arms), 
             new ParallelCommandGroup(
-                new PivotToHold(climber),
+                new PivotToHold(pivots),
                 new SequentialCommandGroup (
                     new WaitCommand(1.0),
-                    new ArmsEngageHooks(climber)
+                    new ArmsEngageHooks(arms)
                 )
             ),
-            () -> (climber.getLeftHoldSensor() && climber.getRightHoldSensor())
+            () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
         )
-    );
+        );
+
+        //"final" controls
+        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(pivots::pivotToHold);
+        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(pivots::pivotToReach);
+        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> -climb.getLeftTriggerAxis()));
+        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> climb.getRightTriggerAxis()));
 
         // Milford controls
         // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> climb.getLeftTriggerAxis()));
         // (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveRightPivot(climber, () -> climb.getRightTriggerAxis()));
         // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveLeftPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
         // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveRightPivot(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
-
-        // Dont constant
-        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> -Constants.DEFAULT_PIVOT_POWER));
-        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveBothPivots(climber, () -> Constants.DEFAULT_PIVOT_POWER));
-
-        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> -climb.getLeftTriggerAxis()));
-        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(climber, () -> climb.getRightTriggerAxis()));
-
 
     }
 
@@ -194,7 +192,7 @@ public class RobotContainer extends LightningContainer {
         indexer.setDefaultCommand(new EjectBall(indexer));
         // intake.setDefaultCommand(new SafeRetrackIntake(intake));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
-        climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
 	}
 
     @Override
@@ -223,7 +221,7 @@ public class RobotContainer extends LightningContainer {
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 
-        climbTab.add(new InstantCommand(climber::resetArmEncoders));
+        climbTab.add(new InstantCommand(arms::resetEncoders));
         
 	}
 	
