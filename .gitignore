@@ -168,3 +168,5 @@ bin/
 */.SysId/*
 .Glass/*
 */,Glass/*
+
+.idea
