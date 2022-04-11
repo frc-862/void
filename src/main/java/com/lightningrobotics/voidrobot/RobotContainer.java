@@ -104,12 +104,14 @@ public class RobotContainer extends LightningContainer {
     protected void configureButtonBindings() {
 
         // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new StopAndShoot(shooter, hood, indexer, targeting, drivetrain), false);//Shoot on close wall right stick left button
-        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoManual(shooter, hood, indexer, turret, targeting), false); // Auto shoot
+        (new JoystickButton(driverRight, 1)).whileHeld(new StopAndShoot(shooter, hood, indexer, targeting, drivetrain, imu), false);//Shoot on close wall right stick left button
+        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false);
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
-        //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer)); // Auto shoot
-        (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); // Auto shoot
+        //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer));
+        // (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); use this
+        (new JoystickButton(driverRight, 3)).whileHeld(new MovingShot(shooter, hood, indexer, targeting, drivetrain), false);
+       
         //TODO: Ask eric for button
        // (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
        // (new JoystickButton(driverRight, 4)).whileHeld(new FarWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on Far wall right stick Right button
@@ -209,8 +211,7 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        indexer.setDefaultCommand(new EjectBall(indexer));
-        // intake.setDefaultCommand(new SafeRetrackIntake(intake));
+        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
         
@@ -240,6 +241,12 @@ public class RobotContainer extends LightningContainer {
 
         var sysCheckTab = Shuffleboard.getTab("system check"); //TODO: check if this is good
 
+        var subsystemTab = Shuffleboard.getTab("subsystems");
+        subsystemTab.add(indexer);
+        subsystemTab.add(shooter);
+        subsystemTab.add(climber);
+        subsystemTab.add(intake);
+        subsystemTab.add(hood);
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));

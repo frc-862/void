@@ -9,20 +9,20 @@ import com.lightningrobotics.voidrobot.subsystems.Turret;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootCargoManual extends CommandBase {
+public class ShootCargoTarmac extends CommandBase {
 
 	private final Shooter shooter;
 	private final Indexer indexer;
 	private final Hood hood;
 	private final HubTargeting targeting;
 
-	public ShootCargoManual(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
+	public ShootCargoTarmac(Shooter shooter, Hood hood, Indexer indexer, Turret turret, HubTargeting targeting) {
 		this.shooter = shooter;
 		this.indexer = indexer;
 		this.hood = hood;
 		this.targeting = targeting;
 
-		addRequirements(shooter, indexer); // not adding vision or turret as it is read only
+		addRequirements(shooter, indexer);
 
 	}
 
@@ -40,12 +40,7 @@ public class ShootCargoManual extends CommandBase {
 	public void end(boolean interrupted) {
 		shooter.coast();
 		indexer.stop();
-
-		if (indexer.getBallCount() == 0) {
-			hood.setAngle(0);
-		} else {
-			hood.setPower(0);
-		}
+		hood.setAngle(0d);
 	}
 
 	@Override

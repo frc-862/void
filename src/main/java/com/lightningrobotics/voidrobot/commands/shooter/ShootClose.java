@@ -24,7 +24,7 @@ public class ShootClose extends CommandBase {
 		this.turret = turret;
 		this.targeting = targeting;
 
-		addRequirements(shooter, hood, indexer, turret); // not adding vision or turret as it is read onl
+		addRequirements(shooter, hood, indexer, turret);
 	}
 	@Override
 	public void initialize() {
@@ -37,8 +37,10 @@ public class ShootClose extends CommandBase {
 		hood.setAngle(Constants.SHOOT_LOW_ANGLE);
 		turret.setAngle(0d);
 		
-		// TODO work with onTarget
-		indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		// TODO test
+		if(targeting.onTarget(Constants.SHOOT_LOW_RPM, Constants.SHOOT_LOW_ANGLE, 0d)){
+			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);	
+		}
 		
 	}
 
