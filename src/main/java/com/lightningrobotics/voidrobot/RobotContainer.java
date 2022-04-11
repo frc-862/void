@@ -5,8 +5,12 @@ import java.util.Arrays;
 import com.lightningrobotics.common.LightningContainer;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.LightningDrivetrain;
+import com.lightningrobotics.common.testing.SystemTest;
+import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
+import com.lightningrobotics.voidrobot.commands.SystemCheck;
+import com.lightningrobotics.voidrobot.commands.SystemCheckNoTest;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
@@ -36,8 +40,12 @@ import com.lightningrobotics.common.auto.*;
 import com.lightningrobotics.common.command.core.TimedCommand;
 import com.lightningrobotics.common.command.drivetrain.differential.DifferentialTankDrive;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -205,6 +213,7 @@ public class RobotContainer extends LightningContainer {
         // intake.setDefaultCommand(new SafeRetrackIntake(intake));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         climber.setDefaultCommand(new ManualClimb(climber, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        
 	}
 
     @Override
@@ -214,7 +223,9 @@ public class RobotContainer extends LightningContainer {
     protected void configureFaultMonitors() { }
 
     @Override
-    protected void configureSystemTests() { }
+    protected void configureSystemTests() { 
+        SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+    }
 
     @Override
     public LightningDrivetrain getDrivetrain() {
@@ -227,13 +238,15 @@ public class RobotContainer extends LightningContainer {
 
         var climbTab = Shuffleboard.getTab("climber");
 
-        var indexerTab = Shuffleboard.getTab("indexer");
-        indexerTab.add(indexer);
+        var sysCheckTab = Shuffleboard.getTab("system check"); //TODO: check if this is good
+
 		// var compTab = Shuffleboard.getTab("Competition");
 		tab.add(new ResetHood(hood));
 		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 
         climbTab.add(new InstantCommand(climber::resetArmEncoders));
+
+       // sysCheckTab.add(new SystemCheckNoTest(intake, indexer, drivetrain, shooter, hood, targeting, turret, climber, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
         
 	}
 	
@@ -260,6 +273,6 @@ public class RobotContainer extends LightningContainer {
 		} catch(Exception e) {
 			System.err.println("Unexpected Error: " + e.getMessage());
 		}
-	}
+	} 
 
 }
