@@ -31,10 +31,10 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			new AimTurret(turret, targeting),
 			
 			new PivotToReach(climber),
-			new SequentialCommandGroup(
-				new DeployIntake(intake),
-				new AutonIntake(intake)
-			),
+			// new SequentialCommandGroup(
+			// 	new DeployIntake(intake),
+				new AutonIntake(intake),
+			// ),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
