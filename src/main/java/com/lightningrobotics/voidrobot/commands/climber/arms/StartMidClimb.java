@@ -5,32 +5,36 @@
 package com.lightningrobotics.voidrobot.commands.climber.arms;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
+import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class StartMidClimb extends CommandBase {
-    Climber climber;
+    ClimbArms arms;
+    ClimbPivots pivots;
 
-    public StartMidClimb(Climber climber) {
-        this.climber = climber;
-        addRequirements(climber);
+    public StartMidClimb(ClimbArms arms, ClimbPivots pivots) {
+        this.arms = arms;
+        this.pivots = pivots;
+        addRequirements(arms, pivots);
     }
 
     @Override
     public void initialize() {
-        climber.pivotToHold();
+        pivots.pivotToHold();
 
-        climber.setArmsTarget(Constants.MID_RUNG_VALUE);
+        arms.setTarget(Constants.MID_RUNG_VALUE);
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.stop();
+        pivots.stop();
+        arms.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return climber.onTarget();
+        return arms.onTarget() && pivots.onTarget();
     }
 }

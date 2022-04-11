@@ -19,11 +19,11 @@ public class TwoBall extends ParallelCommandGroup {
 
 	private static Path twoBallPath = new Path("1-2Ball.path", false);
 
-	public TwoBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, Climber climber, HubTargeting targeting) throws Exception {
+	public TwoBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, ClimbPivots pivots, HubTargeting targeting) throws Exception {
 		super(
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 			
-			new PivotToReach(climber),
+			new PivotToReach(pivots),
 			new SequentialCommandGroup(
 				new DeployIntake(intake),
 				new AutonIntake(intake)

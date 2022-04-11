@@ -18,30 +18,20 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climber extends SubsystemBase {
+public class ClimbArms extends SubsystemBase {
 	private TalonFX leftArm;
 	private TalonFX rightArm;
 
-	private TalonSRX leftPivot;
-	private TalonSRX rightPivot;
 
 	LightningIMU imu;
 
 	//initialize set point for arm height
 	private double armsTarget = 0;
-	private double pivotPower = 0;
 
 	private double startTime;
 
 	private boolean isSettled = false;
 	private boolean checkIfSettled = true;
-	private enum pivotPosition {
-		hold,
-		reach,
-		moving
-	}
-
-	private pivotPosition pivotState = pivotPosition.reach;
 
 	//pid tuning stuff, will be removed later
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
@@ -50,14 +40,10 @@ public class Climber extends SubsystemBase {
 	private NetworkTableEntry gyroPitch = climbTab.add("pitch", 0).getEntry();
 	private NetworkTableEntry isSettledEntry = climbTab.add("is settled", false).getEntry();
 	
-  	public Climber(LightningIMU imu) {
+  	public ClimbArms(LightningIMU imu) {
 		// Sets the IDs of our arm motors
 		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
 		rightArm = new TalonFX(RobotMap.RIGHT_CLIMB);
-
-		// Sets the IDs of the pivot motors
-		leftPivot = new TalonSRX(RobotMap.LEFT_PIVOT);
-		rightPivot = new TalonSRX(RobotMap.RIGHT_PIVOT);
 
 		this.imu = imu;
 
@@ -65,19 +51,13 @@ public class Climber extends SubsystemBase {
 		leftArm.setNeutralMode(NeutralMode.Brake);
 		rightArm.setNeutralMode(NeutralMode.Brake);
 
-		//pivot motors need to be in brake mode to hold pivot in place
-		leftPivot.setNeutralMode(NeutralMode.Brake);
-		rightPivot.setNeutralMode(NeutralMode.Brake);
 
 		//set arm inverts
 		leftArm.setInverted(false);
 		rightArm.setInverted(true);
 
-		//set pivot inverts
-		leftPivot.setInverted(false);
-		rightPivot.setInverted(true);
 
-		resetArmEncoders();
+		resetEncoders();
 		setGains();
 
 		initLogging();
@@ -91,8 +71,6 @@ public class Climber extends SubsystemBase {
 		DataLogger.addDataElement("leftArmPosition", () -> leftArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("rightArmPosition", () -> rightArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("armsTarget", () -> armsTarget);
-		DataLogger.addDataElement("pivot position", () -> pivotState == pivotPosition.hold ? 0 : (pivotState == pivotPosition.reach ? 2 : 3));
-		DataLogger.addDataElement("pivot power", () -> rightPivot.getMotorOutputPercent());
 		DataLogger.addDataElement("gyro pitch", () -> imu.getPitch().getDegrees());
 	}
 
@@ -114,33 +92,17 @@ public class Climber extends SubsystemBase {
 
 	}
 
-	public void setClimbPower(double leftPower, double rightPower) {
+	public void setPower(double leftPower, double rightPower) {
 		leftArm.set(TalonFXControlMode.PercentOutput, leftPower);
 		rightArm.set(TalonFXControlMode.PercentOutput, rightPower);
 	}
 
-	public void setPivotPower(double leftPower, double rightPower) {
-		//only set one as the left motor is set to follow the right
-		rightPivot.set(TalonSRXControlMode.PercentOutput, rightPower);
-		leftPivot.set(TalonSRXControlMode.PercentOutput, leftPower);
-
-		pivotPower = (rightPower+leftPower)/2;
-	}
-
-
-	public void setLeftPivotPower(double power) {
-		leftPivot.set(TalonSRXControlMode.PercentOutput, power);
-	}
-
-	public void setRightPivotPower(double power) {
-		rightPivot.set(TalonSRXControlMode.PercentOutput, power);
-	}
-
+	
 	/**
 	 * @param armTarget desired set point, in encoder ticks
 	 * @param climbMode 0 for unloaded PID, 1 for loaded
 	 */
-	public void setArmsTarget(double armTarget) {
+	public void setTarget(double armTarget) {
 		System.out.println("setting arm target _______________________________------");
 		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
 
@@ -149,23 +111,8 @@ public class Climber extends SubsystemBase {
 		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}
 
-	/**
-	 * run the pivots towards collector until they hit the limit switch
-	 */
-	public void pivotToHold() {
-		System.out.println("running pviot ot hold_____________________");
-		setPivotPower(Constants.DEFAULT_PIVOT_POWER, Constants.DEFAULT_PIVOT_POWER);
-	}
-
-	/**
-	 * run the pivots away from collector until they hit the limit switch
-	 */
-	public void pivotToReach() {
-		System.out.println("running pviot ot reach_______________________");
-		setPivotPower(-Constants.DEFAULT_PIVOT_POWER, -Constants.DEFAULT_PIVOT_POWER);
-	}
-
-	public void resetArmEncoders() {
+	
+	public void resetEncoders() {
 		leftArm.setSelectedSensorPosition(0);
 		rightArm.setSelectedSensorPosition(0);
 	}
@@ -174,80 +121,23 @@ public class Climber extends SubsystemBase {
 		return leftArm.getSelectedSensorPosition();
 	}
 
-
 	public double getRightEncoder() {
 		return rightArm.getSelectedSensorPosition();
-	}
-	/**
-	 * @return true if the pivot is at its far limit from the collector
-	 */
-	public boolean getLeftReachSensor() {
-		return leftPivot.isRevLimitSwitchClosed() == 1;
-	}
-
-	/**
-	 * @return true if the pivot is at its near limit to the collector
-	 */
-	public boolean getLeftHoldSensor() {
-		return leftPivot.isFwdLimitSwitchClosed() == 1;
-	}
-
-	/**
-	 * @return true if the pivot is at its far limit from the collector
-	 */
-	public boolean getRightReachSensor() {
-		return rightPivot.isRevLimitSwitchClosed() == 1;
-	}
-
-	/**
-	 * @return true if the pivot is at its near limit to the collector
-	 */
-	public boolean getRightHoldSensor() {
-		return rightPivot.isFwdLimitSwitchClosed() == 1;
 	}
 
 	public boolean isSettled() {
 		return isSettled;
 	}
 
-	/**
-	 * @return true if the pivot is triggering the appropriate sensor
-	 */
-	public boolean pivotOnTarget() {
-		if(pivotPower == Constants.DEFAULT_PIVOT_POWER) {
-			return getLeftHoldSensor() && getRightHoldSensor();
-		} else {
-			return getLeftReachSensor() && getRightReachSensor();
-		}
-	}
 
 	/**
 	 * @return true if the arms are within a given threshhold
 	 */
-	public boolean armsOnTarget() {
+	public boolean onTarget() {
 		return Math.abs(leftArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD && 
 			   Math.abs(rightArm.getSelectedSensorPosition() - armsTarget) < Constants.ARM_TARGET_THRESHOLD;
 	}
-
-	/**
-	 * @return true if both the arms and pivots are on target
-	 */
-	public boolean onTarget() {
-		return pivotOnTarget() && armsOnTarget();
-	}
-
-	/**
-	 * checks the pivot state based on which sensor is being triggered
-	 */
-	private void checkPivotState() {
-		if(getLeftHoldSensor() && getRightHoldSensor()) {
-			pivotState = pivotPosition.hold;
-		} else if(getLeftReachSensor() && getRightReachSensor()) {
-			pivotState = pivotPosition.reach;
-		} else {
-			pivotState = pivotPosition.moving;
-		}
-	}
+	
 	/**
 	 * checks if the gyro is settled
 	 */
@@ -296,24 +186,14 @@ public class Climber extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-
 		leftArmPos.setNumber(leftArm.getSelectedSensorPosition());
 		rightArmPos.setNumber(rightArm.getSelectedSensorPosition());
 		gyroPitch.setNumber(imu.getPitch().getDegrees());
-
-		checkPivotState();
 	}
-	public void stopPivot() {
-		setPivotPower(0, 0);
-	}
-
-	public void stopArms() {
-		setClimbPower(0, 0);
-	}
+	
 
 	public void stop() {
-		stopArms();
-		stopPivot();
+		setPower(0, 0);
 	}
 
 }

@@ -7,12 +7,13 @@ package com.lightningrobotics.voidrobot.commands.climber;
 import java.util.function.BooleanSupplier;
 
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsRelease;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
+import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,38 +24,39 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class NextRung extends SequentialCommandGroup {
-    Climber climber;
+    ClimbArms arms;
+    ClimbPivots pivots;
     boolean toEnd = false;
 
-    public NextRung(Climber climber) {
+    public NextRung(ClimbPivots pivots, ClimbArms arms) {
         super(
             new ParallelCommandGroup(
-                new PivotToReach(climber),
+                new PivotToReach(pivots),
                 new SequentialCommandGroup(
                     new WaitCommand(1),
-                    new ArmsToReach(climber)
+                    new ArmsToReach(arms)
                 )
             ),
 
-            //new InstantCommand(climber::pivotToHold).withTimeout(0.25), //make sure we're engaged before we start pulling up
-
             new ParallelCommandGroup(
-                new PivotToHold(climber),
+                new PivotToHold(pivots),
                 new SequentialCommandGroup (
                     new WaitCommand(0.25),
-                    new ArmsEngageHooks(climber)
+                    new ArmsEngageHooks(arms)
                 )
-            ) 
+            ),
+            new ArmsReleaseBar(arms)
         );
-        this.climber = climber;
-        addRequirements(climber);
+        this.arms = arms;
+        this.pivots = pivots;
+        addRequirements(arms, pivots);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
-        System.out.println("STOPPED _______________________________");
-        climber.stop();
+        pivots.stop();
+        arms.stop();
     }
 }

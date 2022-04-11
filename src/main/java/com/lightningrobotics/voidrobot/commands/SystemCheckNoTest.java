@@ -13,7 +13,6 @@ import com.lightningrobotics.common.testing.SystemTest;
 import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsLetGoOfHooks;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
@@ -21,7 +20,7 @@ import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.shooter.ShootCargo;
 import com.lightningrobotics.voidrobot.commands.shooter.ShootClose;
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
@@ -50,7 +49,7 @@ public class SystemCheckNoTest extends SequentialCommandGroup {
   Hood hood;
   HubTargeting targeting;
   Turret turret;
-  Climber climber;
+  ClimbArms arms;
   BooleanSupplier nextButton;
 
   static boolean isDone = false;
@@ -61,7 +60,7 @@ public class SystemCheckNoTest extends SequentialCommandGroup {
 
   // private static Debouncer m_debouncer = new Debouncer(0.5, Debouncer.DebounceType.kRising);
 
-  public SystemCheckNoTest(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, Climber climber, BooleanSupplier nextButton) {
+  public SystemCheckNoTest(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, ClimbArms arm, BooleanSupplier nextButton) {
     super(
         new InstantCommand(() -> currentMode.setString("intake in")),
         new StartEndCommand(
@@ -190,7 +189,7 @@ public class SystemCheckNoTest extends SequentialCommandGroup {
     this.hood = hood;
     this.targeting = targeting;
     this.turret = turret;
-    this.climber = climber;
+    this.arms = arms;
     
     this.nextButton = nextButton;
 

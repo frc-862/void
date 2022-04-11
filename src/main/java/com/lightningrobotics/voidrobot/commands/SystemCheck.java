@@ -13,7 +13,6 @@ import com.lightningrobotics.common.testing.SystemTest;
 import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsLetGoOfHooks;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
@@ -21,7 +20,7 @@ import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.shooter.ShootCargo;
 import com.lightningrobotics.voidrobot.commands.shooter.ShootClose;
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 import com.lightningrobotics.voidrobot.subsystems.Hood;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
@@ -50,7 +49,7 @@ public class SystemCheck extends SystemTest {
   Hood hood;
   HubTargeting targeting;
   Turret turret;
-  Climber climber;
+  ClimbArms arms;
   BooleanSupplier nextButton;
 
   boolean isDone = false;
@@ -59,7 +58,7 @@ public class SystemCheck extends SystemTest {
 
   private static NetworkTableEntry currentMode = sysCheckTab.add("current mode", "").getEntry();
 
-  public SystemCheck(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, Climber climber, BooleanSupplier nextButton) {
+  public SystemCheck(Intake intake, Indexer indexer, Drivetrain drivetrain, Shooter shooter, Hood hood, HubTargeting targeting, Turret turret, ClimbArms arms, BooleanSupplier nextButton) {
     super("system test", LightningFaultCodes.getFaultCode("system test"), Priority.DO_FIRST); //idk what to put here
 
     this.intake = intake;
@@ -69,7 +68,7 @@ public class SystemCheck extends SystemTest {
     this.hood = hood;
     this.targeting = targeting;
     this.turret = turret;
-    this.climber = climber;
+    this.arms = arms;
     
     this.nextButton = nextButton;
 

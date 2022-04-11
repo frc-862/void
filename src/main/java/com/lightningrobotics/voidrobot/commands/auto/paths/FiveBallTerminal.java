@@ -24,13 +24,13 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 
 	// private static Path oneMeter = new Path("1Meter.path", false);
 
-    public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, Climber climber, HubTargeting targeting) throws Exception {
+    public FiveBallTerminal(Drivetrain drivetrain, Indexer indexer, Intake intake, Shooter shooter, Hood hood, Turret turret, ClimbPivots pivots, HubTargeting targeting) throws Exception {
 		super(
 			new InstantCommand(() -> targeting.setState(0)),
 			new InstantCommand(() -> turret.setConstraint(0, 25)),
 			new AimTurret(turret, targeting),
 			
-			new PivotToReach(climber),
+			new PivotToReach(pivots),
 			new SequentialCommandGroup(
 				new DeployIntake(intake),
 				new AutonIntake(intake)
