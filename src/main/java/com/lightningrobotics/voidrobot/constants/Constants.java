@@ -16,7 +16,7 @@ public final class Constants {
     public static final double KV = 2.1297;
     public static final double KA = 0.35019;
 
-    public static final double DRIVETRAIN_BRAKE_KP = 0.00066934;
+    public static final double DRIVETRAIN_BRAKE_KP = 0.036934;
     public static final double DRIVETRAIN_MAX_ACCELERATION = 200; //encoder ticks per 100 ms
 
     public static final boolean LEFT_1_INVERT = false;
@@ -69,6 +69,8 @@ public final class Constants {
 
     // Indexer
     public static final double DEFAULT_INDEXER_POWER = 1.0;
+    public static final double AUTON_INDEXER_POWER = 0.9;
+    public static final double AUTON_CENTER_POWER = 0.4;
     public static final double RED_THRESHOLD = 0.38;
     public static final double BLUE_THRESHOLD = 0.32;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
@@ -187,16 +189,16 @@ public final class Constants {
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
-    public static final double DEFAULT_INTAKE_WINCH_POWER = 1.0d;
+    public static final double DEFAULT_INTAKE_WINCH_POWER = 0.8d;
 
     //Climber
     public static final double DEFAULT_PIVOT_POWER = 1.0;
     public static final double MID_RUNG_VALUE = 296000;
     public static final double MAX_ARM_VALUE = 372000;
     public static final double HOLD_HEIGHT = 34000;
-    public static final double TRIGGER_HEIGHT = -8000;
+    public static final double TRIGGER_HEIGHT = -9250;
     public static final double RELEASE_HEIGHT = 25000;
-    public static final double REACH_HEIGHT = 330000;
+    public static final double REACH_HEIGHT = 327000;
     public static final double ARM_TARGET_THRESHOLD = 750;
     public static final double ON_RUNG_ANGLE = 1.4;
     

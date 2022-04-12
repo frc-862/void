@@ -398,7 +398,7 @@ public class HubTargeting extends SubsystemBase {
 	private double getTurretAngleRPMAdjust() {
 		final double CLOSEST_SHOT = 2.46;
 		final double FARTHEST_SHOT = 7.0;
-		final double MAX_RPM_GAIN = 200;
+		final double MAX_RPM_GAIN = 150;
 
 		double anglePercent = Math.abs(currentTurretAngleSupplier.get().getDegrees() / Constants.MAX_TURRET_ANGLE);
 		double distancePercent = LightningMath.constrain((hubDistance - CLOSEST_SHOT) / (FARTHEST_SHOT - CLOSEST_SHOT), 0, 1);

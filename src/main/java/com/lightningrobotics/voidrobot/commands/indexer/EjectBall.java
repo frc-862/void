@@ -30,7 +30,7 @@ public class EjectBall extends CommandBase {
 
     @Override
     public void execute() {
-        boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+        boolean isEnenmyBall = indexer.isEnenmyBall();
         
         if(isEnenmyBall && indexer.getBallCount() == 1){
 				indexer.setPower(1);

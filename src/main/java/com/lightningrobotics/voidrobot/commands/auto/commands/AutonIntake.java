@@ -5,11 +5,11 @@ import com.lightningrobotics.voidrobot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonIntake extends CommandBase {
-	
-    private Intake intake;
 
-	public AutonIntake(Intake intake) {
-		this.intake = intake;
+    private final Intake intake;
+
+    public AutonIntake(Intake intake) {
+        this.intake = intake;
 
         addRequirements(intake);
     }    
@@ -17,15 +17,23 @@ public class AutonIntake extends CommandBase {
     @Override
     public void execute() {
         intake.setPower(0.75);
+
+        if (!intake.getDeployedSensor()){
+            intake.actuateIntake(0.75d); 
+        } else {
+            intake.actuateIntake(0d);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
+        super.end(interrupted);
         intake.stop();
+        intake.stopDeploy();
     }
 
     @Override
     public boolean isFinished(){
-		return false;
-	}
+        return false;
+    }
 }

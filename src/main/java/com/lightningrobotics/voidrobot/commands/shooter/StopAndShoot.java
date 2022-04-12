@@ -52,23 +52,9 @@ public class StopAndShoot extends CommandBase {
 		var getRPM = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 		var getHoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
 
-		var setRPM = 0d;
-		var setHoodAngle = 0d;
+		var setRPM = getRPM;
+		var setHoodAngle = getHoodAngle;
 		
-		// Enemy-Our ball sequence: prevent RPM going down, causing our ball to shoot shorter than intended
-		// If detect enemyball in lower, our ball on upper, start timer.
-		if(indexer.getUpperBallColor().toString().equals(allianceBallColor) && !indexer.getLowerBallColor().toString().equals(allianceBallColor) && indexer.getBallCount() == 2){
-			enenmyOurTimer = Timer.getFPGATimestamp();
-			setRPM = getRPM;
-			setHoodAngle = getHoodAngle; 
-		}
-		
-		// when upper ball shoots, timer stops. Wait before decreasing RPM
-		if(Timer.getFPGATimestamp() - enenmyOurTimer > ENENMY_OUR_WAIT_TIME || enenmyOurTimer == 0){
-			setRPM = getRPM;
-			setHoodAngle = getHoodAngle;
-		}
-
 		var accelX = mafX.filter(imu.getNavxAccelerationX());
 		var accelY = mafY.filter(imu.getNavxAccelerationY());
 		var accelZ = mafZ.filter(imu.getNavxAccelerationZ());

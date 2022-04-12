@@ -31,10 +31,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			new AimTurret(turret, targeting),
 			
 			new PivotToReach(pivots),
-			new SequentialCommandGroup(
-				new DeployIntake(intake),
-				new AutonIntake(intake)
-			),
+			new AutonIntake(intake),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
@@ -44,13 +41,13 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 				new ParallelDeadlineGroup(
 					new TimedCommand(start5Ball.getCommand(drivetrain), start5Ball.getDuration(drivetrain) - 0.7d),
 					new SequentialCommandGroup(
-						new AutonVisionShooting(shooter, hood, indexer, targeting, 3d, 0.2d, 200d),
+						new AutonVisionShooting(shooter, hood, indexer, targeting, 3d, 0d, 200d),
 						new InstantCommand(() -> turret.setConstraint(40, 25)),
 						new InstantCommand(() -> targeting.setState(1)),
 							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2)),
 							new InstantCommand(() -> shooter.setRPM(4200)),
 							new InstantCommand(() -> targeting.setState(1.5)),
-							new TimedCommand(new AutonIndexeCargo(indexer, 1), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))			
+							new TimedCommand(new AutonIndexeCargo(indexer, 2), start5Ball.getDuration(drivetrain) - (start5Ball.getDuration(drivetrain) / 2))			
 					)
 				),
 				new InstantCommand(() -> targeting.setState(1.75)),
@@ -87,7 +84,8 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 				new InstantCommand(() -> targeting.setState(7)),
 				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d),
 
-				new InstantCommand(() -> turret.resetConstraint())
+				new InstantCommand(() -> turret.resetConstraint()),
+				new InstantCommand(() -> targeting.setBiasDistance(-0.15d))
 
 			)
 		

@@ -9,8 +9,8 @@ import com.lightningrobotics.common.testing.SystemTest;
 import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-import com.lightningrobotics.voidrobot.commands.SystemCheck;
-import com.lightningrobotics.voidrobot.commands.SystemCheckNoTest;
+// import com.lightningrobotics.voidrobot.commands.SystemCheck;
+// import com.lightningrobotics.voidrobot.commands.SystemCheckNoTest;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
@@ -21,6 +21,7 @@ import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
+import com.lightningrobotics.voidrobot.commands.climber.BackHooks;
 import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
 import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveBothPivots;
@@ -133,7 +134,7 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 
 		// CLIMB
-        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, targeting));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
         (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
             new SequentialCommandGroup(
                 new InstantCommand(() -> turret.setDisableTurret(false)),
@@ -145,6 +146,7 @@ public class RobotContainer extends LightningContainer {
         //fully auto climb
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
+        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whileHeld(new BackHooks(arms, pivots));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(arms, pivots));
 
@@ -199,9 +201,10 @@ public class RobotContainer extends LightningContainer {
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        indexer.setDefaultCommand(new AutoIndexCargo(indexer));
+        //indexer.setDefaultCommand(new EjectBall(indexer));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        intake.setDefaultCommand(new SafeRetrackIntake(intake));
 	}
 
     @Override
@@ -212,7 +215,7 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureSystemTests() { 
-        SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, arms, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
+        // SystemTest.register(new SystemCheck(intake, indexer, drivetrain, shooter, hood, targeting, turret, arms, () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_A).get())));
     }
 
     @Override

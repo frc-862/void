@@ -38,7 +38,7 @@ public class ShootClose extends CommandBase {
 		turret.setAngle(0d);
 		
 		// TODO test
-		if(targeting.onTarget(Constants.SHOOT_LOW_RPM, Constants.SHOOT_LOW_ANGLE, 0d)){
+		if(targeting.onTarget(Constants.SHOOT_LOW_RPM, 0d, Constants.SHOOT_LOW_ANGLE)){
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);	
 		}
 		

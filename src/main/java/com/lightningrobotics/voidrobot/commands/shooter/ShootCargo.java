@@ -32,7 +32,7 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 		boolean isEnenmyBall = indexer.isEnenmyBall();
-		var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
+		var rpm =  isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 		var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
 
 		shooter.setRPM(rpm);

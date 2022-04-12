@@ -78,7 +78,6 @@ public class Drivetrain extends DifferentialDrivetrain {
             WPI_TalonFX motor = (WPI_TalonFX)m;
             motor.config_kP(0, Constants.DRIVETRAIN_BRAKE_KP);
             motor.config_kF(0, 0.005);
-            motor.configMotionAcceleration(Constants.DRIVETRAIN_MAX_ACCELERATION);
         });
 
 		CommandScheduler.getInstance().registerSubsystem(this);

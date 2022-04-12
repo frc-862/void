@@ -34,10 +34,10 @@ public class AutonVisionShooting extends CommandBase {
 	}
 
 	@Override
-	public void initialize() {	
+	public void initialize() {
 		targeting.zeroBias();
-		targeting.adjustBiasDistance(distanceBias);
 		targeting.adjustBiasAngle(angleBias);
+		targeting.adjustBiasDistance(distanceBias);
 	}
 	
 	@Override
@@ -52,7 +52,7 @@ public class AutonVisionShooting extends CommandBase {
 		hood.setAngle(hoodAngle);
 
 		if ((targeting.onTarget())) {
-			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+			indexer.setPower(Constants.AUTON_INDEXER_POWER);
 		}
 
 	}
@@ -60,7 +60,7 @@ public class AutonVisionShooting extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		indexer.stop();
-		shooter.coast();
+		shooter.setRPM(4000);
 		hood.setAngle(0.5);
 		targeting.zeroBias();
 	}
