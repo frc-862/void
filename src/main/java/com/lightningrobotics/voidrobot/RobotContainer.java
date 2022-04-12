@@ -53,6 +53,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
@@ -107,7 +108,8 @@ public class RobotContainer extends LightningContainer {
 
         // DRIVER
         (new JoystickButton(driverRight, 1)).whileHeld(new StopAndShoot(shooter, hood, indexer, targeting, drivetrain, imu), false);//Shoot on close wall right stick left button
-        (new JoystickButton(driverLeft, 1)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false);
+        // (new JoystickButton(driverLeft, 1)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting), false); // launch pad shot
+        (new JoystickButton(driverRight, 4)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false); // shoot cargo from tarmac
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
 		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
         //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer));
@@ -117,19 +119,17 @@ public class RobotContainer extends LightningContainer {
         //TODO: Ask eric for button
        // (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
        // (new JoystickButton(driverRight, 4)).whileHeld(new FarWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on Far wall right stick Right button
-       // (new JoystickButton(driverRight, 5)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on Launch wall right stick button 5 ?
-        (new JoystickButton(driverRight, 4)).toggleWhenPressed(new AutoShoot(drivetrain, targeting, turret, indexer, shooter, hood));
+        // (new JoystickButton(driverRight, 4)).toggleWhenPressed(new AutoShoot(drivetrain, targeting, turret, indexer, shooter, hood));
 
 
         // COPILOT
         // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new RunIntake(intake, () -> copilot.getRightTriggerAxis()));
-        
+        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); // RT: move intake out and run intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
         (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_INTAKE_WINCH_POWER)); //RB: Retract intake
         (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_INTAKE_WINCH_POWER)); //SELECT/BACK: Deploy intake
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new AutoIndexCargo(indexer));
         (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, shooter, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new RunCommand(() -> shooter.setRPM(-1000), shooter));
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 

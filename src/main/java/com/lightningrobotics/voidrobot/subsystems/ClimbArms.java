@@ -107,6 +107,7 @@ public class ClimbArms extends SubsystemBase {
 		armsTarget = LightningMath.constrain(armTarget, 0, Constants.MAX_ARM_VALUE);
 
 		leftArm.selectProfileSlot(1, 0);
+		rightArm.selectProfileSlot(1, 0);
 		leftArm.set(TalonFXControlMode.Position, armsTarget);
 		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}

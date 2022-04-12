@@ -122,7 +122,6 @@ public class Indexer extends SubsystemBase {
                 if(ballCount == 0) {
                     upperBallColor = BallColor.nothing;
                     lowerBallColor = BallColor.nothing;
-                    System.out.println("IndexerA: " + upperBallColor + "-" + lowerBallColor);
                 }
             break;
 
@@ -130,10 +129,8 @@ public class Indexer extends SubsystemBase {
                 if(ballCount == 1) {
                     upperBallColor = BallColor.Red;
                     lowerBallColor = BallColor.nothing;
-                    System.out.println("IndexerB: " + upperBallColor + "-" + lowerBallColor);
                 } else if(ballCount == 2) {
                     lowerBallColor = BallColor.Red;
-                    System.out.println("IndexerC: " + upperBallColor + "-" + lowerBallColor);
                 }
             break;
 
@@ -141,10 +138,8 @@ public class Indexer extends SubsystemBase {
                 if(ballCount == 1) {
                     upperBallColor = BallColor.Blue;
                     lowerBallColor = BallColor.nothing;
-                    System.out.println("IndexerD: " + upperBallColor + "-" + lowerBallColor);
                 } else if(ballCount == 2) {
                     lowerBallColor = BallColor.Blue;
-                    System.out.println("IndexerE: " + upperBallColor + "-" + lowerBallColor);
                 }
             break;
         }
