@@ -136,9 +136,10 @@ public class RobotContainer extends LightningContainer {
 		// CLIMB
         (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
         (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> turret.setDisableTurret(false)),
-                new InstantCommand(() -> hood.setDisableHood(false))
+            new ParallelCommandGroup(
+                new RunCommand(() -> turret.setDisableTurret(false), turret),
+                new RunCommand(() -> hood.setDisableHood(false), hood),
+                new SafeRetrackIntake(intake)
         ));
         (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(arms, 1));
         (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(arms, -1));
