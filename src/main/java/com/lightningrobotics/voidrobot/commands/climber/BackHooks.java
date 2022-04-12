@@ -11,6 +11,7 @@ import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
@@ -19,9 +20,7 @@ public class BackHooks extends SequentialCommandGroup {
   ClimbPivots pivots;
   public BackHooks(ClimbArms arms, ClimbPivots pivots) {
     super(
-      new InstantCommand(() -> arms.setTarget(Constants.REACH_HEIGHT)),
-      new WaitUntilCommand(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
-      new PivotToReach(pivots).withTimeout(1.25)
+      
     );
     this.arms = arms;
     this.pivots = pivots; 

@@ -146,7 +146,11 @@ public class RobotContainer extends LightningContainer {
         //fully auto climb
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whileHeld(new BackHooks(arms, pivots));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
+            new RunCommand(() -> arms.setTarget(Constants.REACH_HEIGHT), arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
+      // new WaitUntilCommand(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
+            new PivotToReach(pivots).withTimeout(1.0)
+            ));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(arms, pivots));
 
