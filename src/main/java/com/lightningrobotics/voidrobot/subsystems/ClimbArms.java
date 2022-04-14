@@ -97,7 +97,14 @@ public class ClimbArms extends SubsystemBase {
 		rightArm.set(TalonFXControlMode.PercentOutput, rightPower);
 	}
 
-	
+	public boolean getUpperLimitSwitches() {
+		return leftArm.isFwdLimitSwitchClosed() == 1 && rightArm.isFwdLimitSwitchClosed() == 1;
+	}
+
+	public boolean getLowerLimitSwitches() {
+		return leftArm.isRevLimitSwitchClosed() == 1 && rightArm.isRevLimitSwitchClosed() == 1;
+	}
+
 	/**
 	 * @param armTarget desired set point, in encoder ticks
 	 * @param climbMode 0 for unloaded PID, 1 for loaded

@@ -16,9 +16,11 @@ import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
 import com.lightningrobotics.voidrobot.commands.climber.NextRung;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsDownLimit;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsUpLimit;
 import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
 import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
 import com.lightningrobotics.voidrobot.commands.climber.BackHooks;
@@ -148,7 +150,8 @@ public class RobotContainer extends LightningContainer {
         // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-            new RunCommand(() -> arms.setTarget(Constants.REACH_HEIGHT), arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
+            // new RunCommand(() -> arms.setTarget(Constants.REACH_HEIGHT), arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
+            new ArmsUpLimit(arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
       // new WaitUntilCommand(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
             new PivotToReach(pivots).withTimeout(1.0)
             ));
@@ -158,13 +161,16 @@ public class RobotContainer extends LightningContainer {
 		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
             new SequentialCommandGroup(
                 new PivotToReach(pivots),
-				new ArmsToReach(arms)
+                new ArmsUpLimit(arms)
+				// new ArmsToReach(arms)
             ),
 
             new SequentialCommandGroup(
 				new ArmsReleaseBar(arms),
 				new PivotToReach(pivots),
-				new ArmsToReach(arms)
+                new ArmsUpLimit(arms)
+				// new ArmsToReach(arms)
+
 				// new WaitCommand(0.5),
 				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
 				// new InstantCommand(climber::stopPivot)
@@ -176,12 +182,14 @@ public class RobotContainer extends LightningContainer {
 
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(new ConditionalCommand(
-            new ArmsEngageHooks(arms), 
+            // new ArmsEngageHooks(arms), 
+            new ArmsDownLimit(arms),
             new ParallelCommandGroup(
                 new PivotToHold(pivots),
                 new SequentialCommandGroup (
                     new WaitCommand(1.0),
-                    new ArmsEngageHooks(arms)
+                    new ArmsDownLimit(arms)
+                    // new ArmsEngageHooks(arms)
                 )
             ),
             () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
