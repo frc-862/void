@@ -84,7 +84,7 @@ public final class Constants {
     public static final double SHOOTER_KF = 0.0455;
     public static final double SHOOTER_KA = 0;
 
-	public static final double RPM_BIAS = 100;
+	public static final double RPM_BIAS = 100; // TODO set large number for testing
 	public static final double RPM_BIAS_TIME = 1;
 
 	public static final double SHOOTER_TOLERANCE = 100d;
