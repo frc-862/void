@@ -24,10 +24,7 @@ public class TwoBall extends ParallelCommandGroup {
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 			
 			new PivotToReach(pivots),
-			new SequentialCommandGroup(
-				new DeployIntake(intake),
-				new AutonIntake(intake)
-			),
+			new AutonIntake(intake),
 
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
@@ -35,7 +32,10 @@ public class TwoBall extends ParallelCommandGroup {
 					twoBallPath.getCommand(drivetrain),
 					new AutonIndexeCargo(indexer, 2)
 				),
-				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d)
+				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d),
+				
+				new InstantCommand(() -> turret.resetConstraint()),
+				new InstantCommand(() -> targeting.setBiasDistance(-0.15d))
 			)
 		);	
 	}

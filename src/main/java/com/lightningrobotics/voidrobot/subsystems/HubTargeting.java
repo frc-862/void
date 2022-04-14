@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -102,6 +103,8 @@ public class HubTargeting extends SubsystemBase {
 	// Command State
 	private double state = 0;
 	private int lastImageIndex = -1;
+	
+	private double startTime = 0;
 
 	// Main Output External Access Functions
 	
@@ -245,7 +248,10 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("validTarget", () -> visionTargetDetectedEntry.getDouble(-1));
 		DataLogger.addDataElement("lastImageIndex", () -> lastImageIndex);
 
-		//Drive Logging
+		// Shot Logging
+		DataLogger.addDataElement("rpmBias ", this::secondShotBias);
+
+		// Drive Logging
 		DataLogger.addDataElement("relativeVelocityY", () -> velocityEntry.getDouble(0));
 
 		// Target Output Logging
@@ -390,8 +396,23 @@ public class HubTargeting extends SubsystemBase {
 		return currentTurretAngleSupplier.get().getDegrees() + hubAngleOffset;
 	}
 
+	private double secondShotBias() {
+		double rpmBias = 0;
+
+		if (exitSensor.getAsBoolean()){
+			startTime = Timer.getFPGATimestamp();
+		}
+
+		if (Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME) {
+			rpmBias = Constants.RPM_BIAS;
+		}
+		
+		return rpmBias;
+
+	}
+
 	private double calcFlywheelRPM() {
-		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
+		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust() - secondShotBias();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
 		return rpm;
 	}
 

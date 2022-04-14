@@ -160,6 +160,7 @@ public class RobotContainer extends LightningContainer {
                 new PivotToReach(pivots),
 				new ArmsToReach(arms)
             ),
+
             new SequentialCommandGroup(
 				new ArmsReleaseBar(arms),
 				new PivotToReach(pivots),
@@ -168,9 +169,10 @@ public class RobotContainer extends LightningContainer {
 				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
 				// new InstantCommand(climber::stopPivot)
 			),
-            () -> (!pivots.getLeftHoldSensor() && !pivots.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
-        )
-		);
+            // () -> (!pivots.getLeftHoldSensor() && !pivots.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
+			() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000)
+		)
+        );
 
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(new ConditionalCommand(

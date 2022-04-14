@@ -45,7 +45,7 @@ public class Robot extends LightningRobot {
 			int height = 120;
 			//width = 640;
 			//height = 480;
-			int fps = 60;
+			int fps = 30;
 
 			UsbCamera camera = CameraServer.startAutomaticCapture();
 			camera.setResolution(width, height);
