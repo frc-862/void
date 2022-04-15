@@ -10,11 +10,11 @@ import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class StartMidClimb extends CommandBase {
+public class ArmsMid extends CommandBase {
     ClimbArms arms;
     ClimbPivots pivots;
 
-    public StartMidClimb(ClimbArms arms, ClimbPivots pivots) {
+    public ArmsMid(ClimbArms arms, ClimbPivots pivots) {
         this.arms = arms;
         this.pivots = pivots;
         addRequirements(arms, pivots);

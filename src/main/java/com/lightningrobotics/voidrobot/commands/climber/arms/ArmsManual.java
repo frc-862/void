@@ -8,11 +8,11 @@ import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class MoveArmsManual extends CommandBase {
+public class ArmsManual extends CommandBase {
   double power;
 
   ClimbArms arms;
-  public MoveArmsManual(ClimbArms arms, double power) {
+  public ArmsManual(ClimbArms arms, double power) {
     this.power = power;
     this.arms = arms;
 

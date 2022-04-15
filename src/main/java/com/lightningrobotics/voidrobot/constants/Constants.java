@@ -236,14 +236,10 @@ public final class Constants {
     public static final double MID_RUNG_VALUE = 275000; // 250500d; // 296000;
     public static final double MAX_ARM_VALUE = 372000;
     public static final double HOLD_HEIGHT = 34000;
-    public static final double TRIGGER_HEIGHT = -9250;
     public static final double RELEASE_HEIGHT = 150000;
     public static final double REACH_HEIGHT = 327000;
     public static final double ARM_TARGET_THRESHOLD = 750;
     public static final double ON_RUNG_ANGLE = 1.4;
-    
-    //TODO: tune these values
-    public static final double GYRO_SETTLE_THRESHOLD = 0;
-    public static final double GYRO_SETTLE_TIME = 0;
+    public static final double ARM_KP = 1d;
 
 }

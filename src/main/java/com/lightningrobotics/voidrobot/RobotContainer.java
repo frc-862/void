@@ -15,14 +15,11 @@ import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
-import com.lightningrobotics.voidrobot.commands.climber.NextRung;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsDownLimit;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsEngageHooks;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsToReach;
 import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsUpLimit;
-import com.lightningrobotics.voidrobot.commands.climber.arms.MoveArmsManual;
-import com.lightningrobotics.voidrobot.commands.climber.arms.StartMidClimb;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsManual;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsMid;
 import com.lightningrobotics.voidrobot.commands.climber.BackHooks;
 import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
 import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
@@ -66,7 +63,7 @@ public class RobotContainer extends LightningContainer {
 
     // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final ClimbArms arms = new ClimbArms(imu);
+    private static final ClimbArms arms = new ClimbArms();
     private static final ClimbPivots pivots = new ClimbPivots();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
@@ -143,57 +140,44 @@ public class RobotContainer extends LightningContainer {
                 new RunCommand(() -> hood.setDisableHood(false), hood),
                 new SafeRetrackIntake(intake)
         ));
-        (new POVButton(climb, 0)).whileHeld(new MoveArmsManual(arms, 1));
-        (new POVButton(climb, 180)).whileHeld(new MoveArmsManual(arms, -1));
-
-        //fully auto climb
-        // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenPressed(new NextRung(climber).withInterrupt(() -> new JoystickButton(climb, JoystickConstants.BUTTON_B).get()), false);
+        (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
+        (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-            // new RunCommand(() -> arms.setTarget(Constants.REACH_HEIGHT), arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
-            new ArmsUpLimit(arms).until(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
-      // new WaitUntilCommand(() -> (arms.getRightEncoder() + arms.getleftEncoder()) / 2 >= Constants.REACH_HEIGHT * 0.75),
+            new ArmsUpLimit(arms),
             new PivotToReach(pivots).withTimeout(1.0)
             ));
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new StartMidClimb(arms, pivots));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
 
 		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
-            new SequentialCommandGroup(
+            new SequentialCommandGroup( //if we're already off of hooks, just pivot back and go straight up
                 new PivotToReach(pivots),
                 new ArmsUpLimit(arms)
-				// new ArmsToReach(arms)
             ),
 
-            new SequentialCommandGroup(
+            new SequentialCommandGroup(//if we're still on hookes, raise enough to get off and then go to reach
 				new ArmsReleaseBar(arms),
 				new PivotToReach(pivots),
                 new ArmsUpLimit(arms)
-				// new ArmsToReach(arms)
-
-				// new WaitCommand(0.5),
-				// new TimedCommand(new InstantCommand(climber::pivotToHold), 0.2),
-				// new InstantCommand(climber::stopPivot)
 			),
-            // () -> (!pivots.getLeftHoldSensor() && !pivots.getRightHoldSensor()) //if both arms have left the hold sensor, don't attempt to let go of the hook
-			() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000)
+			() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000) // check if arms are high enough to be off of hook already
 		)
         );
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(new ConditionalCommand(
-            // new ArmsEngageHooks(arms), 
-            new ArmsDownLimit(arms),
-            new ParallelCommandGroup(
-                new PivotToHold(pivots),
-                new SequentialCommandGroup (
-                    new WaitCommand(1.0),
-                    new ArmsDownLimit(arms)
-                    // new ArmsEngageHooks(arms)
-                )
-            ),
-            () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
-        )
+        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
+            new ConditionalCommand(
+                new ArmsDownLimit(arms), // if starting from mid, just pull arms down
+                new ParallelCommandGroup( //otherwise, run timed pivot and arm movement
+                    new PivotToHold(pivots),
+                    new SequentialCommandGroup (
+                        new WaitCommand(1.0),
+                        new ArmsDownLimit(arms)
+                    )
+                ),
+                () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
+            )
         );
 
         //"final" controls
