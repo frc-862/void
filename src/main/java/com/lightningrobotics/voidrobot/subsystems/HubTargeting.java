@@ -199,7 +199,7 @@ public class HubTargeting extends SubsystemBase {
 		setLastVisionIndex();
 		CommandScheduler.getInstance().registerSubsystem(this);
 
-		distanceBias = -0.15d;
+		distanceBias = Constants.DEFAULT_DISTANCE_BIAS;
 
 	}
 
@@ -403,8 +403,11 @@ public class HubTargeting extends SubsystemBase {
 			startTime = Timer.getFPGATimestamp();
 		}
 
-		if (Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME) {
-			rpmBias = Constants.RPM_BIAS;
+		if (Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME && getHubDistance() > Constants.SHORT_BIAS_DISTANCE) {
+			rpmBias = Constants.LONG_RPM_BIAS;
+		}
+		else if(Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME && getHubDistance() < Constants.SHORT_BIAS_DISTANCE) {
+			rpmBias = Constants.SHORT_RPM_BIAS;
 		}
 		
 		return rpmBias;
@@ -412,8 +415,8 @@ public class HubTargeting extends SubsystemBase {
 	}
 
 	private double calcFlywheelRPM() {
-		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust() - secondShotBias();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
-		return rpm;
+		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
+		return rpm - secondShotBias();
 	}
 
 	private double getTurretAngleRPMAdjust() {

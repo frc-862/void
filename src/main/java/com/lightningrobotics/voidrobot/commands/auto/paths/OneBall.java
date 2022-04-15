@@ -7,6 +7,7 @@ import com.lightningrobotics.voidrobot.commands.auto.commands.AutonIntake;
 import com.lightningrobotics.voidrobot.commands.auto.commands.AutonVisionShooting;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.intake.DeployIntake;
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,9 +31,9 @@ public class OneBall extends ParallelCommandGroup {
 				twoBallPath.getCommand(drivetrain),
 				
 				new AutonVisionShooting(shooter, hood, indexer, targeting, 0d, 0d, 0d),
-				
+
 				new InstantCommand(() -> turret.resetConstraint()),
-				new InstantCommand(() -> targeting.setBiasDistance(-0.15d))
+				new InstantCommand(() -> targeting.setBiasDistance(Constants.DEFAULT_DISTANCE_BIAS))
 			)
 		);	
 	}

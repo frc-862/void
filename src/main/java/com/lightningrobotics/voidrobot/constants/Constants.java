@@ -76,7 +76,7 @@ public final class Constants {
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.2;
+    public static final double SHOOTER_KP = 0.17;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
@@ -84,11 +84,14 @@ public final class Constants {
     public static final double SHOOTER_KF = 0.0455;
     public static final double SHOOTER_KA = 0;
 
-	public static final double RPM_BIAS = 100; // TODO set large number for testing
+	public static final double LONG_RPM_BIAS = 100; // TODO set large number for testing
+	public static final double SHORT_RPM_BIAS = 50;
+	public static final double SHORT_BIAS_DISTANCE = 3.25;
 	public static final double RPM_BIAS_TIME = 1;
 
 	public static final double SHOOTER_TOLERANCE = 100d;
 	public static final double HOOD_TOLERANCE = .2d;
+	public static final double DEFAULT_DISTANCE_BIAS = 0.0d;
 
 	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
@@ -137,6 +140,26 @@ public final class Constants {
 			// put(5.13d, 4300d);
 			// put(6.02d, 4550d);
 
+			// put(2.46d, 3550d);
+            // put(3.11d, 3750d);
+            // put(3.67d, 3850d);
+            // put(4.13d, 4000d);
+            // // put(4.9d, 4400d);
+			// put(5.22, 4350d);
+            // put(5.6d, 4500d);
+			// put(6.19d, 4550d);
+            // // put(6.08d, 4800d);
+            // // put(7.11d, 5000d);
+			// put(7.33d, 4750d);
+			// put(8.03, 5300d);
+			// put(9.35d, 5400d);
+
+			// put(8.03d, 5400d);
+            // put(9.35d, 5500d);
+
+
+
+
 			put(2.46d, 3550d);
             put(3.11d, 3750d);
             put(3.67d, 3850d);
@@ -144,9 +167,8 @@ public final class Constants {
             put(4.9d, 4400d);
             put(5.6d, 4650d);
             put(6.08d, 4800d);
-            put(7.11d, 5000d);
-			put(8.03d, 5400d);
-            put(9.35d, 5500d);
+            put(7.11d, 5200d);
+			put(8.03d, 5600d);
         }
     };
 
@@ -162,6 +184,24 @@ public final class Constants {
 			// put(6.02d, 1.1d);
 
            
+            // put(2.46d, 0d);
+            // put(3.11d, 0d);
+            // put(3.67d, 1.2d);
+            // put(4.13d, 1.4d);
+            // put(4.9d, 1.9d);
+            // put(5.6d, 2.3d);
+			// put(6.19d, 2.7d);
+            // // put(6.08d, 2.6d);
+            // // put(7.11d, 2.4d);
+			// put(7.33d, 2.5);
+			// put(8.03d, 2.3d);
+            // put(9.35d, 3.0d);
+
+
+
+
+
+			    
             put(2.46d, 0d);
             put(3.11d, 0d);
             put(3.67d, 1.2d);
@@ -171,7 +211,6 @@ public final class Constants {
             put(6.08d, 2.6d);
             put(7.11d, 2.4d);
 			put(8.03d, 2.3d);
-            put(9.35d, 3.0d);
         }
     };
 
@@ -194,7 +233,7 @@ public final class Constants {
 
     //Climber
     public static final double DEFAULT_PIVOT_POWER = 1.0;
-    public static final double MID_RUNG_VALUE = 296000;
+    public static final double MID_RUNG_VALUE = 275000; // 250500d; // 296000;
     public static final double MAX_ARM_VALUE = 372000;
     public static final double HOLD_HEIGHT = 34000;
     public static final double TRIGGER_HEIGHT = -9250;
