@@ -110,10 +110,13 @@ public class RobotContainer extends LightningContainer {
         // (new JoystickButton(driverLeft, 1)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting), false); // launch pad shot
         (new JoystickButton(driverRight, 4)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false); // shoot cargo from tarmac
         (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
-		(new JoystickButton(driverLeft, 2)).whileHeld(new ZeroTurretHood(hood, turret));
+		(new JoystickButton(driverLeft, 2)).whileHeld(new ParallelCommandGroup(
+			new ZeroTurretHood(hood, turret), 
+			new InstantCommand(turret::resetConstraint)));
         //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer));
         // (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); use this
         (new JoystickButton(driverRight, 3)).whileHeld(new MovingShot(shooter, hood, indexer, targeting, drivetrain), false);
+		(new JoystickButton(driverLeft, 4)).whenPressed(turret::resetConstraint);
        
         //TODO: Ask eric for button
        // (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
@@ -143,10 +146,11 @@ public class RobotContainer extends LightningContainer {
         (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
         (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-            new ArmsUpLimit(arms),
-            new PivotToReach(pivots).withTimeout(1.0)
-            ));
+		(new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
+        //     new ArmsUpLimit(arms),
+        //     new PivotToReach(pivots).withTimeout(1.0)
+        //     ));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
 

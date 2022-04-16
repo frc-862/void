@@ -48,6 +48,11 @@ public class ClimbArms extends SubsystemBase {
 		DataLogger.addDataElement("leftArmPosition", () -> leftArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("rightArmPosition", () -> rightArm.getSelectedSensorPosition());
 		DataLogger.addDataElement("armsTarget", () -> armsTarget);
+
+		DataLogger.addDataElement("left arm reach", () -> leftArm.isFwdLimitSwitchClosed());
+		DataLogger.addDataElement("right arm reach", () -> rightArm.isFwdLimitSwitchClosed());
+		DataLogger.addDataElement("left arm hold", () -> leftArm.isRevLimitSwitchClosed());
+		DataLogger.addDataElement("right arm hold", () -> rightArm.isRevLimitSwitchClosed());
 	}
 
 	private void setGains() {
@@ -62,6 +67,9 @@ public class ClimbArms extends SubsystemBase {
 		rightArm.config_kI(1, 0);
 		rightArm.config_kD(1, 0);
 		rightArm.configAllowableClosedloopError(1, Constants.ARM_TARGET_THRESHOLD);
+
+		leftArm.selectProfileSlot(1, 0);
+		rightArm.selectProfileSlot(1, 0);
 
 	}
 
@@ -82,8 +90,9 @@ public class ClimbArms extends SubsystemBase {
 	 * @param armTarget desired set point, in encoder ticks
 	 */
 	public void setTarget(double armTarget) {
-		leftArm.selectProfileSlot(1, 0);
-		rightArm.selectProfileSlot(1, 0);
+		// leftArm.selectProfileSlot(1, 0);
+		// rightArm.selectProfileSlot(1, 0);
+		this.armsTarget = armTarget;
 		leftArm.set(TalonFXControlMode.Position, armsTarget);
 		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}

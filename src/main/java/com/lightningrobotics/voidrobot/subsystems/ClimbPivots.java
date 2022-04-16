@@ -45,7 +45,13 @@ public class ClimbPivots extends SubsystemBase {
   }
   private void initLogging() {
 		DataLogger.addDataElement("pivot position", () -> pivotState == pivotPosition.hold ? 0 : (pivotState == pivotPosition.reach ? 2 : 3));
-		DataLogger.addDataElement("pivot power", () -> rightPivot.getMotorOutputPercent());
+		DataLogger.addDataElement("right pivot power", () -> rightPivot.getMotorOutputPercent());
+		DataLogger.addDataElement("left pivot power", () -> leftPivot.getMotorOutputPercent());
+
+		DataLogger.addDataElement("left pivot reach", () -> leftPivot.isRevLimitSwitchClosed());
+		DataLogger.addDataElement("right pivot reach", () -> rightPivot.isRevLimitSwitchClosed());
+		DataLogger.addDataElement("left pivot hold", () -> leftPivot.isFwdLimitSwitchClosed());
+		DataLogger.addDataElement("right pivot hold", () -> rightPivot.isFwdLimitSwitchClosed());
   }
   /**
 	 * run the pivots towards collector until they hit the limit switch

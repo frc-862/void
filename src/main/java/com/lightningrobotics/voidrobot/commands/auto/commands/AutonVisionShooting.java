@@ -48,10 +48,11 @@ public class AutonVisionShooting extends CommandBase {
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 
-		shooter.setRPM(rpm + RPMBias);
+		var biasedRPM = rpm + RPMBias;
+		shooter.setRPM(biasedRPM);
 		hood.setAngle(hoodAngle);
 
-		if ((targeting.onTarget())) {
+		if ((targeting.onTarget(biasedRPM, hoodAngle))) {
 			indexer.setPower(Constants.AUTON_INDEXER_POWER);
 		}
 

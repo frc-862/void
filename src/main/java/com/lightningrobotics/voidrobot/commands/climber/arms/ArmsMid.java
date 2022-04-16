@@ -22,10 +22,14 @@ public class ArmsMid extends CommandBase {
 
     @Override
     public void initialize() {
-        pivots.pivotToHold();
-
-        arms.setTarget(Constants.MID_RUNG_VALUE);
+        // pivots.pivotToHold();
     }
+
+	@Override
+	public void execute() {
+		pivots.pivotToHold();
+		arms.setTarget(Constants.MID_RUNG_VALUE);
+	}
 
     @Override
     public void end(boolean interrupted) {
