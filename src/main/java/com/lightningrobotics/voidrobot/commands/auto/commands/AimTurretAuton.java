@@ -1,33 +1,29 @@
-package com.lightningrobotics.voidrobot.commands.turret;
+package com.lightningrobotics.voidrobot.commands.auto.commands;
 
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Turret;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AimTurret extends CommandBase {
+public class AimTurretAuton extends CommandBase {
 
     protected final Turret turret;
 	protected final HubTargeting targeting;
 
-	private static boolean zero = false;
-
-    public AimTurret(Turret turret, HubTargeting targeting) {
+    public AimTurretAuton(Turret turret, HubTargeting targeting) {
         this.turret = turret;
 		this.targeting = targeting;
+
         addRequirements(turret); // HubTargeting is read only
     }
 
 	@Override
-	public void initialize() {
-		zero = false;
-	}
+	public void initialize() {}
 
     @Override
     public void execute() {
-		var targetAngle = targeting.getTargetTurretAngle();
-		turret.setAngle(targetAngle);
-			
-    }
+		var target_angle = targeting.calcTurretAngle();
+		turret.setAngle(target_angle);
+	}
 
 	@Override
     public void end(boolean interrupted) {

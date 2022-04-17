@@ -48,7 +48,7 @@ public class AutoShoot extends CommandBase {
   @Override
   public void execute() {
     //check if the current ball is not the same color as the alliance
-    boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+    boolean isEnenmyBall = indexer.isEnenmyBall();
     // check if it is too far to shoot 
     boolean withinDistanceBound = targeting.getHubDistance() < 8 && targeting.getHubDistance() > 2;
     // check if drive speed is slow enough
@@ -105,7 +105,6 @@ public class AutoShoot extends CommandBase {
     }
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
      // toggles boolean on Shuffleboard whether autoshooting is on
@@ -114,7 +113,6 @@ public class AutoShoot extends CommandBase {
      hood.setAngle(0);
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;

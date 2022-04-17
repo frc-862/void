@@ -5,23 +5,22 @@ import java.util.function.DoubleSupplier;
 import com.lightningrobotics.voidrobot.subsystems.HubTargeting;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 import com.lightningrobotics.voidrobot.subsystems.Shooter;
+import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class RunIndexer extends CommandBase {
+public class EjectBall extends CommandBase {
 
     // Creates the indexer subsystem
     private final Indexer indexer;
-    private final Shooter shooter;
     // The power we want to supply to the indexer
     private DoubleSupplier power;
 
     
 
-    public RunIndexer(Indexer indexer, Shooter shooter, DoubleSupplier power) {
+    public EjectBall(Indexer indexer) {
         this.indexer = indexer;
-        this.power = power; // The power that is comming from the controller
-        this.shooter = shooter;
 
         addRequirements(indexer); 
     }
@@ -31,12 +30,14 @@ public class RunIndexer extends CommandBase {
 
     @Override
     public void execute() {
-        if (indexer.getExitStatusNoDebounce() && shooter.getCurrentRPM() < 1000 && power.getAsDouble() >= 0) { 
-            indexer.setPower(0);
-        }
-        else {
-            indexer.setPower(power.getAsDouble()); // Gets the supplied power, and sets it to the indexer motor
-        }
+        boolean isEnenmyBall = indexer.isEnenmyBall();
+        
+        if(isEnenmyBall && indexer.getBallCount() == 1){
+				indexer.setPower(1);
+			}
+			else{
+				indexer.setPower(0);
+			}
     }
 
     @Override

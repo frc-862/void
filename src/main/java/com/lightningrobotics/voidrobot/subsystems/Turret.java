@@ -30,6 +30,9 @@ public class Turret extends SubsystemBase {
 	private boolean disabelTurret = false;
 	private boolean manualOverride = false;
 
+	private double minTurretConstraint = Constants.MIN_TURRET_ANGLE;
+	private double maxTurretConstraint = Constants.MAX_TURRET_ANGLE; 
+
 	private ShuffleboardTab turretTab = Shuffleboard.getTab("Turret");
 	private NetworkTableEntry currentAngle;
 	private NetworkTableEntry centerSensorEntry;
@@ -112,11 +115,22 @@ public class Turret extends SubsystemBase {
 		double sign = Math.signum(targetAngle);
         targetAngle =  sign * (((Math.abs(targetAngle) + 180) % 360) - 180);
 
-        this.targetAngle = LightningMath.constrain(targetAngle, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
+        this.targetAngle = LightningMath.constrain(targetAngle, minTurretConstraint, maxTurretConstraint);
+	}
+
+	public void resetConstraint() {
+		minTurretConstraint = Constants.MIN_TURRET_ANGLE;
+		maxTurretConstraint = Constants.MAX_TURRET_ANGLE;
+	}
+
+	public void setConstraint(double center, double constrainRange) {
+		System.out.println("ive been called " + center);
+		minTurretConstraint = LightningMath.constrain(center - constrainRange, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
+		maxTurretConstraint = LightningMath.constrain(center + constrainRange, Constants.MIN_TURRET_ANGLE, Constants.MAX_TURRET_ANGLE);
 	}
 
 	public void resetEncoder() {
-		turretMotor.setSelectedSensorPosition(0);
+		turretMotor.setSelectedSensorPosition(0); 
 	}
 
 	public boolean getLeftLimitSwitch() {

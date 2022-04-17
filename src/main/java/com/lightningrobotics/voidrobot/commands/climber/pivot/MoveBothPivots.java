@@ -6,16 +6,18 @@ package com.lightningrobotics.voidrobot.commands.climber.pivot;
 
 import java.util.function.DoubleSupplier;
 
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
+import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class MoveBothPivots extends CommandBase {
   DoubleSupplier power;
-  Climber climber;
-  public MoveBothPivots(Climber climber, DoubleSupplier power) {
-      this.climber = climber;
+  ClimbPivots pivots;
+  public MoveBothPivots(ClimbPivots pivots, DoubleSupplier power) {
+      this.pivots = pivots;
       this.power = power;
+      addRequirements(pivots);
   }
 
   // Called when the command is initially scheduled.
@@ -25,15 +27,15 @@ public class MoveBothPivots extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    climber.setLeftPivotPower(power.getAsDouble());
-    climber.setRightPivotPower(power.getAsDouble());
+    pivots.setLeftPower(power.getAsDouble());
+    pivots.setRightPower(power.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climber.setLeftPivotPower(0);
-    climber.setRightPivotPower(0);
+    pivots.setLeftPower(0);
+    pivots.setRightPower(0);
   }
 
   // Returns true when the command should end.

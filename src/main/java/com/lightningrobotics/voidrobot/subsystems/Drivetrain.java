@@ -4,6 +4,8 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
@@ -26,6 +28,7 @@ public class Drivetrain extends DifferentialDrivetrain {
     private double currentVelocity;
 
     private Pose2d pose = new Pose2d();
+    private Pose2d poseContinious = new Pose2d();
     private Pose2d prevPose = new Pose2d();
 
     private Rotation2d heading = Rotation2d.fromDegrees(0);
@@ -68,11 +71,14 @@ public class Drivetrain extends DifferentialDrivetrain {
 
 		setCanBusFrameRate(StatusFrameEnhanced.Status_1_General, 200);
 		setCanBusFrameRate(StatusFrameEnhanced.Status_2_Feedback0, 500);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_3_Quadrature, 200);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_4_AinTempVbat, 200);
-		// setCanBusFrameRate(StatusFrameEnhanced.Status_10_MotionMagic, 200);
     
         intitLogging();
+
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.config_kP(0, Constants.DRIVETRAIN_BRAKE_KP);
+            motor.config_kF(0, 0.005);
+        });
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 
@@ -90,7 +96,9 @@ public class Drivetrain extends DifferentialDrivetrain {
         DataLogger.addDataElement("heading", () -> this.getPose().getRotation().getDegrees());
         DataLogger.addDataElement("poseX", () -> this.getPose().getX());
         DataLogger.addDataElement("poseY", () -> this.getPose().getY());
-
+        DataLogger.addDataElement("accelX", () -> imu.getNavxAccelerationX());
+        DataLogger.addDataElement("accelY", () -> imu.getNavxAccelerationY());
+        DataLogger.addDataElement("accelZ", () -> imu.getNavxAccelerationZ());
         // Moveing while shooting stuff
     }
 
@@ -108,6 +116,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         super.periodic();
 		
         pose = this.getPose();
+        poseContinious = this.getPose();
         heading = this.getPose().getRotation();
         
         var deltaX = pose.getX() - prevPose.getX();
@@ -117,7 +126,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         var rot = Math.atan2(deltaY, deltaX);  
         
         prevPose = pose;
-        prevHeading = heading; 
+        prevHeading = heading;
 
         SmartDashboard.putNumber("currentVelocity", currentVelocity);
         SmartDashboard.putNumber("rot thigy", rot);
@@ -125,8 +134,10 @@ public class Drivetrain extends DifferentialDrivetrain {
         setMotorCoastMode();
 
         SmartDashboard.putNumber("heading", imu.getHeading().getDegrees());
-        SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
-        SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
+        // SmartDashboard.putNumber("left motor vel", ((WPI_TalonFX)LEFT_MOTORS[1]).getSelectedSensorVelocity());
+        // SmartDashboard.putNumber("right motor vel", rightPositionSupplier.getAsDouble());
+
+        SmartDashboard.putNumber("velocity", getCurrentVelocity()); // TODO want to test this
     }
 
     public void setMotorBreakMode() {
@@ -146,8 +157,22 @@ public class Drivetrain extends DifferentialDrivetrain {
     }
 
     public double getCurrentVelocity() {
-        return -currentVelocity; // this is negative b/c we want it shooter-forward
+        return (leftVelocitySupplier.getAsDouble() + rightVelocitySupplier.getAsDouble()) / 2; // TODO want to test this
+        // return -currentVelocity; // this is negative b/c we want it shooter-forward
     }
+
+    public void setMotorBrakeMode(){
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.setNeutralMode(NeutralMode.Brake);
+        });
+    }
+    public void pidStop() { 
+        this.withEachMotor((m) -> {
+            WPI_TalonFX motor = (WPI_TalonFX)m;
+            motor.set(TalonFXControlMode.Velocity, 0);
+        });
+    }  
 
 
 }

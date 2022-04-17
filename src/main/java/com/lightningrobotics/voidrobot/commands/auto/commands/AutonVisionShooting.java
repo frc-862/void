@@ -34,8 +34,9 @@ public class AutonVisionShooting extends CommandBase {
 	}
 
 	@Override
-	public void initialize() {	
+	public void initialize() {
 		targeting.zeroBias();
+		targeting.adjustBiasAngle(angleBias);
 		targeting.adjustBiasDistance(distanceBias);
 	}
 	
@@ -47,15 +48,12 @@ public class AutonVisionShooting extends CommandBase {
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 
-		shooter.setRPM(rpm + RPMBias);
+		var biasedRPM = rpm + RPMBias;
+		shooter.setRPM(biasedRPM);
 		hood.setAngle(hoodAngle);
 
-		if (indexer.getCollectedBall()) {			
-			targeting.adjustBiasAngle(angleBias);
-		}
-
-		if ((targeting.onTarget())) {
-			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
+		if ((targeting.onTarget(biasedRPM, hoodAngle))) {
+			indexer.setPower(Constants.AUTON_INDEXER_POWER);
 		}
 
 	}

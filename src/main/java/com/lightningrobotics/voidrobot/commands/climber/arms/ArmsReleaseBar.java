@@ -5,30 +5,32 @@
 package com.lightningrobotics.voidrobot.commands.climber.arms;
 
 import com.lightningrobotics.voidrobot.constants.Constants;
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmsToReach extends CommandBase {
-    Climber climber;
-
-    public ArmsToReach(Climber climber) {
-        this.climber = climber;
-        addRequirements(climber);
+public class ArmsReleaseBar extends CommandBase {
+    ClimbArms arms;
+    public ArmsReleaseBar(ClimbArms arms) {
+        this.arms = arms;
+        addRequirements(arms);
     }
 
     @Override
-    public void initialize() {
-        climber.setArmsTarget(Constants.REACH_HEIGHT);
+    public void initialize() {}
+
+    @Override
+    public void execute() {
+        arms.setTarget(Constants.RELEASE_HEIGHT);
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.stopArms();
+        arms.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return climber.armsOnTarget();
+        return arms.onTarget();
     }
 }

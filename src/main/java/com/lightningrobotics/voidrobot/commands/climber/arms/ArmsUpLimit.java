@@ -4,36 +4,39 @@
 
 package com.lightningrobotics.voidrobot.commands.climber.arms;
 
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class MoveArmsManual extends CommandBase {
-  double power;
+public class ArmsUpLimit extends CommandBase {
+  ClimbArms arms;
+  public ArmsUpLimit(ClimbArms arms) {
+    this.arms = arms;
 
-  Climber climber;
-  public MoveArmsManual(Climber climber, double power) {
-    this.power = power;
-    this.climber = climber;
-
-    addRequirements(climber);
+    addRequirements(arms);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    climber.setClimbPower(power, power);
+    arms.setPower(1, 1);
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    arms.setPower(1, 1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climber.stopArms();
+    arms.setPower(0, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return arms.getUpperLimitSwitches();
   }
 }

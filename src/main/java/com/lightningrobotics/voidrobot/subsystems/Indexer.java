@@ -9,9 +9,12 @@ import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +30,7 @@ public class Indexer extends SubsystemBase {
     private final DigitalInput exitSensor  = new DigitalInput(RobotMap.EXIT_BEAM_BREAK);
 
     Debouncer enterDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
-    Debouncer exitDebouncer = new Debouncer(Constants.INDEX_DEBOUNCE_TIME);
+    Debouncer exitDebouncer = new Debouncer(0);
 
     // define variables to store beam break data
     private boolean lower;
@@ -60,6 +63,7 @@ public class Indexer extends SubsystemBase {
     BallColor lowerBallColor = BallColor.nothing;
 
     private ShuffleboardTab indexerTab = Shuffleboard.getTab("Indexer");
+    private final NetworkTableEntry colorBlindModeEntry = indexerTab.add("Color Blind Mode", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
 
     public Indexer() {
         // Sets Motor and color ID/ports
@@ -71,6 +75,8 @@ public class Indexer extends SubsystemBase {
         indexerTab.addString("upper ball color", () -> upperBallColor.toString());
         indexerTab.addString("llower ball color", () -> lowerBallColor.toString());
         indexerTab.addNumber("ball count", () -> ballCount);
+        indexerTab.addBoolean("upper sensor", () -> upper);
+        indexerTab.addBoolean("lower sensor", () -> lower);
 
 		CommandScheduler.getInstance().registerSubsystem(this);
     }
@@ -103,6 +109,7 @@ public class Indexer extends SubsystemBase {
         }
         if (eject1) {
             ballCount--;
+            upperBallColor = lowerBallColor;
         }
         ballCount = LightningMath.constrain(ballCount, 0, 2);
 
@@ -205,6 +212,18 @@ public class Indexer extends SubsystemBase {
         return 0;
     }
     
+    public boolean isEnenmyBall(){
+        return false;
+        // if(colorBlindModeEntry.getBoolean(false)){
+        //     return false;
+        // }
+        // else{
+        //     var allianceBallColor = DriverStation.getAlliance().toString();
+        //     System.out.println("Cargo: " + getUpperBallColor() + " - " + allianceBallColor);
+        //     return !allianceBallColor.equals(getUpperBallColor().toString()) && getUpperBallColor() != BallColor.nothing;
+        // }
+    }
+
     public ColorSensorV3 getColorSensor() {
         return indexerColorSensor;
     }
