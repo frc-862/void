@@ -36,7 +36,7 @@ public class AutoFlywheelHood extends CommandBase {
 			var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
 
 			shooter.setRPM(rpm);
-			hood.setAngle(hoodAngle);
+			// hood.setAngle(hoodAngle);
 
 			// // if the only ball is enemy ball, shoots directly
 			// if(isEnenmyBall && indexer.getBallCount() == 1){

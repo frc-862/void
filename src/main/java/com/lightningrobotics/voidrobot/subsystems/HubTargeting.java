@@ -15,8 +15,11 @@ import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
+import com.lightningrobotics.voidrobot.Robot;
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -25,6 +28,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -77,6 +81,8 @@ public class HubTargeting extends SubsystemBase {
 	private DoubleSupplier currentHoodAngleSupplier;
 	private DoubleSupplier currentFlywheelRPMSupplier;
 	private BooleanSupplier exitSensor;
+
+	private PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, PowerDistribution.ModuleType.kRev);
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
@@ -200,6 +206,7 @@ public class HubTargeting extends SubsystemBase {
 		CommandScheduler.getInstance().registerSubsystem(this);
 
 		distanceBias = Constants.DEFAULT_DISTANCE_BIAS;
+		pdh.setSwitchableChannel(true);
 
 	}
 
