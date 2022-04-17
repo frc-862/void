@@ -1,28 +1,30 @@
 package com.lightningrobotics.voidrobot.commands.climber.pivot;
 
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
+import com.lightningrobotics.voidrobot.subsystems.ClimbPivots;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class PivotToReach extends CommandBase {
-    Climber climber;
+    ClimbPivots pivots;
 
-    public PivotToReach(Climber climber) {
-        this.climber = climber;
+    public PivotToReach(ClimbPivots pivots) {
+        this.pivots = pivots;
+        addRequirements(pivots);
     }
 
     @Override
     public void initialize() {
-        climber.pivotToReach();
+        pivots.pivotToReach();
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.stopPivot();
+        pivots.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return climber.pivotOnTarget();
+        return pivots.onTarget();
     }
 }

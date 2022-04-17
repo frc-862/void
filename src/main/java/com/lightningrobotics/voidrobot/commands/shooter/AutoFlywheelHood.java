@@ -29,14 +29,14 @@ public class AutoFlywheelHood extends CommandBase {
 
 	@Override
 	public void execute() {
-		boolean isEnenmyBall = !DriverStation.getAlliance().toString().equals(indexer.getUpperBallColor().toString()) && indexer.getUpperBallColor() != BallColor.nothing;
+		boolean isEnenmyBall = indexer.isEnenmyBall();
 		
 		if(indexer.getBallCount() > 0){
 			var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 			var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
 
 			shooter.setRPM(rpm);
-			hood.setAngle(hoodAngle);
+			// hood.setAngle(hoodAngle);
 
 			// // if the only ball is enemy ball, shoots directly
 			// if(isEnenmyBall && indexer.getBallCount() == 1){

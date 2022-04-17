@@ -15,15 +15,20 @@ import com.lightningrobotics.common.geometry.kinematics.DrivetrainState;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.common.util.filter.MovingAverageFilter;
+import com.lightningrobotics.voidrobot.Robot;
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -77,6 +82,8 @@ public class HubTargeting extends SubsystemBase {
 	private DoubleSupplier currentFlywheelRPMSupplier;
 	private BooleanSupplier exitSensor;
 
+	private PowerDistribution pdh = new PowerDistribution(RobotMap.PDH_ID, PowerDistribution.ModuleType.kRev);
+
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
 	private double lastKnownDistance = 0d;
@@ -102,6 +109,8 @@ public class HubTargeting extends SubsystemBase {
 	// Command State
 	private double state = 0;
 	private int lastImageIndex = -1;
+	
+	private double startTime = 0;
 
 	// Main Output External Access Functions
 	
@@ -196,7 +205,8 @@ public class HubTargeting extends SubsystemBase {
 		setLastVisionIndex();
 		CommandScheduler.getInstance().registerSubsystem(this);
 
-		distanceBias = -0.15d;
+		distanceBias = Constants.DEFAULT_DISTANCE_BIAS;
+		pdh.setSwitchableChannel(true);
 
 	}
 
@@ -218,8 +228,10 @@ public class HubTargeting extends SubsystemBase {
 
 		filterDistance();
 
+		hubDistance = LightningMath.constrain(hubDistance, 2.46d, 9.35d); // lowest and highest interpolated values ps: ur bad
+
 		// Account for robot motion
-		filterRobotMotion();
+		// filterRobotMotion();
 
 		targetFlywheelRPM = calcFlywheelRPM();
 		targetHoodAngle = calcHoodAngle();
@@ -243,7 +255,10 @@ public class HubTargeting extends SubsystemBase {
 		DataLogger.addDataElement("validTarget", () -> visionTargetDetectedEntry.getDouble(-1));
 		DataLogger.addDataElement("lastImageIndex", () -> lastImageIndex);
 
-		//Drive Logging
+		// Shot Logging
+		DataLogger.addDataElement("rpmBias ", this::secondShotBias);
+
+		// Drive Logging
 		DataLogger.addDataElement("relativeVelocityY", () -> velocityEntry.getDouble(0));
 
 		// Target Output Logging
@@ -303,14 +318,15 @@ public class HubTargeting extends SubsystemBase {
 			DrivetrainSpeed speed = currentSpeedSupplier.get();
 			//var vel = Math.sqrt(Math.pow(speed.vx, 2) + Math.pow(speed.vy, 2));
 			var changeInHeading = currentPoseSupplier.get().getRotation().getDegrees();
-			var relativeVel = rotateY(speed.vx, speed.vy, changeInHeading);
-			velocityEntry.setDouble(relativeVel);
 
 			var dist = hubDistance;
 			var theta = targetTurretAngle;
 
-			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
+			var relativeVel = -rotateY(speed.vx, speed.vy, changeInHeading);
+			relativeVel = relativeVel * Constants.DISTANCE_TO_TIME_SHOOT_MAP.get(dist); //convert velocity to a distance
+			velocityEntry.setDouble(relativeVel);
 			
+			motionAdjustedDistance = Math.sqrt((Math.pow(dist, 2)) + (Math.pow(relativeVel, 2)) - (2 * dist * relativeVel * Math.cos(Math.toRadians(theta))));
 			//if(motionAdjustedDistance <= 0) {
 			//	System.err.println("Bias Distance <= 0 - Will Fail");
 			//	return;
@@ -387,15 +403,33 @@ public class HubTargeting extends SubsystemBase {
 		return currentTurretAngleSupplier.get().getDegrees() + hubAngleOffset;
 	}
 
+	private double secondShotBias() {
+		double rpmBias = 0;
+
+		if (exitSensor.getAsBoolean()){
+			startTime = Timer.getFPGATimestamp();
+		}
+
+		if (Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME && getHubDistance() > Constants.SHORT_BIAS_DISTANCE) {
+			rpmBias = Constants.LONG_RPM_BIAS;
+		}
+		else if(Timer.getFPGATimestamp() - startTime <= Constants.RPM_BIAS_TIME && getHubDistance() < Constants.SHORT_BIAS_DISTANCE) {
+			rpmBias = Constants.SHORT_RPM_BIAS;
+		}
+		
+		return rpmBias;
+
+	}
+
 	private double calcFlywheelRPM() {
 		var rpm = Constants.DISTANCE_RPM_MAP.get(hubDistance) + getTurretAngleRPMAdjust();// Constants.ANGLE_POWER_MAP.get(currentTurretAngleSupplier.get().getDegrees());
-		return rpm;
+		return rpm - secondShotBias();
 	}
 
 	private double getTurretAngleRPMAdjust() {
 		final double CLOSEST_SHOT = 2.46;
 		final double FARTHEST_SHOT = 7.0;
-		final double MAX_RPM_GAIN = 200;
+		final double MAX_RPM_GAIN = 150;
 
 		double anglePercent = Math.abs(currentTurretAngleSupplier.get().getDegrees() / Constants.MAX_TURRET_ANGLE);
 		double distancePercent = LightningMath.constrain((hubDistance - CLOSEST_SHOT) / (FARTHEST_SHOT - CLOSEST_SHOT), 0, 1);
@@ -468,6 +502,14 @@ public class HubTargeting extends SubsystemBase {
 	
 	public void adjustBiasAngle(double delta) {
 		angleBias -= delta; // needs to subtract to add on to the delta, its werid
+	}
+
+	public void setBiasDistance(double distanceBias) {
+		this.distanceBias = distanceBias;
+	}
+
+	public void setBiasAngle(double angleBias) {
+		this.angleBias = angleBias;
 	}
 
 	public void zeroBias() {

@@ -1,7 +1,5 @@
 package com.lightningrobotics.voidrobot.constants;
 
-// import javax.smartcardio.CardNotPresentException;
-
 import com.lightningrobotics.common.controller.FeedForwardController;
 import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
@@ -17,6 +15,9 @@ public final class Constants {
     public static final double KS = 0.74863;
     public static final double KV = 2.1297;
     public static final double KA = 0.35019;
+
+    public static final double DRIVETRAIN_BRAKE_KP = 0.036934;
+    public static final double DRIVETRAIN_MAX_ACCELERATION = 200; //encoder ticks per 100 ms
 
     public static final boolean LEFT_1_INVERT = false;
     public static final boolean LEFT_2_INVERT = false;
@@ -43,7 +44,7 @@ public final class Constants {
         new FeedForwardController(Constants.KS, Constants.KV, Constants.KA)
     );
 
-    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.15; //TODO: tune. also in meters per second.
+    public static final double MAXIMUM_LINEAR_SPEED_TO_SHOOT = 0.3; //TODO: tune. also in meters per second.
 
     public static final double MAXIMUM_ANGULAR_SPEED_TO_SHOOT = 1; //TODO: tune. also in meters per second.
 
@@ -67,13 +68,15 @@ public final class Constants {
     public static final double SLOW_PID_THRESHOLD = 10; // degrees
 
     // Indexer
-    public static final double DEFAULT_INDEXER_POWER = 1.0; // 0.5
+    public static final double DEFAULT_INDEXER_POWER = 1.0;
+    public static final double AUTON_INDEXER_POWER = 0.9;
+    public static final double AUTON_CENTER_POWER = 0.4;
     public static final double RED_THRESHOLD = 0.38;
     public static final double BLUE_THRESHOLD = 0.32;
     public static final double INDEX_DEBOUNCE_TIME = 0.1;
 
 	// Shooter Constants
-    public static final double SHOOTER_KP = 0.2; // 0.00023742; // tune
+    public static final double SHOOTER_KP = 0.17;
     public static final double SHOOTER_KI = 0;
     public static final double SHOOTER_KD = 0;
 
@@ -81,10 +84,14 @@ public final class Constants {
     public static final double SHOOTER_KF = 0.0455;
     public static final double SHOOTER_KA = 0;
 
-    public static final double SHOOTER_COOLDOWN = 1;
+	public static final double LONG_RPM_BIAS = 100; // TODO set large number for testing
+	public static final double SHORT_RPM_BIAS = 50;
+	public static final double SHORT_BIAS_DISTANCE = 3.25;
+	public static final double RPM_BIAS_TIME = 1;
 
 	public static final double SHOOTER_TOLERANCE = 100d;
 	public static final double HOOD_TOLERANCE = .2d;
+	public static final double DEFAULT_DISTANCE_BIAS = 0.0d;
 
 	public static final double HOOD_KP = 0.9d;
     public static final double HOOD_KI = 0d;
@@ -120,7 +127,7 @@ public final class Constants {
 
     // Auto Shoot
     public static final double EJECT_BALL_RPM = 1500;
-    public static final double EJECT_BALL_HOOD_ANGLE = 4.0; //TODO: tune
+    public static final double EJECT_BALL_HOOD_ANGLE = 4.0;
 
     //distance in meters, power in RPMs 
     public static final InterpolationMap DISTANCE_RPM_MAP = new InterpolationMap() {
@@ -129,10 +136,29 @@ public final class Constants {
 			// put(3.07d, 3650d);
 			// put(3.56d, 3850d);
 			// put(4.24d, 3950d);
-			// put(5.13d, 4250d);
+			// put(4.6d, 4250d);
+			// put(5.13d, 4300d);
 			// put(6.02d, 4550d);
-			// put(7.11d, 5000d);
-			// put(8.03, 5400d);
+
+			// put(2.46d, 3550d);
+            // put(3.11d, 3750d);
+            // put(3.67d, 3850d);
+            // put(4.13d, 4000d);
+            // // put(4.9d, 4400d);
+			// put(5.22, 4350d);
+            // put(5.6d, 4500d);
+			// put(6.19d, 4550d);
+            // // put(6.08d, 4800d);
+            // // put(7.11d, 5000d);
+			// put(7.33d, 4750d);
+			// put(8.03, 5300d);
+			// put(9.35d, 5400d);
+
+			// put(8.03d, 5400d);
+            // put(9.35d, 5500d);
+
+
+
 
 			put(2.46d, 3550d);
             put(3.11d, 3750d);
@@ -141,9 +167,8 @@ public final class Constants {
             put(4.9d, 4400d);
             put(5.6d, 4650d);
             put(6.08d, 4800d);
-            put(7.11d, 5000d);
-			put(8.03d, 5400d);
-            put(9.35d, 5500d);
+            put(7.11d, 5200d);
+			put(8.03d, 5600d);
         }
     };
 
@@ -154,11 +179,29 @@ public final class Constants {
 			// put(3.07d, 0d);
 			// put(3.56d, 0.2d);
 			// put(4.24d, 0.4d);
+			// put(4.6d, 2.0d);
 			// put(5.13d, 0.8d);
 			// put(6.02d, 1.1d);
-			// put(7.11d, 2.4d);
-			// put(8.03, 2.3d);
 
+           
+            // put(2.46d, 0d);
+            // put(3.11d, 0d);
+            // put(3.67d, 1.2d);
+            // put(4.13d, 1.4d);
+            // put(4.9d, 1.9d);
+            // put(5.6d, 2.3d);
+			// put(6.19d, 2.7d);
+            // // put(6.08d, 2.6d);
+            // // put(7.11d, 2.4d);
+			// put(7.33d, 2.5);
+			// put(8.03d, 2.3d);
+            // put(9.35d, 3.0d);
+
+
+
+
+
+			    
             put(2.46d, 0d);
             put(3.11d, 0d);
             put(3.67d, 1.2d);
@@ -166,9 +209,17 @@ public final class Constants {
             put(4.9d, 1.9d);
             put(5.6d, 2.3d);
             put(6.08d, 2.6d);
-			put(7.11d, 2.4d);
+            put(7.11d, 2.4d);
 			put(8.03d, 2.3d);
-            put(9.35d, 3.0d);
+        }
+    };
+
+    //distance in meters, time the ball takes to get in from the shooter to the target
+    public static final InterpolationMap DISTANCE_TO_TIME_SHOOT_MAP = new InterpolationMap() {
+        {
+            put(0d, 1.5d);
+            put(10d, 1.5d);
+            put(20d, 1.5d);
         }
     };
 
@@ -178,20 +229,17 @@ public final class Constants {
 	public static final double INTAKE_DEPLOY_TIME = 2d;
     public static final double INTAKE_RETRACT_TIME = 2.3d;
     public static final double DEFAULT_INTAKE_POWER = 1.0; // 0.5
-    public static final double DEFAULT_INTAKE_WINCH_POWER = 1.0d;
+    public static final double DEFAULT_INTAKE_WINCH_POWER = 0.8d;
 
     //Climber
     public static final double DEFAULT_PIVOT_POWER = 1.0;
-    public static final double MID_RUNG_VALUE = 257000;
+    public static final double MID_RUNG_VALUE = 275000; // 250500d; // 296000;
     public static final double MAX_ARM_VALUE = 372000;
-    public static final double HOLD_HEIGHT = 34000; //height to engage the traversal hooks
-    public static final double TRIGGER_HEIGHT = 7100;
-    public static final double REACH_HEIGHT = 330000; //height climber reaches to when pivoting back
+    public static final double HOLD_HEIGHT = 34000;
+    public static final double RELEASE_HEIGHT = 150000;
+    public static final double REACH_HEIGHT = 327000;
     public static final double ARM_TARGET_THRESHOLD = 750;
     public static final double ON_RUNG_ANGLE = 1.4;
-    
-    //TODO: tune these values
-    public static final double GYRO_SETTLE_THRESHOLD = 0;
-    public static final double GYRO_SETTLE_TIME = 0;
+    public static final double ARM_KP = 1d;
 
 }

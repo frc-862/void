@@ -1,5 +1,8 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
+import java.lang.invoke.ConstantBootstraps;
+
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Indexer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -22,7 +25,7 @@ public class AutonIndexeCargo extends CommandBase {
 
     @Override
     public void execute() {
-        indexer.setPower(0.4d);
+        indexer.setPower(Constants.AUTON_CENTER_POWER);
     }
 
     @Override
@@ -32,6 +35,6 @@ public class AutonIndexeCargo extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return indexer.getBallCount() == indexer.getBallCount() + ballsWanted; // indexer.getColorSensor().getProximity() > 350 && 
+        return indexer.getBallCount() == ballsWanted; // indexer.getColorSensor().getProximity() > 350 && 
     }
 }

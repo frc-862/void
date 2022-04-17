@@ -2,38 +2,38 @@ package com.lightningrobotics.voidrobot.commands.climber;
 
 import java.util.function.DoubleSupplier;
 
-import com.lightningrobotics.voidrobot.subsystems.Climber;
+import com.lightningrobotics.voidrobot.subsystems.ClimbArms;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ManualClimb extends CommandBase {
 
-    public final Climber climber;
+    public final ClimbArms arms;
 
     private DoubleSupplier leftClimbPower;
     private DoubleSupplier rightClimbPower;
 
     private boolean zeroBool = true;
 
-    public ManualClimb(Climber climber, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower) {
-        this.climber = climber;
+    public ManualClimb(ClimbArms arms, DoubleSupplier leftClimbPower, DoubleSupplier rightClimbPower) {
+        this.arms = arms;
         this.leftClimbPower = leftClimbPower;
         this.rightClimbPower = rightClimbPower;
 
-        addRequirements(climber);
+        addRequirements(arms);
     }
 
     @Override
     public void execute() {
-        climber.setClimbPower(
+        arms.setPower(
             MathUtil.applyDeadband(leftClimbPower.getAsDouble(), 0.1),
             MathUtil.applyDeadband(rightClimbPower.getAsDouble(), 0.1));
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.stop();
+        arms.stop();
     }
 
     @Override

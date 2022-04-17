@@ -11,7 +11,7 @@ import com.lightningrobotics.voidrobot.subsystems.Indexer.BallColor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ShootCargo extends CommandBase {
+public class MovingShot extends CommandBase {
 
 	private final Shooter shooter;
 	private final Hood hood;
@@ -19,7 +19,7 @@ public class ShootCargo extends CommandBase {
 	private final HubTargeting targeting;
 	private final Drivetrain drivetrain;
 
-	public ShootCargo(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
+	public MovingShot(Shooter shooter, Hood hood, Indexer indexer, HubTargeting targeting, Drivetrain drivetrain) {
 		this.shooter = shooter;
 		this.hood = hood;
 		this.indexer = indexer;
@@ -32,27 +32,29 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void execute() {
 		boolean isEnenmyBall = indexer.isEnenmyBall();
-		var rpm =  isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
+		var rpm = isEnenmyBall ? Constants.EJECT_BALL_RPM : targeting.getTargetFlywheelRPM();
 		var hoodAngle = isEnenmyBall ? Constants.EJECT_BALL_HOOD_ANGLE : targeting.getTargetHoodAngle();
+
+        calcVelDistanceBias(drivetrain.getCurrentVelocity());
 
 		shooter.setRPM(rpm);
 		hood.setAngle(hoodAngle);
 		
-		if (drivetrain.getCurrentVelocity() < Constants.MAXIMUM_LINEAR_SPEED_TO_SHOOT && targeting.onTarget()) { // getCurrentVelocity() may not work, may need another constant
+		if (targeting.onTarget()) {
 			indexer.setPower(Constants.DEFAULT_INDEXER_POWER);
 		} 
 	}
+
+    private void calcVelDistanceBias(double velocity) {
+        targeting.setBiasDistance(velocity * 10d);
+    }
 
 	@Override
 	public void end(boolean interrupted) {
 		shooter.coast();
 		indexer.stop();
-		hood.setAngle(0); // TODO: see if eric likes -nick
-		// if (indexer.getBallCount() == 0) {
-		// 	hood.setAngle(0);
-		// } else {
-		// 	hood.setPower(0);
-		// }
+		hood.setAngle(0);
+
 	}
 
 	@Override
