@@ -80,9 +80,9 @@ public class Turret extends SubsystemBase {
 			turretMotor.set(TalonSRXControlMode.PercentOutput, 0);
 		}
 
-		if (getCenterSensor()) {
-			resetEncoder();
-		}
+		// if (getCenterSensor()) {
+		// 	resetEncoder();
+		// }
 	}
 
 	private void initLogging() {
