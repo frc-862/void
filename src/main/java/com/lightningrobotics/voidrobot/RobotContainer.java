@@ -54,6 +54,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
 
@@ -135,6 +136,12 @@ public class RobotContainer extends LightningContainer {
         (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
         (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 
+        (new POVButton(copilot, 0)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
+        (new POVButton(copilot, 180)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(-Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
+        (new POVButton(copilot, 90)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(-Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
+        (new POVButton(copilot, 270)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
+        (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).whenPressed(targeting::zeroBias);
+
 		// CLIMB
         (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
         (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
@@ -146,11 +153,11 @@ public class RobotContainer extends LightningContainer {
         (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
         (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
 
-		(new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
-        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-        //     new ArmsUpLimit(arms),
-        //     new PivotToReach(pivots).withTimeout(1.0)
-        //     ));
+		// (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
+        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
+            new ArmsUpLimit(arms),
+            new PivotToReach(pivots).withTimeout(1.0)
+        ));
 
         (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
 
@@ -184,6 +191,15 @@ public class RobotContainer extends LightningContainer {
             )
         );
 
+        //Automated retract from back hooks code, should stop mashing into the vision mount, but untested
+        // (new POVButton(climb, 90)).whenHeld(new ParallelCommandGroup(
+        //     new StartEndCommand(() -> arms.setPower(-1, -1), () -> arms.setPower(0, 0), arms).withTimeout(0.4), //run the arms down for 0.4 seconds
+        //     new SequentialCommandGroup( //wait 0.1 seconds, then start pivoting
+        //         new WaitCommand(0.1),
+        //         new PivotToHold(pivots)
+        //     )
+        // ));
+
         //"final" controls
         (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(pivots::pivotToHold);
         (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(pivots::pivotToReach);
@@ -203,7 +219,7 @@ public class RobotContainer extends LightningContainer {
     protected void configureDefaultCommands() {        
 		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
-		targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
         //indexer.setDefaultCommand(new EjectBall(indexer));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
         arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));

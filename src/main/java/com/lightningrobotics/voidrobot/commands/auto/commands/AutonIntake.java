@@ -1,7 +1,9 @@
 package com.lightningrobotics.voidrobot.commands.auto.commands;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.subsystems.Intake;
 
+import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonIntake extends CommandBase {
@@ -16,13 +18,16 @@ public class AutonIntake extends CommandBase {
 
     @Override
     public void execute() {
-        intake.setPower(0.75);
 
-        if (!intake.getDeployedSensor()){
-            intake.actuateIntake(0.75d); 
-        } else {
-            intake.actuateIntake(0d);
-        }
+        intake.actuateIntake(0.75d);
+        intake.setPower(0.75d);
+
+        // if (!intake.getDeployedSensor()){
+        //     intake.actuateIntake(0.75d); 
+        // } else {
+        //     intake.actuateIntake(0d);
+        //     intake.setPower(0.75);
+        // }
     }
 
     @Override

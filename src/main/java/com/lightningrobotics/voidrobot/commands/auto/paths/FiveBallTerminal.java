@@ -14,6 +14,7 @@ import com.lightningrobotics.voidrobot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class FiveBallTerminal extends ParallelCommandGroup {
@@ -33,7 +34,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			
 			new PivotToReach(pivots),
 			new AutonIntake(intake),
-
+				
 			new SequentialCommandGroup(
 				new InstantCommand(indexer::initializeBallsHeld),
 				new InstantCommand(drivetrain::setMotorBreakMode),

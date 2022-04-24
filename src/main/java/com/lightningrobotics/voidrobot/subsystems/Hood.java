@@ -91,6 +91,9 @@ public class Hood extends SubsystemBase {
 		setSmartDashboardCommands();
 
 		SmartDashboard.putBoolean("hood limit switch ", getLimitSwitch());
+
+		SmartDashboard.putNumber("hood actual", getAngle());
+		SmartDashboard.putNumber("hood set point", getSetPoint());
 	}
 
 	private void initLogging() {
