@@ -91,11 +91,11 @@ public final class Constants {
 
 	public static final double SHOOTER_TOLERANCE = 100d;
 	public static final double HOOD_TOLERANCE = .2d;
-	public static final double DEFAULT_DISTANCE_BIAS = 0.0d;
+	public static final double DEFAULT_DISTANCE_BIAS = 0.15d;
 
-	public static final double HOOD_KP = 0.9d;
+	public static final double HOOD_KP = 0.55d;
     public static final double HOOD_KI = 0d;
-    public static final double HOOD_KD = 0d;
+    public static final double HOOD_KD = 0.00555d;
 	public static final PIDFController HOOD_PID =  new PIDFController(Constants.HOOD_KP, Constants.HOOD_KI, Constants.HOOD_KD);
     public static final double HOOD_MANUAL_SPEED_MULTIPLIER = 0.1d;
     public static final double HOOD_ZERO_SPEED = -0.4d;
@@ -106,6 +106,9 @@ public final class Constants {
 
 	public static final double SHOOT_TARMAC_RPM = 3800;
 	public static final double SHOOT_TARMAC_ANGLE = 0;
+
+    public static final double DEFAULT_DISTANCE_BIAS_ADJUSTMENT = 0.05d;
+    public static final double DEFAULT_ANGLE_BIAS_ADJUSTMENT = 1;
 
     // Canned shot Constants
     //Close wall

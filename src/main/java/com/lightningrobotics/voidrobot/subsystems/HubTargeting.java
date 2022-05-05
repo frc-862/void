@@ -297,15 +297,21 @@ public class HubTargeting extends SubsystemBase {
 		
 	}
 
+	private int in_shot = 0;
 	private void snapshot() {
 		// Take Snapshot of Vision Target When Enabled
 		if (exitSensor.getAsBoolean()) {
-			if (Timer.getFPGATimestamp() - lastVisionSnapshot > Constants.SNAPSHOT_DELAY) {
-				visionSnapshotEntry.setNumber(1);
-				lastImageIndex++;
-			} else {
-				visionSnapshotEntry.setNumber(0);
-			}
+			visionSnapshotEntry.setNumber(1);
+			lastVisionSnapshot = Timer.getFPGATimestamp();
+			in_shot = 1;
+			lastImageIndex++;
+		} 
+		else if (in_shot >= 3 && Timer.getFPGATimestamp() - lastVisionSnapshot > Constants.SNAPSHOT_DELAY) {
+			visionSnapshotEntry.setNumber(0);
+			in_shot = 0;
+		}
+		else if(in_shot > 0 && in_shot < 3) {
+			in_shot++;
 		}
 	}
 

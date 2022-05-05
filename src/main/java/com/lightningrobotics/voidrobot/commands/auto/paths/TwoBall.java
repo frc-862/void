@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class TwoBall extends ParallelCommandGroup {
 
@@ -32,7 +33,7 @@ public class TwoBall extends ParallelCommandGroup {
 				new ParallelCommandGroup(
 					twoBallPath.getCommand(drivetrain),
 					new SequentialCommandGroup(
-						new AutonVisionShooting(shooter, hood, indexer, targeting, 0, 0, 0),
+						new AutonVisionShooting(shooter, hood, indexer, targeting, 0, 0.4d, 0),
 						new AutonIndexeCargo(indexer, 1),
 						new AutonVisionShooting(shooter, hood, indexer, targeting, 0, 0, 0)
 
