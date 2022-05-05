@@ -37,14 +37,11 @@ public class AutonVisionShooting extends CommandBase {
 	public void initialize() {
 		targeting.zeroBias();
 		targeting.adjustBiasAngle(angleBias);
-		targeting.adjustBiasDistance(distanceBias);
+		targeting.adjustBiasDistance(distanceBias + Constants.DEFAULT_DISTANCE_BIAS);
 	}
 	
 	@Override
 	public void execute() {
-		SmartDashboard.putNumber("distance bias thingy", distanceBias);
-		SmartDashboard.putNumber("angle bias things", angleBias);
-
 		var rpm = targeting.getTargetFlywheelRPM();
 		var hoodAngle = targeting.getTargetHoodAngle();
 

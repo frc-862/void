@@ -25,7 +25,11 @@ public class AutonIndexeCargo extends CommandBase {
 
     @Override
     public void execute() {
-        indexer.setPower(Constants.AUTON_CENTER_POWER);
+        if (!indexer.getExitStatus()){
+            indexer.setPower(Constants.AUTON_CENTER_POWER);
+        } else {
+            indexer.setPower(0);
+        }
     }
 
     @Override
