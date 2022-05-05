@@ -7,6 +7,8 @@ import com.lightningrobotics.common.util.InterpolationMap;
 
 public final class Constants {
 
+	public static final double DEMO_SPEED_LIM = 0.4;
+
     // Drivetrain
     public static final double KP = 0.00066934;
     public static final double KI = 0.01;

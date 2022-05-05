@@ -9,26 +9,17 @@ import com.lightningrobotics.common.testing.SystemTest;
 import com.lightningrobotics.common.testing.SystemTestCommand;
 import com.lightningrobotics.common.util.filter.JoystickFilter;
 import com.lightningrobotics.common.util.filter.JoystickFilter.Mode;
-// import com.lightningrobotics.voidrobot.commands.SystemCheck;
-// import com.lightningrobotics.voidrobot.commands.SystemCheckNoTest;
 import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsDownLimit;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsReleaseBar;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsUpLimit;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsManual;
-import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsMid;
+import com.lightningrobotics.voidrobot.commands.climber.arms.*;
 import com.lightningrobotics.voidrobot.commands.climber.BackHooks;
 import com.lightningrobotics.voidrobot.commands.climber.GetReadyForClimb;
 import com.lightningrobotics.voidrobot.commands.climber.ManualClimb;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveBothPivots;
-import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveLeftPivot;
-import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveRightPivot;
-import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToHold;
-import com.lightningrobotics.voidrobot.commands.climber.pivot.PivotToReach;
 import com.lightningrobotics.voidrobot.commands.hood.ResetHood;
+import com.lightningrobotics.voidrobot.commands.climber.pivot.*;
 import com.lightningrobotics.voidrobot.commands.indexer.*;
 import com.lightningrobotics.voidrobot.commands.intake.*;
 
@@ -143,53 +134,53 @@ public class RobotContainer extends LightningContainer {
         (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).whenPressed(targeting::zeroBias);
 
 		// CLIMB
-        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
-            new ParallelCommandGroup(
-                new RunCommand(() -> turret.setDisableTurret(false), turret),
-                new RunCommand(() -> hood.setDisableHood(false), hood),
-                new SafeRetrackIntake(intake)
-        ));
-        (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
-        (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
+        //     new ParallelCommandGroup(
+        //         new RunCommand(() -> turret.setDisableTurret(false), turret),
+        //         new RunCommand(() -> hood.setDisableHood(false), hood),
+        //         new SafeRetrackIntake(intake)
+        // ));
+        // (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
+        // (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
 
 		// (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-            new ArmsUpLimit(arms),
-            new PivotToReach(pivots).withTimeout(1.0)
-        ));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
+        //     new ArmsUpLimit(arms),
+        //     new PivotToReach(pivots).withTimeout(1.0)
+        // ));
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
 
-		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
-            new SequentialCommandGroup( //if we're already off of hooks, just pivot back and go straight up
-                new PivotToReach(pivots),
-                new ArmsUpLimit(arms)
-            ),
+		// (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
+        //     new SequentialCommandGroup( //if we're already off of hooks, just pivot back and go straight up
+        //         new PivotToReach(pivots),
+        //         new ArmsUpLimit(arms)
+        //     ),
 
-            new SequentialCommandGroup(//if we're still on hookes, raise enough to get off and then go to reach
-				new ArmsReleaseBar(arms),
-				new PivotToReach(pivots),
-                new ArmsUpLimit(arms)
-			),
-			() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000) // check if arms are high enough to be off of hook already
-		)
-        );
+        //     new SequentialCommandGroup(//if we're still on hookes, raise enough to get off and then go to reach
+		// 		new ArmsReleaseBar(arms),
+		// 		new PivotToReach(pivots),
+        //         new ArmsUpLimit(arms)
+		// 	),
+		// 	() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000) // check if arms are high enough to be off of hook already
+		// )
+        // );
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
-            new ConditionalCommand(
-                new ArmsDownLimit(arms), // if starting from mid, just pull arms down
-                new ParallelCommandGroup( //otherwise, run timed pivot and arm movement
-                    new PivotToHold(pivots),
-                    new SequentialCommandGroup (
-                        new WaitCommand(1.0),
-                        new ArmsDownLimit(arms)
-                    )
-                ),
-                () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
-            )
-        );
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
+        //     new ConditionalCommand(
+        //         new ArmsDownLimit(arms), // if starting from mid, just pull arms down
+        //         new ParallelCommandGroup( //otherwise, run timed pivot and arm movement
+        //             new PivotToHold(pivots),
+        //             new SequentialCommandGroup (
+        //                 new WaitCommand(1.0),
+        //                 new ArmsDownLimit(arms)
+        //             )
+        //         ),
+        //         () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
+        //     )
+        // );
 
         //Automated retract from back hooks code, should stop mashing into the vision mount, but untested
         // (new POVButton(climb, 90)).whenHeld(new ParallelCommandGroup(
@@ -217,12 +208,12 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {        
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() * Constants.DEMO_SPEED_LIM, () -> -driverRight.getY() * Constants.DEMO_SPEED_LIM, driverFilter));
         turret.setDefaultCommand(new AimTurret(turret, targeting));
 		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
         //indexer.setDefaultCommand(new EjectBall(indexer));
         shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
-        arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        // arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
         intake.setDefaultCommand(new SafeRetrackIntake(intake));
 	}
 
