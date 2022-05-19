@@ -7,7 +7,10 @@ import com.lightningrobotics.common.util.InterpolationMap;
 
 public final class Constants {
 
-	public static final double DEMO_SPEED_LIM = 0.4;
+	public static final double DEFAULT_DEMO_SPEED_LIM = 0.35;
+    public static final double DEMO_INTAKE_POWER = 0.8d;
+    public static final double DEMO_INDEXER_POWER = 0.8d;
+    public static final double DEMO_RPM = 2000d;
 
     // Drivetrain
     public static final double KP = 0.00066934;

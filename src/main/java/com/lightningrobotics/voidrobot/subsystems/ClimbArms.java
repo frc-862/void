@@ -93,8 +93,8 @@ public class ClimbArms extends SubsystemBase {
 		// leftArm.selectProfileSlot(1, 0);
 		// rightArm.selectProfileSlot(1, 0);
 		this.armsTarget = armTarget;
-		leftArm.set(TalonFXControlMode.Position, armsTarget);
-		rightArm.set(TalonFXControlMode.Position, armsTarget);
+		leftArm.set(TalonFXControlMode.Position, armsTarget); 
+		rightArm.set(TalonFXControlMode.Position, armsTarget); 
 	}
 
 	

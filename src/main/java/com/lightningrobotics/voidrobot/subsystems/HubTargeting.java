@@ -86,7 +86,7 @@ public class HubTargeting extends SubsystemBase {
 
 	// Misc. Vision Targeting Variables
 	private double lastVisionSnapshot = 0d;
-	private double lastKnownDistance = 0d;
+	private double lastKnownDistance = 1d;
 	private double lastKnownHeading = 0d;
 	private double initX = 0d;
     private double initY = 0d;
@@ -116,6 +116,10 @@ public class HubTargeting extends SubsystemBase {
 	
 	public double getTargetTurretAngle() {
 		return targetTurretAngle;
+	}
+
+	public void setTargetTurretAngle(double targetTurretAngle) {
+		this.targetTurretAngle = targetTurretAngle;
 	}
 
 	public double getTargetFlywheelRPM() {
@@ -220,12 +224,13 @@ public class HubTargeting extends SubsystemBase {
 		hubAngleOffset = calcHubAngleOffset(); 
 
 		if(!hasVision()) {
-			calcHubGyro();
 		} else {
 			resetForGyro();
 			targetTurretAngle = calcTurretAngle();
 		}
 
+		calcHubGyro();
+		
 		filterDistance();
 
 		hubDistance = LightningMath.constrain(hubDistance, 2.46d, 9.35d); // lowest and highest interpolated values ps: ur bad
@@ -465,7 +470,7 @@ public class HubTargeting extends SubsystemBase {
 		}
 	}
 
-	private void resetForGyro() {
+	public void resetForGyro() {
 		var rot = currentPoseSupplier.get();
 		initRot = rot.getRotation().getDegrees();
         initX = rot.getX();

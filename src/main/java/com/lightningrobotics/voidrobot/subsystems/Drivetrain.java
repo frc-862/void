@@ -5,19 +5,21 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.common.subsystem.core.LightningIMU;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialDrivetrain;
 import com.lightningrobotics.common.util.LightningMath;
-import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
+import com.lightningrobotics.voidrobot.constants.RobotMap;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -33,6 +35,10 @@ public class Drivetrain extends DifferentialDrivetrain {
 
     private Rotation2d heading = Rotation2d.fromDegrees(0);
     private Rotation2d prevHeading = Rotation2d.fromDegrees(0);
+
+    private ShuffleboardTab tab = Shuffleboard.getTab("Demo");
+    private NetworkTableEntry demoSpeedEntry = tab.add("demo speed %", Constants.DEFAULT_DEMO_SPEED_LIM).getEntry();
+    private double demoSpeed;
 
     private static final MotorController[] LEFT_MOTORS = new MotorController[]{
         new WPI_TalonFX(RobotMap.LEFT_MOTOR_1),
@@ -114,6 +120,8 @@ public class Drivetrain extends DifferentialDrivetrain {
 	@Override
     public void periodic() {
         super.periodic();
+
+        demoSpeed = demoSpeedEntry.getDouble(Constants.DEFAULT_DEMO_SPEED_LIM);
 		
         pose = this.getPose();
         poseContinious = this.getPose();
@@ -174,5 +182,8 @@ public class Drivetrain extends DifferentialDrivetrain {
         });
     }  
 
+    public double getDemoSpeedLim() {
+        return demoSpeed;
+    }
 
 }
