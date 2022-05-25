@@ -62,16 +62,16 @@ public class RobotContainer extends LightningContainer {
 
 	public static final boolean TESTING = true;
 
-    // Subsystems
+    // // Subsystems
 	private static final LightningIMU imu = LightningIMU.navX();
-    private static final ClimbArms arms = new ClimbArms();
-    private static final ClimbPivots pivots = new ClimbPivots();
+    // private static final ClimbArms arms = new ClimbArms();
+    // private static final ClimbPivots pivots = new ClimbPivots();
 	private static final Drivetrain drivetrain = new Drivetrain(imu);
-    private static final Turret turret = new Turret();
-	private static final Shooter shooter = new Shooter();
-	private static final Indexer indexer = new Indexer();
-	private static final Intake intake = new Intake();
-    private static final Hood hood = new Hood();
+    // private static final Turret turret = new Turret();
+	// private static final Shooter shooter = new Shooter();
+	// private static final Indexer indexer = new Indexer();
+	// private static final Intake intake = new Intake();
+    // private static final Hood hood = new Hood();
 	// private static final LEDs leds = new LEDs();
                                             
 	// Joysticks
@@ -84,40 +84,40 @@ public class RobotContainer extends LightningContainer {
     private static final JoystickFilter driverFilter = new JoystickFilter(0.13, 0.1, 1, Mode.CUBED);
     // private static final JoystickFilter copilotFilter = new JoystickFilter(0.13, 0.1, 1, Mode.LINEAR);
 
-	private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM, indexer::getEjectedBall);
+	// private static final HubTargeting targeting = new HubTargeting(drivetrain::getPose, () -> drivetrain.getGains().getKinematics().forward(drivetrain.getDriveState()), turret::getCurrentAngle, hood::getAngle, shooter::getCurrentRPM, indexer::getEjectedBall);
 
     @Override
     protected void configureAutonomousCommands() {
 
-        try {
-            Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
-			Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
-			Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
-            Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
-            Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, pivots, targeting));
-		} catch (Exception e) {
-			System.err.println("I did an oopsie.");
-            e.printStackTrace();
-		}
+        // try {
+        //     Autonomous.register("1 Meter.path file", new Path("1Meter.path", false).getCommand(drivetrain));
+		// 	Autonomous.register("Taxi", new Path("1-2Ball.path", false).getCommand(drivetrain));
+		// 	Autonomous.register("2 Ball", new TwoBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
+        //     Autonomous.register("1 Ball", new OneBall(drivetrain, shooter, hood, turret, indexer, intake, pivots, targeting));
+        //     Autonomous.register("5 Ball Terminal", new FiveBallTerminal(drivetrain, indexer, intake, shooter, hood, turret, pivots, targeting));
+		// } catch (Exception e) {
+		// 	System.err.println("I did an oopsie.");
+        //     e.printStackTrace();
+		// }
 
-        if(TESTING) registerTestPaths();        
+        // if(TESTING) registerTestPaths();        
     }
 
     @Override
     protected void configureButtonBindings() {
 
-        // DRIVER
-        (new JoystickButton(driverRight, 1)).whileHeld(new StopAndShoot(shooter, hood, indexer, targeting, drivetrain, imu), false);//Shoot on close wall right stick left button
-        // (new JoystickButton(driverLeft, 1)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting), false); // launch pad shot
-        (new JoystickButton(driverRight, 4)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false); // shoot cargo from tarmac
-        (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
-		(new JoystickButton(driverLeft, 2)).whileHeld(new ParallelCommandGroup(
-			new ZeroTurretHood(hood, turret), 
-			new InstantCommand(turret::resetConstraint)));
-        //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer));
-        // (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); use this
-        (new JoystickButton(driverRight, 3)).whileHeld(new MovingShot(shooter, hood, indexer, targeting, drivetrain), false);
-		(new JoystickButton(driverLeft, 4)).whenPressed(turret::resetConstraint);
+        // // DRIVER
+        // (new JoystickButton(driverRight, 1)).whileHeld(new StopAndShoot(shooter, hood, indexer, targeting, drivetrain, imu), false);//Shoot on close wall right stick left button
+        // // (new JoystickButton(driverLeft, 1)).whileHeld(new LaunchPadCannedShot(shooter, hood, indexer, targeting), false); // launch pad shot
+        // (new JoystickButton(driverRight, 4)).whileHeld(new ShootCargoTarmac(shooter, hood, indexer, turret, targeting), false); // shoot cargo from tarmac
+        // (new JoystickButton(driverRight, 2)).whileHeld(new ShootClose(shooter, hood, indexer, turret, targeting), false); // Shoot close no vision
+		// (new JoystickButton(driverLeft, 2)).whileHeld(new ParallelCommandGroup(
+		// 	new ZeroTurretHood(hood, turret), 
+		// 	new InstantCommand(turret::resetConstraint)));
+        // //(new JoystickButton(driverLeft, 3)).whileHeld(new ReverseFlywheel(shooter, indexer));
+        // // (new JoystickButton(driverRight, 3)).whileHeld(new ShootCargo(shooter, hood, indexer, targeting, drivetrain), false); use this
+        // (new JoystickButton(driverRight, 3)).whileHeld(new MovingShot(shooter, hood, indexer, targeting, drivetrain), false);
+		// (new JoystickButton(driverLeft, 4)).whenPressed(turret::resetConstraint);
        
         //TODO: Ask eric for button
        // (new JoystickButton(driverRight, 3)).whileHeld(new CloseWallCannedShot(shooter, hood, indexer, targeting, turret), false);//Shoot on close wall right stick left button
@@ -127,69 +127,69 @@ public class RobotContainer extends LightningContainer {
 
         // COPILOT
         // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in
-        (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); // RT: move intake out and run intake
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
-        (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_INTAKE_WINCH_POWER)); //RB: Retract intake
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_INTAKE_WINCH_POWER)); //SELECT/BACK: Deploy intake
-        (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, shooter, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new RunCommand(() -> shooter.setRPM(-1000), shooter));
-        (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
+        // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); // RT: move intake out and run intake
+        // (new JoystickButton(copilot, JoystickConstants.BUTTON_B)).whileHeld(new RunIntake(intake, () -> -1)); //B: run collector out
+        // (new JoystickButton(copilot, JoystickConstants.RIGHT_BUMPER)).whileHeld(new MoveIntake(intake, () -> -Constants.DEFAULT_INTAKE_WINCH_POWER)); //RB: Retract intake
+        // (new JoystickButton(copilot, JoystickConstants.BUTTON_BACK)).whileHeld(new MoveIntake(intake, () -> Constants.DEFAULT_INTAKE_WINCH_POWER)); //SELECT/BACK: Deploy intake
+        // (new JoystickButton(copilot, JoystickConstants.LEFT_BUMPER)).whileHeld(new RunIndexer(indexer, shooter, () -> -Constants.DEFAULT_INDEXER_POWER)); //LB: run indexer down
+        // (new JoystickButton(copilot, JoystickConstants.BUTTON_Y)).whileHeld(new RunCommand(() -> shooter.setRPM(-1000), shooter));
+        // (new Trigger(() -> copilot.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new RunIndexer(indexer, shooter, () -> copilot.getLeftTriggerAxis()));//LT: run indexer up
+        // (new JoystickButton(copilot, JoystickConstants.BUTTON_START)).whenPressed(new InstantCommand(() -> indexer.resetBallCount())); //START: Reset ball count 
 
-        (new POVButton(copilot, 0)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
-        (new POVButton(copilot, 180)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(-Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
-        (new POVButton(copilot, 90)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(-Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
-        (new POVButton(copilot, 270)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
-        (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).whenPressed(targeting::zeroBias);
+        // (new POVButton(copilot, 0)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
+        // (new POVButton(copilot, 180)).whenPressed(new InstantCommand(() -> targeting.adjustBiasDistance(-Constants.DEFAULT_DISTANCE_BIAS_ADJUSTMENT)));
+        // (new POVButton(copilot, 90)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(-Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
+        // (new POVButton(copilot, 270)).whenPressed(new InstantCommand(() -> targeting.adjustBiasAngle(Constants.DEFAULT_ANGLE_BIAS_ADJUSTMENT)));
+        // (new JoystickButton(copilot, JoystickConstants.BUTTON_X)).whenPressed(targeting::zeroBias);
 
-		// CLIMB
-        (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
-            new ParallelCommandGroup(
-                new RunCommand(() -> turret.setDisableTurret(false), turret),
-                new RunCommand(() -> hood.setDisableHood(false), hood),
-                new SafeRetrackIntake(intake)
-        ));
-        (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
-        (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
+		// // CLIMB
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_START)).whenPressed(new GetReadyForClimb(hood, turret, shooter, intake, targeting));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_BACK)).whenPressed(
+        //     new ParallelCommandGroup(
+        //         new RunCommand(() -> turret.setDisableTurret(false), turret),
+        //         new RunCommand(() -> hood.setDisableHood(false), hood),
+        //         new SafeRetrackIntake(intake)
+        // ));
+        // (new POVButton(climb, 0)).whileHeld(new ArmsManual(arms, 1));
+        // (new POVButton(climb, 180)).whileHeld(new ArmsManual(arms, -1));
 
-		// (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
-        (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
-            new ArmsUpLimit(arms),
-            new PivotToReach(pivots).withTimeout(1.0)
-        ));
+		// // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenPressed(new RunCommand(() -> intake.actuateIntake(-Constants.DEFAULT_INTAKE_POWER), intake));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_B)).whenHeld(new SequentialCommandGroup(
+        //     new ArmsUpLimit(arms),
+        //     new PivotToReach(pivots).withTimeout(1.0)
+        // ));
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_Y)).whenHeld(new ArmsMid(arms, pivots));
 
-		(new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
-            new SequentialCommandGroup( //if we're already off of hooks, just pivot back and go straight up
-                new PivotToReach(pivots),
-                new ArmsUpLimit(arms)
-            ),
+		// (new JoystickButton(climb, JoystickConstants.BUTTON_X)).whenHeld(new ConditionalCommand(
+        //     new SequentialCommandGroup( //if we're already off of hooks, just pivot back and go straight up
+        //         new PivotToReach(pivots),
+        //         new ArmsUpLimit(arms)
+        //     ),
 
-            new SequentialCommandGroup(//if we're still on hookes, raise enough to get off and then go to reach
-				new ArmsReleaseBar(arms),
-				new PivotToReach(pivots),
-                new ArmsUpLimit(arms)
-			),
-			() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000) // check if arms are high enough to be off of hook already
-		)
-        );
+        //     new SequentialCommandGroup(//if we're still on hookes, raise enough to get off and then go to reach
+		// 		new ArmsReleaseBar(arms),
+		// 		new PivotToReach(pivots),
+        //         new ArmsUpLimit(arms)
+		// 	),
+		// 	() -> (((arms.getleftEncoder() + arms.getRightEncoder()) / 2) >= 20000) // check if arms are high enough to be off of hook already
+		// )
+        // );
 
 
-        (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
-            new ConditionalCommand(
-                new ArmsDownLimit(arms), // if starting from mid, just pull arms down
-                new ParallelCommandGroup( //otherwise, run timed pivot and arm movement
-                    new PivotToHold(pivots),
-                    new SequentialCommandGroup (
-                        new WaitCommand(1.0),
-                        new ArmsDownLimit(arms)
-                    )
-                ),
-                () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
-            )
-        );
+        // (new JoystickButton(climb, JoystickConstants.BUTTON_A)).whenHeld(
+        //     new ConditionalCommand(
+        //         new ArmsDownLimit(arms), // if starting from mid, just pull arms down
+        //         new ParallelCommandGroup( //otherwise, run timed pivot and arm movement
+        //             new PivotToHold(pivots),
+        //             new SequentialCommandGroup (
+        //                 new WaitCommand(1.0),
+        //                 new ArmsDownLimit(arms)
+        //             )
+        //         ),
+        //         () -> (pivots.getLeftHoldSensor() && pivots.getRightHoldSensor())
+        //     )
+        // );
 
         //Automated retract from back hooks code, should stop mashing into the vision mount, but untested
         // (new POVButton(climb, 90)).whenHeld(new ParallelCommandGroup(
@@ -200,11 +200,11 @@ public class RobotContainer extends LightningContainer {
         //     )
         // ));
 
-        //"final" controls
-        (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(pivots::pivotToHold);
-        (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(pivots::pivotToReach);
-        (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> -climb.getLeftTriggerAxis()));
-        (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> climb.getRightTriggerAxis()));
+        // //"final" controls
+        // (new JoystickButton(climb, JoystickConstants.RIGHT_BUMPER)).whileHeld(pivots::pivotToHold);
+        // (new JoystickButton(climb, JoystickConstants.LEFT_BUMPER)).whileHeld(pivots::pivotToReach);
+        // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> -climb.getLeftTriggerAxis()));
+        // (new Trigger(() -> climb.getRightTriggerAxis() > 0.03)).whileActiveContinuous(new MoveBothPivots(pivots, () -> climb.getRightTriggerAxis()));
 
         // Milford controls
         // (new Trigger(() -> climb.getLeftTriggerAxis() > 0.03)).whileActiveContinuous(new MoveLeftPivot(climber, () -> climb.getLeftTriggerAxis()));
@@ -217,13 +217,13 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {        
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
-        turret.setDefaultCommand(new AimTurret(turret, targeting));
-		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
-        //indexer.setDefaultCommand(new EjectBall(indexer));
-        shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
-        arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
-        intake.setDefaultCommand(new SafeRetrackIntake(intake));
+		// drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+        // turret.setDefaultCommand(new AimTurret(turret, targeting));
+		// // targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
+        // //indexer.setDefaultCommand(new EjectBall(indexer));
+        // shooter.setDefaultCommand(new AutoFlywheelHood(shooter, hood, targeting, indexer));
+        // arms.setDefaultCommand(new ManualClimb(arms, () -> -climb.getLeftY(), () -> -climb.getRightY()));
+        // intake.setDefaultCommand(new SafeRetrackIntake(intake));
 	}
 
     @Override
@@ -251,16 +251,16 @@ public class RobotContainer extends LightningContainer {
         var sysCheckTab = Shuffleboard.getTab("system check"); //TODO: check if this is good
 
         var subsystemTab = Shuffleboard.getTab("subsystems");
-        subsystemTab.add(indexer);
-        subsystemTab.add(shooter);
-        subsystemTab.add(arms);
-        subsystemTab.add(intake);
-        subsystemTab.add(hood);
-		// var compTab = Shuffleboard.getTab("Competition");
-		tab.add(new ResetHood(hood));
-		// compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
+        // subsystemTab.add(indexer);
+        // subsystemTab.add(shooter);
+        // subsystemTab.add(arms);
+        // subsystemTab.add(intake);
+        // subsystemTab.add(hood);
+		// // var compTab = Shuffleboard.getTab("Competition");
+		// tab.add(new ResetHood(hood));
+		// // compTab.add(new MoveHoodManual(shooter, () -> copilot.getLeftY()));
 
-        climbTab.add(new InstantCommand(arms::resetEncoders));
+        // climbTab.add(new InstantCommand(arms::resetEncoders));
         
 	}
 	
@@ -268,25 +268,25 @@ public class RobotContainer extends LightningContainer {
     protected void releaseDefaultCommands() { }
 
 	private void registerTestPaths() {
-		try {
-			Autonomous.register("1 meter", 
-                new SequentialCommandGroup(
-                    new InstantCommand(() -> System.out.println("One Meter Forward Yay!")),
-                    new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0)), 
-                                        new Pose2d(1d, 0d, Rotation2d.fromDegrees(0)))).getCommand(drivetrain),
-                    new InstantCommand(() -> System.out.println("Did We Move One Meter?"))
-                )
+		// try {
+		// 	Autonomous.register("1 meter", 
+        //         new SequentialCommandGroup(
+        //             new InstantCommand(() -> System.out.println("One Meter Forward Yay!")),
+        //             new Path(Arrays.asList(new Pose2d(0d, 0d, Rotation2d.fromDegrees(0)), 
+        //                                 new Pose2d(1d, 0d, Rotation2d.fromDegrees(0)))).getCommand(drivetrain),
+        //             new InstantCommand(() -> System.out.println("Did We Move One Meter?"))
+        //         )
                 
-            );
-		} catch(Exception e) {
-			System.err.println("Unexpected Error: " + e.getMessage());
-		}
-		try {
-			Autonomous.register("1 meter forward 1 meter right", 
-			(new Path("1Forward1right.path", false)).getCommand(drivetrain));
-		} catch(Exception e) {
-			System.err.println("Unexpected Error: " + e.getMessage());
-		}
+        //     );
+		// } catch(Exception e) {
+		// 	System.err.println("Unexpected Error: " + e.getMessage());
+		// }
+		// try {
+		// 	Autonomous.register("1 meter forward 1 meter right", 
+		// 	(new Path("1Forward1right.path", false)).getCommand(drivetrain));
+		// } catch(Exception e) {
+		// 	System.err.println("Unexpected Error: " + e.getMessage());
+		// }
 	} 
 
 }

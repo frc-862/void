@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningRobot;
+import com.lightningrobotics.voidrobot.simulation.FieldController;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -39,24 +40,24 @@ public class Robot extends LightningRobot {
         super.robotInit();
 
 		// Log Commands When They Are Scheduled
-        CommandScheduler.getInstance().onCommandInitialize((cmd) -> {
-            dataLog.appendString(commandInitEntry, cmd.getName(), (long) (Timer.getFPGATimestamp() * 1000));
-        });
+        // CommandScheduler.getInstance().onCommandInitialize((cmd) -> {
+        //     dataLog.appendString(commandInitEntry, cmd.getName(), (long) (Timer.getFPGATimestamp() * 1000));
+        // });
 
-			int width = 160;
-			int height = 120;
-			//width = 640;
-			//height = 480;
-			int fps = 30;
+		// 	int width = 160;
+		// 	int height = 120;
+		// 	//width = 640;
+		// 	//height = 480;
+		// 	int fps = 30;
 
-			camera = new UsbCamera("USB Camera 0", 0);
-			// camera.setResolution(width, height);
-			// camera.setFPS(fps);
-			camera.setVideoMode(PixelFormat.kMJPEG, width, height, fps);
-			mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
-			mjpegServer1.setFPS(fps);
-			mjpegServer1.setResolution(width, height);
-			mjpegServer1.setSource(camera);
+		// 	camera = new UsbCamera("USB Camera 0", 0);
+		// 	// camera.setResolution(width, height);
+		// 	// camera.setFPS(fps);
+		// 	camera.setVideoMode(PixelFormat.kMJPEG, width, height, fps);
+		// 	mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
+		// 	mjpegServer1.setFPS(fps);
+		// 	mjpegServer1.setResolution(width, height);
+		// 	mjpegServer1.setSource(camera);
 			
 
 			// camera = CameraServer.startAutomaticCapture();
@@ -65,6 +66,7 @@ public class Robot extends LightningRobot {
 	@Override
 	public void teleopInit() {
 		FieldController.Initialize();
+		System.out.println(";odsfujidsfoidsfpjafio;aslkfalsdhfj;asfhksuifodj");
 	}
 
 }
