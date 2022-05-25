@@ -62,4 +62,9 @@ public class Robot extends LightningRobot {
 			// camera = CameraServer.startAutomaticCapture();
     }
 
+	@Override
+	public void teleopInit() {
+		FieldController.Initialize();
+	}
+
 }

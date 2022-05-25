@@ -5,7 +5,19 @@ import com.lightningrobotics.common.controller.PIDFController;
 import com.lightningrobotics.common.subsystem.drivetrain.differential.DifferentialGains;
 import com.lightningrobotics.common.util.InterpolationMap;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N7;
+
 public final class Constants {
+
+    public static final int ROBOT_MASS = 125;
+    public static final double MOI = 7.5d;
+    public static final Vector<N7> MEASUREMENT_NOISE = 
+    VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005); 
+
+    public static final double MAX_INPUT_VOLTAGE = 12d;
+    public static final double SIM_UPDATE_TIME = 0.02d;
 
     // Drivetrain
     public static final double KP = 0.00066934;

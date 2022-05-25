@@ -13,7 +13,22 @@ import com.lightningrobotics.common.subsystem.drivetrain.differential.Differenti
 import com.lightningrobotics.common.util.LightningMath;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.voidrobot.constants.Constants;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import lightningrobotics.sim.SimulationConstants;
+import com.lightningrobotics.voidrobot.simulation.FieldController;
+import com.lightningrobotics.voidrobot.simulation.Battery;
+// import lightningrobotics.sim.util.PIDFController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -56,6 +71,17 @@ public class Drivetrain extends DifferentialDrivetrain {
 	private static final DoubleSupplier rightPositionSupplier = 
 		() -> LightningMath.ticksToDistance((((WPI_TalonFX)RIGHT_MOTORS[0]).getSelectedSensorPosition()), Units.inchesToMeters(Constants.WHEEL_DIAMETER), Constants.GEAR_REDUCTION, Constants.TICKS_PER_REV_FALCON);
     
+    private DifferentialDrivetrainSim drivetrain;
+    private DifferentialDriveOdometry odometry;
+    
+    private Encoder leftEncoder = new Encoder(0, 1);
+    private Encoder rightEncoder = new Encoder(2, 3);
+    private AnalogGyro gyro = new AnalogGyro(1);
+    
+    private EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
+    private EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
+    private AnalogGyroSim gyroSim = new AnalogGyroSim(gyro);
+
     public Drivetrain(LightningIMU imu) {
         super(
             Constants.DIFFERENTIAL_GAINS, 
@@ -79,6 +105,18 @@ public class Drivetrain extends DifferentialDrivetrain {
             motor.config_kP(0, Constants.DRIVETRAIN_BRAKE_KP);
             motor.config_kF(0, 0.005);
         });
+
+        drivetrain = new DifferentialDrivetrainSim(
+            DCMotor.getNEO(2),     // 2 NEO motors on each side of the drivetrain.
+            7.29,                    // 7.29:1 gearing reduction.
+            Constants.MOI,          
+            Constants.ROBOT_MASS,     
+            Constants.WHEEL_DIAMETER,
+            Constants.TRACK_WIDTH,       
+            Constants.MEASUREMENT_NOISE);
+      
+            odometry = 
+            new DifferentialDriveOdometry(new Rotation2d(), new Pose2d(0,0,new Rotation2d()));
 
 		CommandScheduler.getInstance().registerSubsystem(this);
 
@@ -167,12 +205,39 @@ public class Drivetrain extends DifferentialDrivetrain {
             motor.setNeutralMode(NeutralMode.Brake);
         });
     }
+    
+    private void updateOdometry(){
+        gyroSim.setAngle(drivetrain.getPose().getRotation().getDegrees());
+        odometry.update(
+        Rotation2d.fromDegrees(gyroSim.getAngle()), 
+        drivetrain.getPose().getX(),
+        drivetrain.getPose().getY());
+
+        leftEncoderSim.setDistance(drivetrain.getLeftPositionMeters());
+        leftEncoderSim.setRate(drivetrain.getLeftVelocityMetersPerSecond());
+        rightEncoderSim.setDistance(drivetrain.getRightPositionMeters());
+        rightEncoderSim.setRate(drivetrain.getRightVelocityMetersPerSecond());
+
+        FieldController.SetRobotPosition(odometry.getPoseMeters());
+        Battery.UseBattery(drivetrain);
+    }
+
+    @Override
+    public void tankDrive(double leftPWR, double rightPWR) {
+        super.tankDrive(leftPWR, rightPWR);
+        var leftVoltageInput = leftPWR * Constants.MAX_INPUT_VOLTAGE;
+        var rightVoltageInput = rightPWR * Constants.MAX_INPUT_VOLTAGE;
+        drivetrain.setInputs(leftVoltageInput, rightVoltageInput);
+        drivetrain.update(Constants.SIM_UPDATE_TIME);
+
+        updateOdometry();
+    }
+
     public void pidStop() { 
         this.withEachMotor((m) -> {
             WPI_TalonFX motor = (WPI_TalonFX)m;
             motor.set(TalonFXControlMode.Velocity, 0);
         });
-    }  
-
+    }
 
 }
