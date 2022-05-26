@@ -74,8 +74,8 @@ public class Drivetrain extends DifferentialDrivetrain {
     private DifferentialDrivetrainSim drivetrain;
     private DifferentialDriveOdometry odometry;
     
-    private Encoder leftEncoder = new Encoder(0, 1);
-    private Encoder rightEncoder = new Encoder(2, 3);
+    private Encoder leftEncoder = new Encoder(5, 6);
+    private Encoder rightEncoder = new Encoder(7, 8);
     private AnalogGyro gyro = new AnalogGyro(1);
     
     private EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
@@ -107,7 +107,7 @@ public class Drivetrain extends DifferentialDrivetrain {
         });
 
         drivetrain = new DifferentialDrivetrainSim(
-            DCMotor.getNEO(2),     // 2 NEO motors on each side of the drivetrain.
+            DCMotor.getNEO(3),     // 2 NEO motors on each side of the drivetrain.
             7.29,                    // 7.29:1 gearing reduction.
             Constants.MOI,          
             Constants.ROBOT_MASS,     
@@ -218,6 +218,8 @@ public class Drivetrain extends DifferentialDrivetrain {
         rightEncoderSim.setDistance(drivetrain.getRightPositionMeters());
         rightEncoderSim.setRate(drivetrain.getRightVelocityMetersPerSecond());
 
+        SmartDashboard.putNumber("pos x", odometry.getPoseMeters().getX());
+        SmartDashboard.putNumber("pos y", odometry.getPoseMeters().getY());
         FieldController.SetRobotPosition(odometry.getPoseMeters());
         Battery.UseBattery(drivetrain);
     }
