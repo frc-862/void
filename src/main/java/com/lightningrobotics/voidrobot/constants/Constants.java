@@ -11,8 +11,8 @@ import edu.wpi.first.math.numbers.N7;
 
 public final class Constants {
 
-    public static final int ROBOT_MASS = 10;
-    public static final double MOI = 0.5d;
+    public static final int ROBOT_MASS = 100;
+    public static final double MOI = 6d;
     public static final Vector<N7> MEASUREMENT_NOISE = 
     VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005); 
 
