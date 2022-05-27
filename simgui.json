@@ -3,6 +3,13 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Autonomous/Auto Mode": "String Chooser",
+      "/Shuffleboard/climber/InstantCommand": "Command",
+      "/Shuffleboard/hood/ResetHood": "Command",
+      "/Shuffleboard/subsystems/ClimbArms": "Subsystem",
+      "/Shuffleboard/subsystems/Hood": "Subsystem",
+      "/Shuffleboard/subsystems/Indexer": "Subsystem",
+      "/Shuffleboard/subsystems/Intake": "Subsystem",
+      "/Shuffleboard/subsystems/Shooter": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Reset everything": "Command"
     },

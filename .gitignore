@@ -170,3 +170,6 @@ bin/
 */,Glass/*
 
 .idea
+
+# wpilog files
+*.wpilog
