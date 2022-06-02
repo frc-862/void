@@ -66,7 +66,7 @@ public class RobotContainer extends LightningContainer {
 	private static final LightningIMU imu = LightningIMU.navX();
     private static final ClimbArms arms = new ClimbArms();
     private static final ClimbPivots pivots = new ClimbPivots();
-	private static final Drivetrain drivetrain = new Drivetrain(imu);
+	public static final Drivetrain drivetrain = new Drivetrain(imu);
     private static final Turret turret = new Turret();
 	private static final Shooter shooter = new Shooter();
 	private static final Indexer indexer = new Indexer();
@@ -217,7 +217,7 @@ public class RobotContainer extends LightningContainer {
 
     @Override
     protected void configureDefaultCommands() {        
-		drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
+		//drivetrain.setDefaultCommand(new DifferentialTankDrive(drivetrain, () -> -driverLeft.getY() , () -> -driverRight.getY(), driverFilter));
         // turret.setDefaultCommand(new AimTurret(turret, targeting));
 		// targeting.setDefaultCommand(new AdjustBias(targeting, () -> copilot.getPOV(), () -> (new JoystickButton(copilot, JoystickConstants.BUTTON_X).get())));
         //indexer.setDefaultCommand(new EjectBall(indexer));

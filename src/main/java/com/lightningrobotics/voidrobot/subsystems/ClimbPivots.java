@@ -11,6 +11,9 @@ import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbPivots extends SubsystemBase {
@@ -27,6 +30,9 @@ public class ClimbPivots extends SubsystemBase {
 
 	private pivotPosition pivotState = pivotPosition.reach;
 
+	private SingleJointedArmSim armLeft;
+	private SingleJointedArmSim armRight;
+
   public ClimbPivots() {
 	// Sets the IDs of the pivot motors
 	leftPivot = new TalonSRX(RobotMap.LEFT_PIVOT);
@@ -41,6 +47,17 @@ public class ClimbPivots extends SubsystemBase {
 	leftPivot.setInverted(false);
 	rightPivot.setInverted(true);
 
+	armLeft = new SingleJointedArmSim(
+		DCMotor.getFalcon500(1),
+		100,
+		10,
+		Units.inchesToMeters(39),
+		Math.PI/2,
+		0,
+		Units.lbsToKilograms(11.5),
+		true
+	);
+	
     initLogging();
   }
   private void initLogging() {

@@ -95,6 +95,9 @@ public class Drivetrain extends DifferentialDrivetrain {
         );
         this.imu = imu;
 
+        leftEncoderSim.setPeriod(0.02);
+        rightEncoderSim.setPeriod(0.02);
+
 		setCanBusFrameRate(StatusFrameEnhanced.Status_1_General, 200);
 		setCanBusFrameRate(StatusFrameEnhanced.Status_2_Feedback0, 500);
     
@@ -207,16 +210,17 @@ public class Drivetrain extends DifferentialDrivetrain {
     }
     
     private void updateOdometry(){
-        gyroSim.setAngle(drivetrain.getPose().getRotation().getDegrees());
-        odometry.update(
-        Rotation2d.fromDegrees(gyroSim.getAngle()), 
-        drivetrain.getPose().getX(),
-        drivetrain.getPose().getY());
-
+    
         leftEncoderSim.setDistance(drivetrain.getLeftPositionMeters());
         leftEncoderSim.setRate(drivetrain.getLeftVelocityMetersPerSecond());
         rightEncoderSim.setDistance(drivetrain.getRightPositionMeters());
         rightEncoderSim.setRate(drivetrain.getRightVelocityMetersPerSecond());
+
+         gyroSim.setAngle(drivetrain.getPose().getRotation().getDegrees());
+
+         odometry.update(
+            Rotation2d.fromDegrees(gyroSim.getAngle()), 
+           drivetrain.getLeftPositionMeters(), drivetrain.getRightPositionMeters());
 
         SmartDashboard.putNumber("pos x", odometry.getPoseMeters().getX());
         SmartDashboard.putNumber("pos y", odometry.getPoseMeters().getY());
@@ -230,8 +234,11 @@ public class Drivetrain extends DifferentialDrivetrain {
         var leftVoltageInput = leftPWR * Constants.MAX_INPUT_VOLTAGE;
         var rightVoltageInput = rightPWR * Constants.MAX_INPUT_VOLTAGE;
         drivetrain.setInputs(leftVoltageInput, rightVoltageInput);
-        drivetrain.update(Constants.SIM_UPDATE_TIME);
 
+   SmartDashboard.putNumber("leftDriveVolt", leftVoltageInput);
+   SmartDashboard.putNumber("rightDriveVolt", rightVoltageInput);
+
+        drivetrain.update(Constants.SIM_UPDATE_TIME);
         updateOdometry();
     }
 

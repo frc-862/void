@@ -1,7 +1,10 @@
 package com.lightningrobotics.voidrobot;
 
 import com.lightningrobotics.common.LightningRobot;
+import com.lightningrobotics.common.subsystem.core.LightningIMU;
+import com.lightningrobotics.voidrobot.constants.JoystickConstants;
 import com.lightningrobotics.voidrobot.simulation.FieldController;
+import com.lightningrobotics.voidrobot.subsystems.Drivetrain;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -15,6 +18,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoMode;
 import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -67,6 +71,18 @@ public class Robot extends LightningRobot {
 	public void teleopInit() {
 		FieldController.Initialize();
 		System.out.println(";odsfujidsfoidsfpjafio;aslkfalsdhfj;asfhksuifodj");
+	}
+
+	
+	private static final LightningIMU imu = LightningIMU.navX();
+	
+	// Joysticks
+	private static final Joystick driverLeft = new Joystick(JoystickConstants.DRIVER_LEFT_PORT);
+	private static final Joystick driverRight = new Joystick(JoystickConstants.DRIVER_RIGHT_PORT);
+	@Override
+	public void teleopPeriodic() {
+		super.teleopPeriodic();
+		RobotContainer.drivetrain.tankDrive( -driverLeft.getY() ,  -driverRight.getY());
 	}
 
 }

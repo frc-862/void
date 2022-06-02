@@ -7,9 +7,17 @@ import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +32,17 @@ public class ClimbArms extends SubsystemBase {
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
 	private NetworkTableEntry leftArmPos =  climbTab.add("left arm",  -1000).getEntry();
 	private NetworkTableEntry rightArmPos = climbTab.add("right arm", -1000).getEntry();
+
+	private ElevatorSim armLeft;
+	private ElevatorSim armRight;
+
+	private final Mechanism2d m_leftClimbMech2d = new Mechanism2d(20, 50);
+	private final MechanismRoot2d m_leftClimbMech2dRoot = m_leftClimbMech2d.getRoot("Left", 10, 0);
+	private MechanismLigament2d m_leftClimbLigament2d;
+
+	private final Mechanism2d m_rightClimbMech2d = new Mechanism2d(20, 50);
+	private final MechanismRoot2d m_rightClimbMech2dRoot = m_rightClimbMech2d.getRoot("Left", 10, 0);
+	private MechanismLigament2d m_rightClimbLigament2d;
 
   	public ClimbArms() {
 		// Sets the IDs of our arm motors
@@ -41,6 +60,29 @@ public class ClimbArms extends SubsystemBase {
 		resetEncoders();
 		setGains();
 		initLogging();
+
+		
+		m_leftClimbLigament2d = m_leftClimbMech2dRoot.append(
+			new MechanismLigament2d("Elevator Left", Units.metersToInches(armLeft.getPositionMeters()), 90)
+		);
+			
+		m_rightClimbLigament2d = m_rightClimbMech2dRoot.append(
+			new MechanismLigament2d("Elevator Right", Units.metersToInches(armRight.getPositionMeters()), 90)
+		);
+		
+		armLeft = new ElevatorSim(
+			DCMotor.getFalcon500(1),
+			100,
+			Units.lbsToKilograms(11.5),
+			Units.inchesToMeters(0.492),
+			Units.inchesToMeters(39),
+			Units.inchesToMeters(65),
+			VecBuilder.fill(0.01)
+		);
+				
+		SmartDashboard.putData("Left Climb Arm Sim", m_leftClimbMech2d);
+		SmartDashboard.putData("Right Climb Arm Sim", m_rightClimbMech2d);
+
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
 
@@ -131,6 +173,8 @@ public class ClimbArms extends SubsystemBase {
 		if (getLowerLimitSwitches()) {
 			resetEncoders();
 		}
+
+		
 	}
 	
 	public void stop() {
