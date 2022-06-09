@@ -50,7 +50,7 @@ public class ClimbPivots extends SubsystemBase {
 	armLeft = new SingleJointedArmSim(
 		DCMotor.getFalcon500(1),
 		100,
-		10,
+		150,
 		Units.inchesToMeters(39),
 		Math.PI/2,
 		0,

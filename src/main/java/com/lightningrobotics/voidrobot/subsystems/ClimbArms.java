@@ -2,6 +2,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
@@ -11,10 +12,13 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -26,11 +30,14 @@ public class ClimbArms extends SubsystemBase {
 	private TalonFX leftArm;
 	private TalonFX rightArm;
 
+	private TalonFXSimCollection leftSim;
+	private TalonFXSimCollection rightSim;
+
 	//initialize set point for arm height
 	private double armsTarget = 0;
 
 	private ShuffleboardTab climbTab = Shuffleboard.getTab("climber");
-	private NetworkTableEntry leftArmPos =  climbTab.add("left arm",  -1000).getEntry();
+	private NetworkTableEntry leftArmPos = climbTab.add("left arm", -1000).getEntry();
 	private NetworkTableEntry rightArmPos = climbTab.add("right arm", -1000).getEntry();
 
 	private ElevatorSim armLeft;
@@ -48,6 +55,8 @@ public class ClimbArms extends SubsystemBase {
 		// Sets the IDs of our arm motors
 		leftArm = new TalonFX(RobotMap.LEFT_CLIMB);
 		rightArm = new TalonFX(RobotMap.RIGHT_CLIMB);
+		leftSim = leftArm.getSimCollection();
+		rightSim = rightArm.getSimCollection();
 
 		//climb motors need to be in brake mode to hold climb up
 		leftArm.setNeutralMode(NeutralMode.Brake);
@@ -55,12 +64,32 @@ public class ClimbArms extends SubsystemBase {
 
 		//set arm inverts
 		leftArm.setInverted(false);
-		rightArm.setInverted(true);
+		rightArm.setInverted(RobotBase.isReal()); // simulation doesn't need to be inverted, but robot does
 
 		resetEncoders();
 		setGains();
 		initLogging();
 
+		//setup right/left sims
+		armLeft = new ElevatorSim(
+			DCMotor.getFalcon500(1),
+			1,
+			Units.lbsToKilograms(11.5),
+			Units.inchesToMeters(0.492),
+			Units.inchesToMeters(39),
+			Units.inchesToMeters(65),
+			VecBuilder.fill(0.01)
+		);
+
+		armRight = new ElevatorSim(
+			DCMotor.getFalcon500(1),
+			1,
+			Units.lbsToKilograms(11.5),
+			Units.inchesToMeters(0.492),
+			Units.inchesToMeters(39),
+			Units.inchesToMeters(65),
+			VecBuilder.fill(0.01)
+		);
 		
 		m_leftClimbLigament2d = m_leftClimbMech2dRoot.append(
 			new MechanismLigament2d("Elevator Left", Units.metersToInches(armLeft.getPositionMeters()), 90)
@@ -68,16 +97,6 @@ public class ClimbArms extends SubsystemBase {
 			
 		m_rightClimbLigament2d = m_rightClimbMech2dRoot.append(
 			new MechanismLigament2d("Elevator Right", Units.metersToInches(armRight.getPositionMeters()), 90)
-		);
-		
-		armLeft = new ElevatorSim(
-			DCMotor.getFalcon500(1),
-			100,
-			Units.lbsToKilograms(11.5),
-			Units.inchesToMeters(0.492),
-			Units.inchesToMeters(39),
-			Units.inchesToMeters(65),
-			VecBuilder.fill(0.01)
 		);
 				
 		SmartDashboard.putData("Left Climb Arm Sim", m_leftClimbMech2d);
@@ -138,7 +157,6 @@ public class ClimbArms extends SubsystemBase {
 		leftArm.set(TalonFXControlMode.Position, armsTarget);
 		rightArm.set(TalonFXControlMode.Position, armsTarget);
 	}
-
 	
 	public void resetEncoders() {
 		leftArm.setSelectedSensorPosition(0);
@@ -153,6 +171,10 @@ public class ClimbArms extends SubsystemBase {
 		return rightArm.getSelectedSensorPosition();
 	}
 
+	public void setSimAngle(int degrees) {
+		m_leftClimbLigament2d.setAngle(degrees);
+		m_rightClimbLigament2d.setAngle(degrees);
+	}
 
 	/**
 	 * @return true if the arms are within a given threshhold
@@ -174,7 +196,24 @@ public class ClimbArms extends SubsystemBase {
 			resetEncoders();
 		}
 
-		
+		leftSim.setBusVoltage(RobotController.getBatteryVoltage());
+		rightSim.setBusVoltage(RobotController.getBatteryVoltage());
+
+		armLeft.setInput(leftSim.getMotorOutputLeadVoltage());
+		armRight.setInput(rightSim.getMotorOutputLeadVoltage());
+
+		armLeft.update(0.020);
+		armRight.update(0.020);
+
+		RoboRioSim.setVInCurrent(
+			BatterySim.calculateDefaultBatteryLoadedVoltage(armLeft.getPositionMeters())
+		);
+		RoboRioSim.setVInCurrent(
+			BatterySim.calculateDefaultBatteryLoadedVoltage(armRight.getPositionMeters())
+		);
+
+		m_leftClimbLigament2d.setLength(armLeft.getPositionMeters());
+		m_rightClimbLigament2d.setLength(armRight.getPositionMeters());
 	}
 	
 	public void stop() {

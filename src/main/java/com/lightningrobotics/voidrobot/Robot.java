@@ -70,7 +70,6 @@ public class Robot extends LightningRobot {
 	@Override
 	public void teleopInit() {
 		FieldController.Initialize();
-		System.out.println(";odsfujidsfoidsfpjafio;aslkfalsdhfj;asfhksuifodj");
 	}
 
 	
