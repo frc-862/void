@@ -34,10 +34,10 @@
           "key270": 324,
           "key315": 327,
           "key45": 329,
-          "key90": 326
+          "key90": 54
         }
       ],
-      "povCount": 1
+      "povCount": 0
     },
     {
       "axisConfig": [
@@ -53,8 +53,8 @@
       "axisCount": 2,
       "buttonCount": 4,
       "buttonKeys": [
-        77,
-        44,
+        -1,
+        -1,
         46,
         47
       ],
@@ -81,7 +81,13 @@
         269,
         267
       ],
-      "povCount": 0
+      "povConfig": [
+        {
+          "key0": 78,
+          "key180": 77
+        }
+      ],
+      "povCount": 1
     },
     {
       "axisCount": 0,
@@ -91,10 +97,19 @@
   ],
   "robotJoysticks": [
     {
-      "guid": "Keyboard0"
+      "guid": "Keyboard0",
+      "name": "Driver"
     },
     {
-      "guid": "Keyboard1"
+      "guid": "Keyboard1",
+      "name": "Driver"
+    },
+    {
+      "name": "Copilot"
+    },
+    {
+      "guid": "Keyboard2",
+      "name": "Climb (xbox)"
     }
   ]
 }
