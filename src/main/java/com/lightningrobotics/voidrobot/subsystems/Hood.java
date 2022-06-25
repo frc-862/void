@@ -102,6 +102,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setDisableHood(boolean disableHood) {
+		
 		this.disableHood = disableHood;
 		hoodDisable.setBoolean(disableHood);
 	}
