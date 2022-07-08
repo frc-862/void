@@ -206,10 +206,10 @@ public class ClimbArms extends SubsystemBase {
 		armRight.update(0.020);
 
 		RoboRioSim.setVInCurrent(
-			BatterySim.calculateDefaultBatteryLoadedVoltage(armLeft.getPositionMeters())
+			BatterySim.calculateDefaultBatteryLoadedVoltage(armLeft.getCurrentDrawAmps())
 		);
 		RoboRioSim.setVInCurrent(
-			BatterySim.calculateDefaultBatteryLoadedVoltage(armRight.getPositionMeters())
+			BatterySim.calculateDefaultBatteryLoadedVoltage(armRight.getCurrentDrawAmps())
 		);
 
 		m_leftClimbLigament2d.setLength(armLeft.getPositionMeters());

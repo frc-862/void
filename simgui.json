@@ -2,6 +2,31 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/ClimbArms": "Subsystem",
+      "/LiveWindow/ClimbPivots": "Subsystem",
+      "/LiveWindow/Drivetrain": "Subsystem",
+      "/LiveWindow/Hood": "Subsystem",
+      "/LiveWindow/HubTargeting": "Subsystem",
+      "/LiveWindow/Indexer": "Subsystem",
+      "/LiveWindow/Intake": "Subsystem",
+      "/LiveWindow/PIDFDashboardTuner": "Subsystem",
+      "/LiveWindow/Shooter": "Subsystem",
+      "/LiveWindow/Turret": "Subsystem",
+      "/LiveWindow/Ungrouped/AnalogGyro[1]": "Gyro",
+      "/LiveWindow/Ungrouped/DigitalInput[0]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[1]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[2]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/Talon FX [1]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [2]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [3]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [4]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [5]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [6]": "Motor Controller",
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
       "/Shuffleboard/Autonomous/Auto Mode": "String Chooser",
       "/Shuffleboard/climber/InstantCommand": "Command",
       "/Shuffleboard/hood/ResetHood": "Command",
@@ -11,19 +36,33 @@
       "/Shuffleboard/subsystems/Intake": "Subsystem",
       "/Shuffleboard/subsystems/Shooter": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/Reset everything": "Command"
+      "/SmartDashboard/Left Climb Arm Sim": "Mechanism2d",
+      "/SmartDashboard/Reset everything": "Command",
+      "/SmartDashboard/Right Climb Arm Sim": "Mechanism2d"
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "image": "D:\\2022-field.png",
+        "window": {
+          "name": "erererer",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Left Climb Arm Sim": {
         "window": {
           "visible": true
         }
       },
-      "/SmartDashboard/Reset everything": {
+      "/SmartDashboard/Right Climb Arm Sim": {
         "window": {
           "visible": true
         }
       }
+    }
+  },
+  "NetworkTables": {
+    "SmartDashboard": {
+      "open": true
     }
   }
 }
