@@ -2,14 +2,21 @@ package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 import com.lightningrobotics.common.logging.DataLogger;
 import com.lightningrobotics.voidrobot.constants.Constants;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -17,6 +24,7 @@ public class Shooter extends SubsystemBase {
 
 	// Creates the flywheel motor and hood motors
 	private TalonFX flywheelMotor;
+	private TalonFXSimCollection flywheelMotorSim;
 
 	// Creates our shuffleboard tabs for seeing important values
 	private ShuffleboardTab shooterTab = Shuffleboard.getTab("shooter");
@@ -33,12 +41,15 @@ public class Shooter extends SubsystemBase {
 	private ShuffleboardTab tuneTab = Shuffleboard.getTab("tune tab");
 	private NetworkTableEntry setRPMAngleTuneEntry = tuneTab.add("set RPM tune", 0).getEntry();
 
+	private FlywheelSim flywheelSim;
+
 	// The power point we want the shooter to be at
 	private double targetRPM;
 
 	public Shooter() {
 		// Sets the IDs of the hood and shooter
 		flywheelMotor = new TalonFX(RobotMap.FLYWHEEL_MOTOR_ID);
+		flywheelMotorSim = flywheelMotor.getSimCollection();
 
 		flywheelMotor.setInverted(true);
 		flywheelMotor.setNeutralMode(NeutralMode.Coast);
@@ -48,6 +59,12 @@ public class Shooter extends SubsystemBase {
 
 		initLogging();
 		
+		flywheelSim = new FlywheelSim(
+			DCMotor.getFalcon500(1),
+			1,
+			Units.inchesToMeters(10)
+		);
+
 		CommandScheduler.getInstance().registerSubsystem(this);
 
 	}
@@ -62,6 +79,16 @@ public class Shooter extends SubsystemBase {
 		if (Constants.SHOT_TUNING) {
 			setRPM(setRPMAngleTuneEntry.getDouble(0));
 		}
+
+		flywheelMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
+		flywheelSim.setInput(flywheelMotorSim.getMotorOutputLeadVoltage());
+		flywheelSim.update(0.020);
+
+		RoboRioSim.setVInVoltage(
+			BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDrawAmps())
+		);
+
+		// TODO: find a way to display flywheelSim via shuffleboard graphically
 
 		setSmartDashboardCommands();
 
