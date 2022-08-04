@@ -9,6 +9,7 @@
       "/LiveWindow/HubTargeting": "Subsystem",
       "/LiveWindow/Indexer": "Subsystem",
       "/LiveWindow/Intake": "Subsystem",
+      "/LiveWindow/LightningIMU": "Subsystem",
       "/LiveWindow/PIDFDashboardTuner": "Subsystem",
       "/LiveWindow/Shooter": "Subsystem",
       "/LiveWindow/Turret": "Subsystem",

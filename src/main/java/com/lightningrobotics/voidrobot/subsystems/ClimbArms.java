@@ -5,6 +5,8 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
+import com.lightningrobotics.voidrobot.Robot;
+import com.lightningrobotics.voidrobot.RobotContainer;
 import com.lightningrobotics.voidrobot.constants.Constants;
 import com.lightningrobotics.voidrobot.constants.RobotMap;
 
@@ -44,11 +46,11 @@ public class ClimbArms extends SubsystemBase {
 	private ElevatorSim armRight;
 
 	private final Mechanism2d m_leftClimbMech2d = new Mechanism2d(20, 50);
-	private final MechanismRoot2d m_leftClimbMech2dRoot = m_leftClimbMech2d.getRoot("Left", 10, 0);
+	private final MechanismRoot2d m_leftClimbMech2dRoot = m_leftClimbMech2d.getRoot("Left", 10, -30);
 	private MechanismLigament2d m_leftClimbLigament2d;
 
 	private final Mechanism2d m_rightClimbMech2d = new Mechanism2d(20, 50);
-	private final MechanismRoot2d m_rightClimbMech2dRoot = m_rightClimbMech2d.getRoot("Left", 10, 0);
+	private final MechanismRoot2d m_rightClimbMech2dRoot = m_rightClimbMech2d.getRoot("Right", 10, -30);
 	private MechanismLigament2d m_rightClimbLigament2d;
 
   	public ClimbArms() {
@@ -92,11 +94,11 @@ public class ClimbArms extends SubsystemBase {
 		);
 		
 		m_leftClimbLigament2d = m_leftClimbMech2dRoot.append(
-			new MechanismLigament2d("Elevator Left", Units.metersToInches(armLeft.getPositionMeters()), 90)
+			new MechanismLigament2d("Elevator Left", 0, 90)
 		);
 			
 		m_rightClimbLigament2d = m_rightClimbMech2dRoot.append(
-			new MechanismLigament2d("Elevator Right", Units.metersToInches(armRight.getPositionMeters()), 90)
+			new MechanismLigament2d("Elevator Right", 0, 90)
 		);
 				
 		SmartDashboard.putData("Left Climb Arm Sim", m_leftClimbMech2d);
@@ -171,7 +173,8 @@ public class ClimbArms extends SubsystemBase {
 		return rightArm.getSelectedSensorPosition();
 	}
 
-	public void setSimAngle(int degrees) {
+	public void setSimAngle(int degrees) throws Exception {
+		if (Robot.isReal()) throw new Exception("Not a simulation");
 		m_leftClimbLigament2d.setAngle(degrees);
 		m_rightClimbLigament2d.setAngle(degrees);
 	}
@@ -212,8 +215,8 @@ public class ClimbArms extends SubsystemBase {
 			BatterySim.calculateDefaultBatteryLoadedVoltage(armRight.getCurrentDrawAmps())
 		);
 
-		m_leftClimbLigament2d.setLength(armLeft.getPositionMeters());
-		m_rightClimbLigament2d.setLength(armRight.getPositionMeters());
+		m_leftClimbLigament2d.setLength(Units.metersToInches(armLeft.getPositionMeters()));
+		m_rightClimbLigament2d.setLength(Units.metersToInches(armRight.getPositionMeters()));
 	}
 	
 	public void stop() {
