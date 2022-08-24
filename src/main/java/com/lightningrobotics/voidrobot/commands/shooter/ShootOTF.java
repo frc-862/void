@@ -27,6 +27,39 @@ public class ShootOTF extends CommandBase {
 		addRequirements(shooter, hood, indexer);
 	}
 
+	// Some super cool stuff ported from "Julia's Design calculator" (a fork of JVN design calculator)
+
+	/**
+	 * calculates the moment of inertia of the flywheel
+	 * @param shooterMass the total mass of each spinning element, in lbs
+	 * @param diameter the diameter of the flywheel, in inches
+	 * @return the moment of inertia, in lb-in^2
+	 */
+	private double calculateMOI(double shooterMass, double diameter) {
+		return 0.5 * shooterMass * Math.pow(diameter / 2, 2);
+	}
+
+	/**
+	 * calculates the percent of the flywheel's speed that is transferred to the ball
+	 * @param ballDiameter the diameter of the ball, in inches
+	 * @param ballMass the mass of the ball, in lbs
+	 * @param wheelDiameter the diameter of the flywheel, in inches
+	 * @param MOI the moment of inertia of the shooter, in lb-in^2
+	 * @return the percent of the flywheel's speed that is transferred to the ball
+	 */
+	private double calculateSpeedTransfer(double ballDiameter, double ballMass, double wheelDiameter, double MOI) {
+		return 1/(2+ballMass*Math.pow(wheelDiameter/2,2)/MOI+(2/5)*ballMass*Math.pow(ballDiameter/2,2)/MOI*Math.pow(wheelDiameter/ballDiameter,2));
+	}
+
+	/**
+	 * convert rotations per minute to radians per second
+	 * @param RPM input rotations per minute
+	 * @return output radians per second
+	 */
+	private double RPMtoRPS(double RPM) {
+		return RPM * 0.104719755;
+	}
+
 	/**
 	 * @return the robot's velocity on the X axis
 	 */
@@ -45,7 +78,10 @@ public class ShootOTF extends CommandBase {
 	 * @return the exit velocity of the ball from the shooter
 	 */
 	private double getBallExitVelocity() {
-		return 900d; //TODO: actually calculate this
+		double MOI = calculateMOI(Constants.SHOOTER_MASS, Constants.FLYWHEEL_DIAMETER);
+		double SPEED_TRANSER = calculateSpeedTransfer(Constants.CARGO_DIAMETER, Constants.CARGO_MASS, Constants.FLYWHEEL_DIAMETER, MOI);
+		
+		return (RPMtoRPS(targeting.getTargetFlywheelRPM()*Constants.FLYWHEEL_DIAMETER/2)/12)*SPEED_TRANSER;
 	}
 
 	/**

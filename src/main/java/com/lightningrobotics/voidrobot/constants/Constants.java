@@ -245,4 +245,17 @@ public final class Constants {
     public static final double ON_RUNG_ANGLE = 1.4;
     public static final double ARM_KP = 1d;
 
+    //OTF Shooting stuff
+    //mass calculations
+    //this part is incredibly specific, because the more accurate the mass is, the more accurate the calculations are
+    public static final double INDIVIDUAL_FLYWHEEL_MASS = 0.74d;
+    public static final double HEX_LENGTH = 8.6d; //hex length in inches
+    public static final double HEX_DENSITY = 0.0185185185185; //hex density in lb/in (length in inches)
+    public static final double FLYWHEEL_HEX_MASS = 0.1 + (HEX_LENGTH * HEX_DENSITY); //add 0.1 for weight of hex coupler
+    public static final double SHOOTER_MASS = INDIVIDUAL_FLYWHEEL_MASS*2 + FLYWHEEL_HEX_MASS; //2 colson wheels + hex mass
+
+    //misc dimensions
+    public static final double FLYWHEEL_DIAMETER = 4d;
+    public static final double CARGO_DIAMETER = 9.5d; //cargo diameter, in inches
+    public static final double CARGO_MASS = 0.59375; //mass of a cargo, in lbs
 }
