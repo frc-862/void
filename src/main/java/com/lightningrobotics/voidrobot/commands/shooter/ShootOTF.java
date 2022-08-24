@@ -47,14 +47,14 @@ public class ShootOTF extends CommandBase {
 	/**
 	 * @return the robot's velocity on the X axis
 	 */
-	private double getXvelocity() {
+	private double getXVelocity() {
 		return 0d; //TODO: hack lightning to give x and y velocities from lightning IMU
 	}
 
 	/**
 	 * @return the robot's velocity on the Y axis
 	 */
-	private double getYvelocity() {
+	private double getYVelocity() {
 		return 0d;
 	}
 
@@ -69,14 +69,14 @@ public class ShootOTF extends CommandBase {
 	 * @return Calculate how far the robot will move on the X axis the time it takes the ball to travel to the hub
 	 */
 	private double getBotTravelDistanceX() {
-		return getXvelocity()*getBallTravelTime();
+		return getXVelocity()*getBallTravelTime();
 	}
 
 	/**
 	 * @return how far the robot will move on the Y axis the time it takes the ball to travel to the hub
 	 */
 	private double getBotTravelDistanceY() {
-		return getYvelocity()*getBallTravelTime();
+		return getYVelocity()*getBallTravelTime();
 	}
 
 	/**
