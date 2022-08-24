@@ -57,7 +57,7 @@ public class ShootOTF extends CommandBase {
 	 * @return output radians per second
 	 */
 	private double RPMtoRPS(double RPM) {
-		return RPM * 0.104719755;
+		return ((RPM/60) * 2 * Math.PI); 
 	}
 
 	/**
