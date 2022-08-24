@@ -36,6 +36,7 @@ public class ShootOTF extends CommandBase {
 	 * @return the moment of inertia, in lb-in^2
 	 */
 	private double calculateMOI(double shooterMass, double diameter) {
+		//formula is 0.5mR^2
 		return 0.5 * shooterMass * Math.pow(diameter / 2, 2);
 	}
 
