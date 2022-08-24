@@ -39,7 +39,7 @@ public class ShootOTF extends CommandBase {
         return RPM * (diameter / 2);
     }
 
-	private double getBallExitVelocity(double ballDiameter, double ballMass, double wheelMass) {
+	private double getBallExitVelocity(double ballMass, double wheelMass) {
         return 1 + (1.4 / (wheelMass / ballMass)) / 2 * calculateSurfaceSpeed(targeting.getTargetFlywheelRPM() / 60, Constants.FLYWHEEL_DIAMETER);
     }
 
@@ -62,7 +62,7 @@ public class ShootOTF extends CommandBase {
 	 * @return the time it will take the ball to reach the hub
 	 */
 	private double getBallTravelTime() {
-		return targeting.getHubDistance()/(getBallExitVelocity(Constants.CARGO_DIAMETER, Constants.CARGO_MASS, Constants.SHOOTER_MASS)*Math.cos(targeting.getTargetHoodAngle()));
+		return targeting.getHubDistance()/(getBallExitVelocity(Constants.CARGO_MASS, Constants.SHOOTER_MASS)*Math.cos(targeting.getTargetHoodAngle()));
 	}
 
 	/**
