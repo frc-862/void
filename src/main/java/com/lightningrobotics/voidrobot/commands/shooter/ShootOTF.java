@@ -48,7 +48,7 @@ public class ShootOTF extends CommandBase {
 	 * @return the robot's velocity on the X axis
 	 */
 	private double getXVelocity() {
-		return 0d; //TODO: hack lightning to give x and y velocities from lightning IMU
+		return drivetrain.getCurrentVelocity(); //TODO: hack lightning to give x and y velocities from lightning IMU
 	}
 
 	/**
@@ -84,11 +84,12 @@ public class ShootOTF extends CommandBase {
 	 */
 	private double getTurretOffset() {
 		double initialTurretAngle = targeting.getTargetTurretAngle();
+		double sign = Math.signum((double)initialTurretAngle);
 		double hubDistance = targeting.getHubDistance();
 		double botOffsetX = getBotTravelDistanceX();
 		double botOffsetY = getBotTravelDistanceY();
 		double a = hubDistance*Math.sin(initialTurretAngle);
-		double b = hubDistance*Math.cos(initialTurretAngle);
+		double b = sign * (hubDistance*Math.cos(initialTurretAngle));
 
 		a -= botOffsetX;
 		b -= botOffsetY;
