@@ -30,7 +30,7 @@ public class ShootOTF extends CommandBase {
 	// Some super cool stuff from 846's shooter physics video
 
 	/**
-	 * Calculate the surface speed of an object given it's angulat velocity
+	 * Calculate the surface speed of an object given it's angular velocity
 	 * @param RPM the RPM of the object
 	 * @param diameter the diameter of the object
 	 * @return the surface speed of the object
@@ -39,6 +39,12 @@ public class ShootOTF extends CommandBase {
         return RPM * (diameter / 2);
     }
 
+	/**
+	 * determine the exit velocity of the ball from the shooter
+	 * @param ballMass the mass of the projectile (solid sphere)
+	 * @param wheelMass the mass of the flywheel (solid cylinder)
+	 * @return the exit velocity of the ball in ft/s
+	 */
 	private double getBallExitVelocity(double ballMass, double wheelMass) {
         return 1 + (1.4 / (wheelMass / ballMass)) / 2 * calculateSurfaceSpeed(targeting.getTargetFlywheelRPM() / 60, Constants.FLYWHEEL_DIAMETER);
     }
@@ -84,12 +90,11 @@ public class ShootOTF extends CommandBase {
 	 */
 	private double getTurretOffset() {
 		double initialTurretAngle = targeting.getTargetTurretAngle();
-		double sign = Math.signum((double)initialTurretAngle);
 		double hubDistance = targeting.getHubDistance();
 		double botOffsetX = getBotTravelDistanceX();
 		double botOffsetY = getBotTravelDistanceY();
 		double a = hubDistance*Math.sin(initialTurretAngle);
-		double b = sign * (hubDistance*Math.cos(initialTurretAngle));
+		double b = (hubDistance*Math.sin(90 - initialTurretAngle));
 
 		a -= botOffsetX;
 		b -= botOffsetY;
@@ -106,14 +111,13 @@ public class ShootOTF extends CommandBase {
 		double botOffsetX = getBotTravelDistanceX();
 		double botOffsetY = getBotTravelDistanceY();
 		double a = hubDistance*Math.sin(initialTurretAngle);
-		double b = hubDistance*Math.cos(initialTurretAngle);
+		double b = hubDistance*Math.sin(90 - initialTurretAngle);
 
 		a -= botOffsetX;
 		b -= botOffsetY;
 		
 		return Math.hypot(a, b) - targeting.getHubDistance();
 	}
-
 	@Override
 	public void execute() {
 		targeting.setBiasAngle(getTurretOffset());
