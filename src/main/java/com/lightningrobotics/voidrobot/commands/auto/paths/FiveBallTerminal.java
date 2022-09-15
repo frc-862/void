@@ -32,7 +32,7 @@ public class FiveBallTerminal extends ParallelCommandGroup {
 			new InstantCommand(() -> turret.setConstraint(0, 25)),
 			new AimTurret(turret, targeting),
 			
-			new PivotToReach(pivots),
+			// new PivotToReach(pivots),
 			new AutonIntake(intake),
 				
 			new SequentialCommandGroup(

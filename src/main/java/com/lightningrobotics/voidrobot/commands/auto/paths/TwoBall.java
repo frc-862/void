@@ -24,7 +24,7 @@ public class TwoBall extends ParallelCommandGroup {
 	public TwoBall(Drivetrain drivetrain, Shooter shooter, Hood hood, Turret turret, Indexer indexer, Intake intake, ClimbPivots pivots, HubTargeting targeting) throws Exception {
 		super(
 			
-			new PivotToReach(pivots),
+			// new PivotToReach(pivots),
 			new AutonIntake(intake),
 
 			new SequentialCommandGroup(
