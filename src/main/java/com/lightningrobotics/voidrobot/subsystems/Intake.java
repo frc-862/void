@@ -21,6 +21,8 @@ public class Intake extends SubsystemBase {
 	public Intake() {
 		// Sets the ID of the intake motor
 		intakeMotor = new TalonFX(RobotMap.INTAKE_MOTOR_ID);
+		intakeMotor.configFactoryDefault();
+		intakeMotor.setNeutralMode(NeutralMode.Coast);
 		intakeMotor.setInverted(false);
 		winchMotor = new TalonSRX(RobotMap.INTAKE_WINCH_ID);
 		winchMotor.setNeutralMode(NeutralMode.Brake);

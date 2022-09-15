@@ -1,6 +1,6 @@
 # void
 
-*TODO insert cool void logo here*
+[![Void At Michigan State Champs](https://photos.smugmug.com/photos/i-K3tFxv9/0/X5/i-K3tFxv9-X5.jpg)](https://www.thebluealliance.com/team/862/2022)
 
 Robot Application for void, our 2022 Robot for FIRST Rapid React
 

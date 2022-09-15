@@ -22,7 +22,7 @@ public class OneBall extends ParallelCommandGroup {
 		super(
 			new TimedCommand(new AutonDeployIntake(intake), 0.75d),
 			
-			new PivotToReach(pivots),
+			// new PivotToReach(pivots),
 			new AutonIntake(intake),
 
 			new SequentialCommandGroup(
