@@ -69,5 +69,3 @@ public class Intake extends SubsystemBase {
 		winchMotor.set(TalonSRXControlMode.PercentOutput, pwr);
 	}
 }
-
-//Michael was here
