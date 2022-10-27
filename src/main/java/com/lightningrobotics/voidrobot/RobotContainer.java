@@ -72,6 +72,7 @@ public class RobotContainer extends LightningContainer {
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
     private static final Hood hood = new Hood();
+    private static final PhotonVision photonVision = new PhotonVision();
 	// private static final LEDs leds = new LEDs();
                                             
 	// Joysticks

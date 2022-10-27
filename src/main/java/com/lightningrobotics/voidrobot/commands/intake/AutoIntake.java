@@ -18,16 +18,12 @@ public class AutoIntake extends CommandBase {
     this.intake = intake;
     this.drivetrain = drivetrain;
 
-     
-
     addRequirements(drivetrain, intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -42,6 +38,6 @@ public class AutoIntake extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return false; // command doesn't return true, idk what built in return statement is for
   }
 }
