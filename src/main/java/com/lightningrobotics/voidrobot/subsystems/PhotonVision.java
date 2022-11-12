@@ -7,6 +7,7 @@ package com.lightningrobotics.voidrobot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.photonvision.*;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -16,6 +17,12 @@ public class PhotonVision extends SubsystemBase {
   /** Creates a new PhotonVision. */
 
   NetworkTableEntry latency;
+
+  NetworkTableEntry targetYaw;
+  NetworkTableEntry targetPitch;
+  NetworkTableEntry targetArea;
+  NetworkTableEntry targetSkew;
+
   PhotonCamera camera = new PhotonCamera("pv camera");
 
   public PhotonVision() {
@@ -25,6 +32,10 @@ public class PhotonVision extends SubsystemBase {
 
     // NetworkTable photonTable = inst.getTable("photonvision");
     latency = photonTable.getEntry("Photonvision Latency");
+    targetYaw = photonTable.getEntry("Photonvision Target Yaw");
+    targetPitch = photonTable.getEntry("Photonvision Target Pitch");
+    targetArea = photonTable.getEntry("Photonvision Target Area");
+    targetSkew = photonTable.getEntry("Photonvision Target Skew");
   }
 
   @Override
@@ -34,18 +45,34 @@ public class PhotonVision extends SubsystemBase {
     // Gets processed result from camera
     var result = this.camera.getLatestResult();
 
-    //boolean hasTargets = result.hasTargets();
-    /*
-    if (hasTargets){
-      List<PhotonTrackedTarget> targets = result.getTargets();
-    }
-    */
-
     // Calculates latency of pipeline
     double latencySeconds = result.getLatencyMillis() / 1000.0;
 
     // Pushes latency in seconds to network tables 
     latency.setDouble(latencySeconds);
 
+    boolean hasTargets = result.hasTargets();
+
+    if (hasTargets) {
+      PhotonTrackedTarget target = result.getBestTarget();
+
+      // Gets the angle of the target from the center of the camera
+      double yaw = target.getYaw();
+      double pitch = target.getPitch();
+      double area = target.getArea();
+      double skew = target.getSkew();
+
+      // Pushes target data to network tables
+      targetYaw.setDouble(yaw);
+      targetPitch.setDouble(pitch);
+      targetArea.setDouble(area);
+      targetSkew.setDouble(skew);
+      
+      // Gets the distance of the target from the camera
+
+
+
+
+    }
   }
 }
