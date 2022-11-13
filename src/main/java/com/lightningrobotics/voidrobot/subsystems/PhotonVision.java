@@ -9,9 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.*;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.lightningrobotics.voidrobot.constants.Constants;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.math.util.Units;
 
 public class PhotonVision extends SubsystemBase {
   /** Creates a new PhotonVision. */
@@ -22,6 +25,9 @@ public class PhotonVision extends SubsystemBase {
   NetworkTableEntry targetPitch;
   NetworkTableEntry targetArea;
   NetworkTableEntry targetSkew;
+  NetworkTableEntry targetDistance;
+
+  private double lastKnownDistance = 0d;
 
   PhotonCamera camera = new PhotonCamera("pv camera");
 
@@ -36,7 +42,21 @@ public class PhotonVision extends SubsystemBase {
     targetPitch = photonTable.getEntry("Photonvision Target Pitch");
     targetArea = photonTable.getEntry("Photonvision Target Area");
     targetSkew = photonTable.getEntry("Photonvision Target Skew");
+    targetDistance = photonTable.getEntry("Photonvision Target Distance");
+
   }
+
+  private double getHubDistance(double pitch) {
+    double distanceBias = 0d;
+	  var rawDistanceInches = // calc raw distance from angle
+	  	(Constants.HUB_HEIGHT-Constants.MOUNT_HEIGHT) / 
+	  	Math.tan(Math.toRadians(Constants.MOUNT_ANGLE + pitch)) + 
+	  	Constants.HUB_CENTER_OFFSET; 
+	  double processedDistance = Units.inchesToMeters(rawDistanceInches) + distanceBias; // add biases/on-the-fly offsets, etc. CURRENTLY BROKEN.
+	  lastKnownDistance = processedDistance;
+	  return processedDistance;
+	}   
+    
 
   @Override
   public void periodic() {
@@ -62,16 +82,14 @@ public class PhotonVision extends SubsystemBase {
       double area = target.getArea();
       double skew = target.getSkew();
 
+      double hubDistance = getHubDistance(pitch);
+
       // Pushes target data to network tables
       targetYaw.setDouble(yaw);
       targetPitch.setDouble(pitch);
       targetArea.setDouble(area);
       targetSkew.setDouble(skew);
-      
-      // Gets the distance of the target from the camera
-
-
-
+      targetDistance.setDouble(hubDistance);
 
     }
   }
