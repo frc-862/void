@@ -44,6 +44,12 @@ public class PhotonVision extends SubsystemBase {
     targetSkew = photonTable.getEntry("Photonvision Target Skew");
     targetDistance = photonTable.getEntry("Photonvision Target Distance");
 
+    targetYaw.setDouble(0d);
+    targetPitch.setDouble(0d);
+    targetArea.setDouble(0d);
+    targetSkew.setDouble(0d);
+    targetDistance.setDouble(0d);
+
   }
 
   private double getHubDistance(double pitch) {
