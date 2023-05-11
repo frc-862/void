@@ -1,6 +1,7 @@
 package com.lightningrobotics.voidrobot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.lightningrobotics.common.logging.DataLogger;
@@ -37,6 +38,9 @@ public class ClimbArms extends SubsystemBase {
 		//set arm inverts
 		leftArm.setInverted(false);
 		rightArm.setInverted(true);
+
+		leftArm.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10d, 10d, 10d));
+		rightArm.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10d, 10d, 10d));
 
 		resetEncoders();
 		setGains();

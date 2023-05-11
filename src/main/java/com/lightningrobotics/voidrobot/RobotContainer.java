@@ -15,6 +15,8 @@ import com.lightningrobotics.voidrobot.commands.ZeroTurretHood;
 import com.lightningrobotics.voidrobot.commands.auto.paths.FiveBallTerminal;
 import com.lightningrobotics.voidrobot.commands.auto.paths.OneBall;
 import com.lightningrobotics.voidrobot.commands.auto.paths.TwoBall;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsDownLimit;
+import com.lightningrobotics.voidrobot.commands.climber.arms.ArmsUpLimit;
 import com.lightningrobotics.voidrobot.commands.climber.pivot.MoveBothPivots;
 import com.lightningrobotics.voidrobot.commands.demo.DemoIndexer;
 import com.lightningrobotics.voidrobot.commands.demo.DemoIntake;
@@ -70,6 +72,7 @@ public class RobotContainer extends LightningContainer {
 	private static final Indexer indexer = new Indexer();
 	private static final Intake intake = new Intake();
     private static final Hood hood = new Hood();
+    private static final ClimbArms arms = new ClimbArms();
 	// private static final LEDs leds = new LEDs();
                                             
 	// Joysticks
@@ -136,6 +139,9 @@ public class RobotContainer extends LightningContainer {
                 new InstantCommand(() -> targeting.setTargetTurretAngle(turret.getCurrentAngle().getDegrees())),
                 new InstantCommand(targeting::resetForGyro),
                 new AimTurret(turret, targeting)));
+
+        (new POVButton(copilot, 0)).whileHeld(new ArmsUpLimit(arms), true);
+        (new POVButton(copilot, 180)).whileHeld(new ArmsDownLimit(arms), true);
 
         // COPILOT
         // (new Trigger(() -> copilot.getRightTriggerAxis() > 0.03)).whenActive(new RunIntake(intake, () -> copilot.getRightTriggerAxis())); //RT: run collector in

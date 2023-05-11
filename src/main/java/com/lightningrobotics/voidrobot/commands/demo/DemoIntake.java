@@ -19,7 +19,9 @@ public class DemoIntake extends CommandBase {
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+        intake.actuateIntake(1d);
+    }
     @Override
     public void execute() {
         intake.setPower(power.getAsDouble());
@@ -28,6 +30,7 @@ public class DemoIntake extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         intake.stop();
+        intake.actuateIntake(-1d);
     }
 
     @Override
